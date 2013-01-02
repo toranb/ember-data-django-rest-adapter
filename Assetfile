@@ -1,0 +1,20 @@
+require 'json'
+require 'rake-pipeline-web-filters'
+
+output 'dist'
+input 'packages' do
+
+  match '*/lib/adapter.js' do
+    if ENV['RAKEP_MODE'] == 'production'
+      uglify
+    end
+    concat ['adapter.js'], 'adapter.js'
+  end
+  match '*/lib/serializer.js' do
+    if ENV['RAKEP_MODE'] == 'production'
+      uglify
+    end
+    concat ['serializer.js'], 'adapter.js'
+  end
+
+end
