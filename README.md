@@ -62,14 +62,14 @@ i) The adapter assumes you have 2 different endpoints per django model
 ii) The above might have a urls.py something like the below
 
     urlpatterns = patterns('',
-        url(r'^/(?P<pk>\d+)$', csrf_exempt(Person.as_view())),
-        url(r'^$', csrf_exempt(People.as_view())),
+        url(r'^/people/(?P<pk>\d+)$', csrf_exempt(Person.as_view())),
+        url(r'^/people$', csrf_exempt(People.as_view())),
     )
 
 
 
 ## Contributing
-This is the adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
+This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
 
 ## Unit tests
 
