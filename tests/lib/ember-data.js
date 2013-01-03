@@ -1429,7 +1429,7 @@ DS.Store = Ember.Object.extend(DS._Mappable, {
     method) or when the data underlying an existing relationship
     changes (via the `fetchUnloadedReferences` method).
   */
-  fetchMany: function(type, references) {
+  fetchMany: function(type, references, parent) {
     if (!references.length) { return; }
 
     var ids = map(references, function(reference) {
@@ -1437,7 +1437,7 @@ DS.Store = Ember.Object.extend(DS._Mappable, {
     });
 
     var adapter = this.adapterForType(type);
-    if (adapter && adapter.findMany) { adapter.findMany(this, type, ids); }
+    if (adapter && adapter.findMany) { adapter.findMany(this, type, ids, parent); }
     else { throw "Adapter is either null or does not implement `findMany` method"; }
   },
 
@@ -1538,7 +1538,7 @@ DS.Store = Ember.Object.extend(DS._Mappable, {
         }
       }
 
-      this.fetchMany(type, neededReferences);
+      this.fetchMany(type, neededReferences, record);
     } else {
       // all requested records are available
       manyArray.set('isLoaded', true);
