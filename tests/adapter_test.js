@@ -6,7 +6,7 @@ var Role, role, roles;
 var Group, group;
 var Task, task;
 
-var REVISION = 10; //ember-data revision
+var REVISION = 11; //ember-data revision
 
 module("DjangoRESTAdapter", {
   setup: function() {
@@ -122,7 +122,7 @@ test("creating a person makes a POST to /people, with the data hash", function()
 
   expectUrl("/people", "the collection is the same as the model name");
   expectType("POST");
-  expectData({ name: "Tom Dale" });
+  expectData({ name: "Tom Dale", tasks: [] });
 
   ajaxHash.success({ id: 1, name: "Tom Dale" });
   expectState('saving', false);
@@ -228,19 +228,15 @@ test("finding a person by ID makes a GET to /people/:id", function() {
   equal(person, store.find(Person, 1), "the record is now in the store, and can be looked up by ID without another Ajax request");
 });
 
-test("if you specify do not set a namespace then it will not be prepended onto all URLs", function() {
+test("if you do not set a namespace then it will not be prepended", function() {
   person = store.find(Person, 1);
   expectUrl("/people/1", "the namespace, followed by by the plural of the model name and the id");
-
-  store.load(Person, 1);
 });
 
 test("if you specify a namespace then it is prepended onto all URLs", function() {
   set(adapter, 'namespace', 'codecamp');
   person = store.find(Person, 1);
   expectUrl("/codecamp/people/1", "the namespace, followed by by the plural of the model name and the id");
-
-  store.load(Person, 1);
 });
 
 test("creating an item with a belongsTo relationship urlifies the Resource URI (default key)", function() {
@@ -336,8 +332,7 @@ test("creating an item and adding hasMany relationships parses the Resource URI 
 
   expectUrl('/groups', 'create Group URL');
   expectType("POST");
-  expectData({name: "Team" });
-  //expectData({name: "Team", people: [] }); //notice we do not get an empty array back
+  expectData({name: "Team", people: [] });
 
   ajaxHash.success({ id: 1, name: "Team", people: [] }, Group);
 
