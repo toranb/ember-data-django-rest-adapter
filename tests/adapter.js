@@ -104,6 +104,14 @@
             jQuery.ajax(hash);
         },
 
+        buildURL: function(record, suffix) {
+            var url = this._super(record, suffix);
+            if (url.charAt(url.length -1) !== '/') {
+                url += '/';
+            }
+            return url;
+        },
+
         buildFindManyUrlWithParent: function(store, type, ids, parent) {
             if (!parent) {
                 Ember.assert("You need to add belongsTo for type (" + type + "). No Parent for this record was found");
@@ -122,9 +130,9 @@
             var parent_key = record['parent_key'] || record.get('parent_key');
             var parent_value = record['parent_value'] || record.get('parent_value');
             if (parent_key && parent_value) {
-                var endpoint = url.split('/').reverse()[0];
+                var endpoint = url.split('/').reverse()[1];
                 var parent_plural = this.pluralize(parent_key);
-                url = url.replace(endpoint, parent_plural + "/" + parent_value + "/" + endpoint + "/");
+                url = url.replace(endpoint, parent_plural + "/" + parent_value + "/" + endpoint);
             }
             return url;
         }

@@ -62,8 +62,8 @@ i) The adapter assumes you have 2 different endpoints per django model
 ii) The above might have a urls.py something like the below
 
     urlpatterns = patterns('',
-        url(r'^/people/(?P<pk>\d+)$', csrf_exempt(Person.as_view())),
-        url(r'^/people$', csrf_exempt(People.as_view())),
+        url(r'^/people/(?P<pk>\d+)/$', csrf_exempt(Person.as_view())),
+        url(r'^/people/$', csrf_exempt(People.as_view())),
     )
 
 

@@ -58,8 +58,7 @@ module("DjangoRESTAdapter", {
     };
 
     Role = DS.Model.extend({
-      name: DS.attr('string'),
-      primaryKey: '_id'
+      name: DS.attr('string')
     });
 
     Role.toString = function() {
@@ -96,320 +95,269 @@ var expectData = function(hash) {
   deepEqual(hash, ajaxHash.data, "the hash was passed along");
 };
 
-var expectState = function(state, value, p) {
-  p = p || person;
-
-  if (value === undefined) { value = true; }
-
+var expectStateForInstance = function(state, value, model) {
   var flag = "is" + state.charAt(0).toUpperCase() + state.substr(1);
-  equal(get(p, flag), value, "the person is " + (value === false ? "not " : "") + state);
+  equal(get(model, flag), value, "the model is " + (value === false ? "not " : "") + state);
 };
 
-var expectStates = function(state, value) {
-  people.forEach(function(person) {
-    expectState(state, value, person);
-  });
+var expectUrlTypeData = function(url, desc, type, hash) {
+  expectUrl(url, desc);
+  expectType(type);
+  expectData(hash);
 };
 
-test("creating a person makes a POST to /people, with the data hash", function() {
-  set(adapter, 'bulkCommit', false);
+var expectLoaded = function(model) {
+  expectStateForInstance('new', false, model);
+  expectStateForInstance('loaded', true, model);
+  expectStateForInstance('dirty', false, model);
+};
 
-  person = store.createRecord(Person, { name: "Tom Dale" });
+var expectNew = function(model) {
+  expectStateForInstance('new', true, model);
+  expectStateForInstance('dirty', true, model);
+};
 
-  expectState('new');
+test("creating a role makes a POST to /roles/ with the data hash", function() {
+  role = store.createRecord(Role, { name: "Admin" });
+
+  expectStateForInstance('new', true, role);
   store.commit();
-  expectState('saving');
+  expectStateForInstance('saving', true, role);
 
-  expectUrl("/people", "the collection is the same as the model name");
+  expectUrl("/roles/", "the url should be the plural of the model name");
   expectType("POST");
-  expectData({ name: "Tom Dale", tasks: [] });
+  expectData({ name: "Admin" });
 
-  ajaxHash.success({ id: 1, name: "Tom Dale" });
-  expectState('saving', false);
+  ajaxHash.success({ id: 1, name: "Admin" });
+  expectStateForInstance('saving', false, role);
 
-  person = store.find(Person, 1);
-
-  equal(person.get('name'), "Tom Dale", "it is now possible to retrieve the person by the ID supplied");
+  result = store.find(Role, 1);
+  equal(result.get('name'), "Admin", "it should now possible to retrieve the role by the id supplied");
 });
 
-test("updating a person makes a PUT to /people/:id with the data hash", function() {
-  set(adapter, 'bulkCommit', false);
+test("updating a role makes a PUT to /roles/:id/ with the data hash", function() {
+  store.load(Role, { id: 1, name: "Admin" });
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-  store.load(Person, { id: 1, name: "Yehuda Katz" });
+  role = store.find(Role, 1);
+  expectLoaded(role);
 
-  person = store.find(Person, 1);
+  set(role, 'name', "Developer");
 
-  expectState('new', false);
-  expectState('loaded');
-  expectState('dirty', false);
-
-  set(person, 'name', "Brohuda Brokatz");
-
-  expectState('dirty');
+  expectStateForInstance('dirty', true, role);
   store.commit();
-  expectState('saving');
+  expectStateForInstance('saving', true, role);
 
-  expectUrl("/people/1", "the plural of the model name with its ID");
+  expectUrl("/roles/1/", "the plural of the model name with its id");
   expectType("PUT");
 
-  ajaxHash.success({ id: 1, name: "Brohuda Brokatz" });
-  expectState('saving', false);
+  ajaxHash.success({ id: 1, name: "Developer" });
+  expectStateForInstance('saving', false, role);
 
-  person = store.find(Person, 1);
+  result = store.find(Role, 1);
 
-  equal(get(person, 'name'), "Brohuda Brokatz", "the hash should be updated");
+  equal(get(result, 'name'), "Developer", "the hash should be updated");
 });
 
+test("deleting a role makes a DELETE to /roles/:id/", function() {
+  store.load(Role, { id: 1, name: "Admin" });
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-test("updates are not required to return data", function() {
-  set(adapter, 'bulkCommit', false);
+  role = store.find(Role, 1);
 
-  store.load(Person, { id: 1, name: "Yehuda Katz" });
+  expectLoaded(role);
+
+  role.deleteRecord();
+
+  expectStateForInstance('dirty', true, role);
+  expectStateForInstance('deleted', true, role);
+  store.commit();
+  expectStateForInstance('saving', true, role);
+
+  expectUrl("/roles/1/", "the plural of the model name with its id");
+  expectType("DELETE");
+
+  expectStateForInstance('deleted', true, role);
+});
+
+test("finding a role by ID makes a GET to /roles/:id/", function() {
+  role = store.find(Role, 1);
+
+  expectStateForInstance('loaded', false, role);
+  expectUrl("/roles/1/", "the plural of the model name with the id requested");
+  expectType("GET");
+
+  ajaxHash.success({ id: 1, name: "Admin" });
+
+  expectLoaded(role);
+
+  equal(role, store.find(Role, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
+});
+
+test("creating a task with associated person should invoke http post using the correct form data and url", function() {
+  store.load(Person, {id: 2, name: "Toran Billups"});
+  person = store.find(Person, 2);
+  expectLoaded(person);
+
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+
+  task = Task.createRecord({name: "Todo", owner: person});
+  expectNew(task);
+
+  store.commit();
+
+  expectUrlTypeData('/owners/2/tasks/', 'create URL', 'POST', { name: "Todo", owner: "2" });
+
+  ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
+  expectLoaded(task);
+});
+
+test("creating a person makes a POST to /people/ with the data hash", function() {
+  person = store.createRecord(Person, { name: "Toran" });
+
+  expectStateForInstance('new', true, person);
+  store.commit();
+  expectStateForInstance('saving', true, person);
+
+  expectUrl("/people/", "the url should be the plural of the model name");
+  expectType("POST");
+  expectData({ name: "Toran", tasks: [] });
+
+  ajaxHash.success({ id: 1, name: "Toran", tasks: [] });
+  expectStateForInstance('saving', false, person);
+
+  result = store.find(Person, 1);
+  equal(result.get('name'), "Toran", "it should now possible to retrieve the person by the id supplied");
+});
+
+test("updating a person makes a PUT to /people/:id/ with the data hash", function() {
+  store.load(Person, { id: 1, name: "Toran" });
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
   person = store.find(Person, 1);
+  expectLoaded(person);
 
-  expectState('new', false);
-  expectState('loaded');
-  expectState('dirty', false);
+  set(person, 'name', "Joel");
 
-  set(person, 'name', "Brohuda Brokatz");
-
-  expectState('dirty');
+  expectStateForInstance('dirty', true, person);
   store.commit();
-  expectState('saving');
+  expectStateForInstance('saving', true, person);
 
-  expectUrl("/people/1", "the plural of the model name with its ID");
+  expectUrl("/people/1/", "the plural of the model name with its id"); //add trailing slash
   expectType("PUT");
 
-  ajaxHash.success();
-  expectState('saving', false);
+  ajaxHash.success({ id: 1, name: "Joel", tasks: [] });
+  expectStateForInstance('saving', false, person);
 
-  equal(person, store.find(Person, 1), "the same person is retrieved by the same ID");
-  equal(get(person, 'name'), "Brohuda Brokatz", "the data is preserved");
+  result = store.find(Person, 1);
+
+  equal(get(result, 'name'), "Joel", "the hash should be updated");
 });
 
-test("deleting a person makes a DELETE to /people/:id", function() {
-  set(adapter, 'bulkCommit', false);
-
-  store.load(Person, { id: 1, name: "Tom Dale" });
+test("deleting a person makes a DELETE to /people/:id/", function() {
+  store.load(Person, { id: 1, name: "Toran" });
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
   person = store.find(Person, 1);
 
-  expectState('new', false);
-  expectState('loaded');
-  expectState('dirty', false);
+  expectLoaded(person);
 
   person.deleteRecord();
 
-  expectState('dirty');
-  expectState('deleted');
+  expectStateForInstance('dirty', true, person);
+  expectStateForInstance('deleted', true, person);
   store.commit();
-  expectState('saving');
+  expectStateForInstance('saving', true, person);
 
-  expectUrl("/people/1", "the plural of the model name with its ID");
+  expectUrl("/people/1/", "the plural of the model name with its id"); //add trailing slash
   expectType("DELETE");
 
-  ajaxHash.success();
-  expectState('deleted');
+  expectStateForInstance('deleted', true, person);
 });
 
-test("finding a person by ID makes a GET to /people/:id", function() {
+test("finding a person by id makes a GET to /people/:id/", function() {
   person = store.find(Person, 1);
 
-  expectState('loaded', false);
-  expectUrl("/people/1", "the plural of the model name with the ID requested");
+  expectStateForInstance('loaded', false, person);
+  expectUrl("/people/1/", "the plural of the model name with the id requested"); //add slash
   expectType("GET");
 
-  ajaxHash.success({ id: 1, name: "Yehuda Katz" });
+  ajaxHash.success({ id: 1, name: "Toran", tasks: [] });
 
-  expectState('loaded');
-  expectState('dirty', false);
-
-  equal(person, store.find(Person, 1), "the record is now in the store, and can be looked up by ID without another Ajax request");
+  expectLoaded(person);
+  equal(person, store.find(Person, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
 });
 
-test("if you do not set a namespace then it will not be prepended", function() {
-  person = store.find(Person, 1);
-  expectUrl("/people/1", "the namespace, followed by by the plural of the model name and the id");
-});
+test("finding all people makes a GET to /people/", function() {
+  store.load(Person, {id: 2, name: "Toran", tasks: []});
+  store.load(Person, {id: 3, name: "Joel", tasks: []});
 
-test("if you specify a namespace then it is prepended onto all URLs", function() {
-  set(adapter, 'namespace', 'codecamp');
-  person = store.find(Person, 1);
-  expectUrl("/codecamp/people/1", "the namespace, followed by by the plural of the model name and the id");
-});
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-test("creating an item with a belongsTo relationship urlifies the Resource URI (default key)", function() {
-  store.load(Person, {id: 1, name: "Maurice Moss"});
-  person = store.find(Person, 1);
+  people = store.find(Person);
+  equal(get(people, 'length'), 2, "there are two people");
 
-  expectState('new', false);
-  expectState('loaded');
-  expectState('dirty', false);
-
-  task = Task.createRecord({name: "Get a bike!"});
-
-  expectState('new', true, task);
-  expectState('dirty', true, task);
-
-  set(task, 'owner', person);
-
-  store.commit();
-
-  expectUrl('/owners/1/tasks/', 'create URL');
-  expectType("POST");
-  expectData({ name: "Get a bike!", owner: "1"});
-
-  ajaxHash.success({ id: 1, name: "Get a bike!", owner_id: "/people/1"}, Task);
-
-});
-
-test("creating an item with a belongsTo relationship urlifies the Resource URI (custom key)", function() {
-
-  var adapter, Adapter, task;
-
-  Adapter = DS.DjangoRESTAdapter.extend({
-    ajax: function(url, type, hash) {
-      var success = hash.success, self = this;
-
-      ajaxUrl = url;
-      ajaxType = type;
-      ajaxHash = hash;
-
-      if (success) {
-        hash.success = function(json, type) {
-          success.call(self, json);
-        };
-      }
-    }
-
-  });
-
-  Adapter.map('Task', {
-    owner: {key: 'owner_custom_key'}
-  });
-
-  adapter = Adapter.create();
-  store.set('adapter', adapter);
-
-  store.load(Person, {id: 1, name: "Maurice Moss"});
-  person = store.find(Person, 1);
-
-  task = Task.createRecord({name: "Get a bike!"});
-
-  task.set('owner', person);
-
-  store.commit();
-
-  expectUrl('/owners/1/tasks/', 'create URL');
-  expectType("POST");
-  expectData({ name: "Get a bike!", owner_custom_key: "1"});
-
-  ajaxHash.success({ id: 1, name: "Get a bike!", owner: "/people/1"}, Task);
-
-});
-
-test("creating an item and adding hasMany relationships parses the Resource URI (default key)", function() {
-
-  Person = DS.Model.extend({
-    name: DS.attr('string'),
-    group: DS.belongsTo('Group')
-  });
-  Person.toString = function() {
-    return "Person";
-  };
-
-  equal(true, true);
-  store.load(Person, {id: 1, name: "Maurice Moss"});
-  store.load(Person, {id: 2, name: "Roy"});
-
-  var moss = store.find(Person, 1);
-  var roy = store.find(Person, 2);
-
-  group = Group.createRecord({name: "Team"});
-
-  store.commit();
-
-  expectUrl('/groups', 'create Group URL');
-  expectType("POST");
-  expectData({name: "Team", people: [] });
-
-  ajaxHash.success({ id: 1, name: "Team", people: [] }, Group);
-
-  group = store.find(Group, 1);
-
-  group.get('people').pushObject(moss);
-  group.get('people').pushObject(roy);
-
-  store.commit();
-
-  // HasMany updates through the belongsTo component
-  expectUrl('/people/2', 'modify Group URL');
-  expectType("PUT");
-  expectData({name: "Roy", group: '1' });
-
-});
-
-test("findMany generates a django-rest style url that requires the parent record", function() {
-  var adapter = store.get('adapter');
-
-  store.load(Person, {id: 1, name: "Maurice Moss"});
-  store.load(Person, {id: 2, name: "Toran Billups"});
-  var firstPerson = store.find(Person, 1);
-  var lastPerson = store.find(Person, 2);
-
-  store.load(Group, {id: 1, name: "Maurice Moss", people: [firstPerson, lastPerson]});
-  var parent = store.find(Group, 1);
-
-  adapter.findMany(store, Person, [1,2], parent);
-  expectUrl("/groups/1/people/");
+  expectUrl("/people/", "the plural of the model"); //add slash
   expectType("GET");
 });
 
-test("finding many people by a list of IDs", function() {
-  store.load(Group, { id: 1, people: [
-    "/people/1",
-    "/people/2",
-    "/people/3"
-  ]});
+test("findMany generates http get request to fetch one-to-many relationship with the correct url", function() {
+  store.load(Person, {id: 9, name: "Toran Billups", tasks: [1, 2]});
+  person = store.find(Person, 9);
+  expectLoaded(person);
 
-  var group = store.find(Group, 1);
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+
+  var tasks = get(person, 'tasks');
+
+  equal(get(tasks, 'length'), 2, "there are two tasks in the association already");
+  tasks.forEach(function(task) {
+    equal(get(task, 'isLoaded'), false, "the task is being loaded");
+  });
+
+  expectUrl("/people/9/tasks/");
+  expectType("GET");
+
+  ajaxHash.success([{"id": 1, "name": "Todo", "person": 9}, {"id": 2, "name": "Done", "person": 9}]);
+
+  equal(get(tasks, 'length'), 2, "there are still two tasks in the association");
+  tasks.forEach(function(task) {
+    expectLoaded(task);
+  });
+  equal(get(tasks.objectAt(0), 'name'), 'Todo');
+  equal(get(tasks.objectAt(1), 'name'), 'Done');
+});
+
+test("findMany generates http get request to fetch m2m relationship with the correct url", function() {
+  store.load(Group, {id: 9, name: "Admin", people: [1, 2, 3]});
+  group = store.find(Group, 9);
+  expectLoaded(group);
 
   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
   var people = get(group, 'people');
 
   equal(get(people, 'length'), 3, "there are three people in the association already");
-
   people.forEach(function(person) {
     equal(get(person, 'isLoaded'), false, "the person is being loaded");
   });
 
-  expectUrl("/groups/1/people/");
+  expectUrl("/groups/9/people/");
   expectType("GET");
 
-  ajaxHash.success({"objects":
-    [
-      { id: 1, name: "Rein Heinrichs" },
-      { id: 2, name: "Tom Dale" },
-      { id: 3, name: "Yehuda Katz" }
-    ]}
-  );
+  ajaxHash.success([{"id": 1, "name": "Toran"}, {"id": 2, "name": "Joel"}, {"id": 3, "name": "Matt"}]);
 
-  //todo why are these objects empty when se use objectAt ?
-  // var rein = people.objectAt(0);
-  // equal(get(rein, 'name'), "Rein Heinrichs");
-  // equal(get(rein, 'id'), 1);
+  equal(get(people, 'length'), 3, "there are still three people in the association");
+  people.forEach(function(person) {
+    expectLoaded(person);
+  });
+  equal(get(people.objectAt(0), 'name'), 'Toran');
+  equal(get(people.objectAt(1), 'name'), 'Joel');
+  equal(get(people.objectAt(2), 'name'), 'Matt');
+});
 
-  // var tom = people.objectAt(1);
-  // equal(get(tom, 'name'), "Tom Dale");
-  // equal(get(tom, 'id'), 2);
-
-  // var yehuda = people.objectAt(2);
-  // equal(get(yehuda, 'name'), "Yehuda Katz");
-  // equal(get(yehuda, 'id'), 3);
-
-  // people.forEach(function(person) {
-  //   equal(get(person, 'isLoaded'), true, "the person is being loaded");
-  // });
+test("if you set a namespace then it will be prepended", function() {
+  set(adapter, 'namespace', 'codecamp');
+  role = store.find(Role, 1);
+  expectUrl("/codecamp/roles/1/", "the namespace, followed by by the plural of the model name and the id");
 });
