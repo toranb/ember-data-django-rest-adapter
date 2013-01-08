@@ -198,9 +198,10 @@ DS.ManyArray = DS.RecordArray.extend({
   fetch: function() {
     var references = get(this, 'content'),
         store = get(this, 'store'),
-        type = get(this, 'type');
+        type = get(this, 'type')
+        parent = get(this, 'owner');
 
-    store.fetchUnloadedReferences(type, references);
+    store.fetchUnloadedReferences(type, references, parent);
   },
 
   // Overrides Ember.Array's replace method to implement
@@ -1413,9 +1414,9 @@ DS.Store = Ember.Object.extend(DS._Mappable, {
     then converts the needed `clientId`s to IDs and invokes `findMany`
     on the adapter.
   */
-  fetchUnloadedReferences: function(type, references) {
+  fetchUnloadedReferences: function(type, references, parent) {
     var neededReferences = this.neededReferences(type, references);
-    this.fetchMany(type, neededReferences);
+    this.fetchMany(type, neededReferences, parent);
   },
 
   /**
