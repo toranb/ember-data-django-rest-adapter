@@ -92,16 +92,10 @@ Go to http://localhost:8000/tests/ to run the Qunit tests.
 Until ember.js and ember-data reach 1.0 a tag will be added with each new revision starting at 10
 
 ## Pending Issues
-This adapter requires a minor change to the core ember-data library to include a parent record for findMany.
-
-What this means for anyone using it right now is that your basic ember-data script won't work. Use the custom ember-data js file found in tests/lib
-
-This should be resolved / added with a pull request that is still pending
-
-https://github.com/emberjs/data/issues/573
+This adapter does not currently support the hypermedia side of the django-rest-framework. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
 
 ## Examples
-An example project is in the works, until this is added as part of this repository checkout my other ember-code-camp example
+An example project that shows the adapter in action with 1-to-many and m2m relationships can be found at the below
 
 https://github.com/toranb/ember-code-camp
 
