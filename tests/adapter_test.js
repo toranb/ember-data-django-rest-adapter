@@ -14,10 +14,9 @@ module("DjangoRESTAdapter", {
     ajaxType = undefined;
     ajaxHash = undefined;
 
+    DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
+
     adapter = DS.DjangoRESTAdapter.create({
-      plurals: {
-        person: 'people'
-      },
       ajax: function(url, type, hash) {
         var success = hash.success, self = this;
 
@@ -221,7 +220,7 @@ test("creating a person makes a POST to /people/ with the data hash", function()
 
   expectUrl("/people/", "the url should be the plural of the model name");
   expectType("POST");
-  expectData({ name: "Toran", tasks: [] });
+  expectData({ name: "Toran" });
 
   ajaxHash.success({ id: 1, name: "Toran", tasks: [] });
   expectStateForInstance('saving', false, person);
