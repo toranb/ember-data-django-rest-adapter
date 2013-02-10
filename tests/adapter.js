@@ -81,6 +81,22 @@
             });
         },
 
+        findQuery: function(store, type, query, recordArray) {
+            var json = {}
+            , root = this.rootForType(type)
+            , plural = this.pluralize(root);
+
+            this.ajax(this.buildURL(root), "GET", {
+                data: query,
+                success: function(pre_json) {
+                    json[plural] = pre_json;
+                    Ember.run(this, function(){
+                        this.didFindQuery(store, type, json, recordArray);
+                    });
+                }
+            });
+        },
+
         find: function(store, type, id) {
             var json = {}
             , root = this.rootForType(type);

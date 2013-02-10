@@ -300,6 +300,17 @@ test("finding all people makes a GET to /people/", function() {
   expectType("GET");
 });
 
+test("finding a person by name uses findQuery", function() {
+  store.load(Person, {id: 2, name: "Toran", tasks: []});
+  store.load(Person, {id: 3, name: "Joel", tasks: []});
+
+  people = store.find(Person, {name: 'Toran'});
+
+  expectUrl("/people/", "object name plural");
+  expectData({name: 'Toran'})
+  expectType("GET");
+});
+
 test("findMany generates http get request to fetch one-to-many relationship with the correct url", function() {
   store.load(Person, {id: 9, name: "Toran Billups", tasks: [1, 2]});
   person = store.find(Person, 9);
