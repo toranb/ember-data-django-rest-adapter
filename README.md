@@ -40,6 +40,13 @@ Creating with a custom plural dictionary that will be used when a custom plural 
         revision: 11,
         adapter: DS.DjangoRESTAdapter.create()
       });
+	  
+Filtering is also supported (see further on how to configure the django side):
+
+	App.Person = DS.Model.extend({
+	    name: DS.attr('string')
+	})
+	var person = App.Person.find({name: 'Toran'})
 
 #### python/django side
 This project requires the django-rest-framework 2.x branch (specifically 2.1.14 or newer)
