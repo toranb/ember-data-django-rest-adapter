@@ -40,7 +40,13 @@ Creating with a custom plural dictionary that will be used when a custom plural 
         revision: 11,
         adapter: DS.DjangoRESTAdapter.create()
       });
+	  
+Filtering is also supported (see further on how to configure the django side):
 
+	App.Person = DS.Model.extend({
+	    name: DS.attr('string')
+	})
+	var person = App.Person.find({name: 'Toran'})
 
 #### python/django side
 This project requires the django-rest-framework 2.x branch (specifically 2.1.14 or newer)
@@ -64,6 +70,12 @@ ii) The above might have a urls.py something like the below
     )
 
 
+##### filtering
+The adapter supports filtering, but by django-rest-framework has turned 
+filtering off by default. Please refer to [Generic Filtering][filtering] for
+more information about setting up filtering.
+
+[filtering]: http://django-rest-framework.org/api-guide/filtering.html#generic-filtering
 
 ## Contributing
 This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
