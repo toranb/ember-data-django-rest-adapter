@@ -40,13 +40,7 @@ Creating with a custom plural dictionary that will be used when a custom plural 
         revision: 11,
         adapter: DS.DjangoRESTAdapter.create()
       });
-	  
-Filtering is also supported (see further on how to configure the django side):
 
-	App.Person = DS.Model.extend({
-	    name: DS.attr('string')
-	})
-	var person = App.Person.find({name: 'Toran'})
 
 #### python/django side
 This project requires the django-rest-framework 2.x branch (specifically 2.1.14 or newer)
@@ -70,10 +64,38 @@ ii) The above might have a urls.py something like the below
     )
 
 
-##### filtering
-The adapter supports filtering, but by django-rest-framework has turned 
-filtering off by default. Please refer to [Generic Filtering][filtering] for
-more information about setting up filtering.
+## Filtering Support
+This adapter supports basic query string filtering
+
+On the client side you would apply a filter using the ember-data find api
+
+	App.Person = DS.Model.extend({
+	    name: DS.attr('string')
+	});
+	var person = App.Person.find({name: 'Toran'});
+
+On the server side you first need to add the django-filter dependency
+
+    pip install django-filter
+
+Next you need to add a setting to tell the django-rest-framework that you intend to use this dependency as your filter backend
+
+    REST_FRAMEWORK = {
+        'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend'
+    }
+
+Now you can apply the filter to your ListView or ListCreateAPIView
+
+    class PersonList(generics.ListCreateAPIView):
+        model = Person
+        serializer_class = serializers.PersonSerializer
+        filter_fields = ['name']
+
+If you have this setup correctly you should see an ajax request that looks something like the below
+
+    http://localhost:8000/codecamp/people/?name=Toran
+
+To learn more about the filtering options available in the django-rest-framework, please refer to the [api-guide][filtering]
 
 [filtering]: http://django-rest-framework.org/api-guide/filtering.html#generic-filtering
 
@@ -104,9 +126,9 @@ Until ember.js and ember-data reach 1.0 a tag will be added with each new revisi
 This adapter does not currently support the hypermedia side of the django-rest-framework. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
 
 ## Examples
-An example project that shows the adapter in action with 1-to-many and m2m relationships can be found at the below
+An example project that shows the adapter in action with 1-to-many and m2m relationships + filtering can be found below
 
-https://github.com/toranb/ember-code-camp
+https://github.com/toranb/complex-ember-data-example.git
 
 ## Credits
 I took a large part of this project (including the motivation) from @escalant3 and his tastypie adapter
