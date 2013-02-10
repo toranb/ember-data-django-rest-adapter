@@ -49,30 +49,30 @@ i) The adapter assumes you have 2 different endpoints per django model
 
     class People(generics.ListCreateAPIView):
         model = Person
-        serializer_class = resources.PersonSerializer
+        serializer_class = PersonSerializer
 
     class Person(generics.RetrieveUpdateDestroyAPIView):
         model = Person
-        serializer_class = resources.PersonSerializer
+        serializer_class = PersonSerializer
 
 
 ii) The above might have a urls.py something like the below
 
     urlpatterns = patterns('',
-        url(r'^/people/(?P<pk>\d+)/$', csrf_exempt(Person.as_view())),
-        url(r'^/people/$', csrf_exempt(People.as_view())),
+        url(r'^/people/(?P<pk>\d+)/$', Person.as_view()),
+        url(r'^/people/$', People.as_view()),
     )
 
 
 ## Filtering Support
 This adapter supports basic query string filtering
 
-On the client side you would apply a filter using the ember-data find api
+On the client side you would apply a filter using the ember-data find api (this returns an DS.AdapterPopulatedRecordArray)
 
 	App.Person = DS.Model.extend({
 	    name: DS.attr('string')
 	});
-	var person = App.Person.find({name: 'Toran'});
+	var people = App.Person.find({name: 'Toran'});
 
 On the server side you first need to add the django-filter dependency
 
@@ -84,11 +84,11 @@ Next you need to add a setting to tell the django-rest-framework that you intend
         'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend'
     }
 
-Now you can apply the filter to your ListView or ListCreateAPIView
+Now you can apply the filter to your ListAPIView or ListCreateAPIView
 
-    class PersonList(generics.ListCreateAPIView):
+    class People(generics.ListCreateAPIView):
         model = Person
-        serializer_class = serializers.PersonSerializer
+        serializer_class = PersonSerializer
         filter_fields = ['name']
 
 If you have this setup correctly you should see an ajax request that looks something like the below
@@ -126,7 +126,7 @@ Until ember.js and ember-data reach 1.0 a tag will be added with each new revisi
 This adapter does not currently support the hypermedia side of the django-rest-framework. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
 
 ## Examples
-An example project that shows the adapter in action with 1-to-many and m2m relationships + filtering can be found below
+An example project that shows the adapter in action can be found below
 
 https://github.com/toranb/complex-ember-data-example.git
 
