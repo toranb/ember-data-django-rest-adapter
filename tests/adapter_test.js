@@ -371,3 +371,17 @@ test("if you set a namespace then it will be prepended", function() {
   role = store.find(Role, 1);
   expectUrl("/codecamp/roles/1/", "the namespace, followed by by the plural of the model name and the id");
 });
+
+test('ajax request made with cache set to false for ie users', function () {
+  var options = null;
+  jQuery.ajax = function (hash) {
+      options = hash;
+  };
+  adapter = DS.DjangoRESTAdapter.create();
+  adapter.ajax('/some/url/', 'GET', {'foo':'bar'});
+  equal(options['url'], '/some/url/');
+  equal(options['type'], 'GET');
+  equal(options['dataType'], 'json');
+  equal(options['foo'], 'bar');
+  equal(options['cache'], false);
+});

@@ -114,6 +114,7 @@
         ajax: function(url, type, hash) {
             hash.url = url;
             hash.type = type;
+            hash.cache = false;
             hash.dataType = 'json';
             hash.context = this;
 
