@@ -152,8 +152,21 @@
                 url = url.replace(endpoint, parent_plural + "/" + parent_value + "/" + endpoint);
             }
             return url;
-        }
+        },
 
+        /**
+         * RESTAdapter expects HTTP 422 for invalid records and a JSON response
+         * with errors inside JSON root `errors`, however DRF uses 400
+         * and errors without a JSON root.
+         */
+        didError: function(store, type, record, xhr) {
+            if (xhr.status === 400) {
+                var data = JSON.parse(xhr.responseText)
+                store.recordWasInvalid(record, data)
+            } else {
+                this._super.apply(this, arguments)
+            }
+        }
     });
 
 })();
