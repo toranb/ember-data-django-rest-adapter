@@ -152,8 +152,43 @@
                 url = url.replace(endpoint, parent_plural + "/" + parent_value + "/" + endpoint);
             }
             return url;
-        }
+        },
 
+        /**
+          RESTAdapter expects HTTP 422 for invalid records and a JSON response
+          with errors inside JSON root `errors`, however DRF uses 400
+          and errors without a JSON root.
+        */
+        didError: function(store, type, record, xhr) {
+            if (xhr.status === 400) {
+                var data = JSON.parse(xhr.responseText)
+                var errors = {}
+
+                // Convert error key names
+                // https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/store.js#L1010-L1012
+                record.eachAttribute(function(name) {
+                    var attr = this.serializer.keyForAttributeName(type, name);
+                    if (attr in data) {
+                        errors[name] = data[attr];
+                    }
+                }, this);
+                record.eachRelationship(function(name, relationship) {
+                    var attr = null;
+                    if (relationship.kind == 'belongsTo') {
+                        attr = this.serializer.keyForBelongsTo(type, name);
+                    } else {
+                        attr = this.serializer.keyForHasMany(type, name);
+                    }
+                    if (attr in data) {
+                        errors[name] = data[attr];
+                    }
+                }, this);
+
+                store.recordWasInvalid(record, errors)
+            } else {
+                this._super.apply(this, arguments)
+            }
+        }
     });
 
 })();
