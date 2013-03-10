@@ -18,7 +18,7 @@ module("DjangoRESTAdapter", {
 
     adapter = DS.DjangoRESTAdapter.create({
       ajax: function(url, type, hash) {
-        var success = hash.success, self = this;
+        var success = hash.success, error = hash.error, self = this;
 
         ajaxUrl = url;
         ajaxType = type;
@@ -27,6 +27,11 @@ module("DjangoRESTAdapter", {
         if (success) {
           hash.success = function(json, type) {
             success.call(self, json);
+          };
+        }
+        if (error) {
+          hash.error = function(json, type) {
+            error.call(self, json);
           };
         }
       }
@@ -66,6 +71,7 @@ module("DjangoRESTAdapter", {
 
     Task = DS.Model.extend({
       name: DS.attr('string'),
+      isFinished: DS.attr('boolean'),
       owner: DS.belongsTo('Person')
     });
 
@@ -205,7 +211,7 @@ test("creating a task with associated person should invoke http post using the c
 
   store.commit();
 
-  expectUrlTypeData('/owners/2/tasks/', 'create URL', 'POST', { name: "Todo", owner: "2" });
+  expectUrlTypeData('/owners/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
 
   ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
   expectLoaded(task);
@@ -384,4 +390,25 @@ test('ajax request made with cache set to false for ie users', function () {
   equal(options['dataType'], 'json');
   equal(options['foo'], 'bar');
   equal(options['cache'], false);
+});
+
+test('validation errors should invalidate object on HTTP 400', function() {
+  task = store.createRecord(Task);
+
+  expectStateForInstance('new', true, task);
+  store.commit();
+  expectStateForInstance('saving', true, task);
+
+  ajaxHash.status = 400;
+  ajaxHash.error({status: 400, responseText: '{"owner": ["Required"],' +
+                                             ' "is_finished": ["Only finished tasks allowed"],' +
+                                             ' "name": ["Required"]}'})
+  expectStateForInstance('valid', false, task);
+  equal(task.get('stateManager.currentPath'), 'rootState.loaded.created.invalid', 'the model is in state invalid')
+
+  deepEqual(task.get('errors'), {
+    isFinished: ['Only finished tasks allowed'],
+    name: ['Required'],
+    owner: ['Required']
+  }, 'the model contains the errors')
 });
