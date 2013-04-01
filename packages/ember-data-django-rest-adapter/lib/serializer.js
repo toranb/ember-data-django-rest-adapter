@@ -3,6 +3,10 @@
 
     DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
+        keyForHasMany: function(type, name) {
+            return this.keyForAttributeName(type, name);
+        },
+
         keyForBelongsTo: function(type, name) {
             return this.keyForAttributeName(type, name);
         },

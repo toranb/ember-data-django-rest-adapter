@@ -6,7 +6,7 @@ var Role, role, roles;
 var Group, group;
 var Task, task;
 
-var REVISION = 11; //ember-data revision
+var REVISION = 12; //ember-data revision
 
 module("DjangoRESTAdapter", {
   setup: function() {
@@ -43,41 +43,46 @@ module("DjangoRESTAdapter", {
       revision: REVISION
     });
 
+    var attr = DS.attr, hasMany = DS.hasMany, belongsTo = DS.belongsTo;
     Person = DS.Model.extend({
-      name: DS.attr('string'),
-      tasks: DS.hasMany('Task')
+      name: attr('string')
+    });
+
+    Group = DS.Model.extend({
+      name: attr('string'),
+      people: hasMany(Person)
+    });
+
+    Role = DS.Model.extend({
+      name: attr('string')
+    });
+
+    Task = DS.Model.extend({
+      name: attr('string'),
+      isFinished: attr('boolean'),
+      owner: belongsTo(Person)
+    });
+
+    Person.reopen({
+      tasks: hasMany(Task)
     });
 
     Person.toString = function() {
       return "App.Person";
     };
 
-    Group = DS.Model.extend({
-      name: DS.attr('string'),
-      people: DS.hasMany('Person')
-    });
+    Role.toString = function() {
+      return "App.Role";
+    };
 
     Group.toString = function() {
       return "App.Group";
     };
 
-    Role = DS.Model.extend({
-      name: DS.attr('string')
-    });
-
-    Role.toString = function() {
-      return "App.Role";
-    };
-
-    Task = DS.Model.extend({
-      name: DS.attr('string'),
-      isFinished: DS.attr('boolean'),
-      owner: DS.belongsTo('Person')
-    });
-
     Task.toString = function() {
       return "App.Task";
     };
+
   },
 
   teardown: function() {
@@ -248,7 +253,7 @@ test("updating a person makes a PUT to /people/:id/ with the data hash", functio
   store.commit();
   expectStateForInstance('saving', true, person);
 
-  expectUrl("/people/1/", "the plural of the model name with its id"); //add trailing slash
+  expectUrl("/people/1/", "the plural of the model name with its id");
   expectType("PUT");
 
   ajaxHash.success({ id: 1, name: "Joel", tasks: [] });
@@ -302,7 +307,7 @@ test("finding all people makes a GET to /people/", function() {
   people = store.find(Person);
   equal(get(people, 'length'), 2, "there are two people");
 
-  expectUrl("/people/", "the plural of the model"); //add slash
+  expectUrl("/people/", "the plural of the model");
   expectType("GET");
 });
 
@@ -313,13 +318,14 @@ test("finding a person by name uses findQuery", function() {
   people = store.find(Person, {name: 'Toran'});
 
   expectUrl("/people/", "object name plural");
-  expectData({name: 'Toran'})
+  expectData({name: 'Toran'});
   expectType("GET");
 });
 
 test("findMany generates http get request to fetch one-to-many relationship with the correct url", function() {
-  store.load(Person, {id: 9, name: "Toran Billups", tasks: [1, 2]});
+  store.load(Person, {id: 9, name: "Toran Billups"});
   person = store.find(Person, 9);
+  store.loadHasMany(person, 'tasks', [ 1, 2 ]);
   expectLoaded(person);
 
   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
@@ -345,8 +351,9 @@ test("findMany generates http get request to fetch one-to-many relationship with
 });
 
 test("findMany generates http get request to fetch m2m relationship with the correct url", function() {
-  store.load(Group, {id: 9, name: "Admin", people: [1, 2, 3]});
+  store.load(Group, {id: 9, name: "Admin"});
   group = store.find(Group, 9);
+  store.loadHasMany(group, 'people', [ 1, 2, 3 ]);
   expectLoaded(group);
 
   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
@@ -378,6 +385,36 @@ test("if you set a namespace then it will be prepended", function() {
   expectUrl("/codecamp/roles/1/", "the namespace, followed by by the plural of the model name and the id");
 });
 
+test('serializer returns plural key without suffix for keyForHasMany method', function() {
+  var serializer = DS.DjangoRESTSerializer.create();
+  var type = Person;
+  var name = 'tasks';
+  var key = serializer.keyForHasMany(type, name);
+  equal(key, 'tasks');
+});
+
+test('serializer returns singular key without suffix for keyForBelongsTo method', function() {
+  var serializer = DS.DjangoRESTSerializer.create();
+  var type = Person;
+  var name = 'task';
+  var key = serializer.keyForBelongsTo(type, name);
+  equal(key, 'task');
+});
+
+test('serializer adds parent_key and parent_value during addBelongsTo method', function() {
+  store.load(Person, {id: 9, name: "Toran Billups"});
+  store.load(Task, {id: 1, name: "Todo", owner: 9});
+  var serializer = DS.DjangoRESTSerializer.create();
+  var hash = {};
+  var key = 'owner';
+  var relationship = {key:key};
+  var record = store.find(Task, 1);
+  serializer.addBelongsTo(hash, record, key, relationship);
+  equal(record.parent_key, 'owner');
+  equal(record.parent_value, 9);
+  equal(hash.owner, 9);
+});
+
 test('ajax request made with cache set to false for ie users', function () {
   var options = null;
   jQuery.ajax = function (hash) {
@@ -385,11 +422,11 @@ test('ajax request made with cache set to false for ie users', function () {
   };
   adapter = DS.DjangoRESTAdapter.create();
   adapter.ajax('/some/url/', 'GET', {'foo':'bar'});
-  equal(options['url'], '/some/url/');
-  equal(options['type'], 'GET');
-  equal(options['dataType'], 'json');
-  equal(options['foo'], 'bar');
-  equal(options['cache'], false);
+  equal(options.url, '/some/url/');
+  equal(options.type, 'GET');
+  equal(options.dataType, 'json');
+  equal(options.foo, 'bar');
+  equal(options.cache, false);
 });
 
 test('validation errors should invalidate object on HTTP 400', function() {
@@ -402,13 +439,13 @@ test('validation errors should invalidate object on HTTP 400', function() {
   ajaxHash.status = 400;
   ajaxHash.error({status: 400, responseText: '{"owner": ["Required"],' +
                                              ' "is_finished": ["Only finished tasks allowed"],' +
-                                             ' "name": ["Required"]}'})
+                                             ' "name": ["Required"]}'});
   expectStateForInstance('valid', false, task);
-  equal(task.get('stateManager.currentPath'), 'rootState.loaded.created.invalid', 'the model is in state invalid')
+  equal(task.get('stateManager.currentPath'), 'rootState.loaded.created.invalid', 'the model is in state invalid');
 
   deepEqual(task.get('errors'), {
     isFinished: ['Only finished tasks allowed'],
     name: ['Required'],
     owner: ['Required']
-  }, 'the model contains the errors')
+  }, 'the model contains the errors');
 });
