@@ -99,6 +99,26 @@ To learn more about the filtering options available in the django-rest-framework
 
 [filtering]: http://django-rest-framework.org/api-guide/filtering.html#generic-filtering
 
+
+## CSRF Support
+This adapter does not require you send a CSRF token with each $.ajax request
+
+If you want to send the token with each request, first add it to your html page as a meta tag
+
+    <!-- inside our page's <head> tag -->
+    <meta name="csrf-token" content="{{csrf_token}}">
+
+Next you need to add a snippet of javascript to ensure your application adds the csrf token to the http headers
+
+    <script type="text/javascript">
+      jQuery(document).ajaxSend(function(event, xhr, settings) {
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+          var token = $('meta[name="csrf-token"]').attr('content');
+          xhr.setRequestHeader("X-CSRFToken", token);
+        }
+      });
+    </script>
+
 ## Contributing
 This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
 
