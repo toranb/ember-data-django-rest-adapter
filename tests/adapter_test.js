@@ -216,10 +216,32 @@ test("creating a task with associated person should invoke http post using the c
 
   store.commit();
 
-  expectUrlTypeData('/owners/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+  expectUrlTypeData('/people/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
 
   ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
   expectLoaded(task);
+});
+
+test("creating a nested resource with nestedCommit disabled posts to the correct url", function() {
+  store.adapter.nestedCommit = false;
+
+  store.load(Person, {id: 2, name: "Toran Billups"});
+  person = store.find(Person, 2);
+  expectLoaded(person);
+
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+
+  task = Task.createRecord({name: "Todo", owner: person});
+  expectNew(task);
+
+  store.commit();
+
+  expectUrlTypeData('/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+
+  ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
+  expectLoaded(task);
+
+  store.adapter.nestedCommit = true;
 });
 
 test("creating a person makes a POST to /people/ with the data hash", function() {
@@ -407,10 +429,11 @@ test('serializer adds parent_key and parent_value during addBelongsTo method', f
   var serializer = DS.DjangoRESTSerializer.create();
   var hash = {};
   var key = 'owner';
-  var relationship = {key:key};
+  var type = Person;
+  var relationship = {key:key, type:type};
   var record = store.find(Task, 1);
   serializer.addBelongsTo(hash, record, key, relationship);
-  equal(record.parent_key, 'owner');
+  equal(record.parent_type, type);
   equal(record.parent_value, 9);
   equal(hash.owner, 9);
 });
