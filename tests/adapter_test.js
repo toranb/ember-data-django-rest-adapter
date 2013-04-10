@@ -216,33 +216,34 @@ test("creating a task with associated person should invoke http post using the c
 
   store.commit();
 
-  expectUrlTypeData('/people/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+  //expectUrlTypeData('/people/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+  expectUrlTypeData('/owners/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
 
   ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
   expectLoaded(task);
 });
 
-test("creating a nested resource with nestedCommit disabled posts to the correct url", function() {
-  store.adapter.nestedCommit = false;
+// test("creating a nested resource with nestedCommit disabled posts to the correct url", function() {
+//   store.adapter.nestedCommit = false;
 
-  store.load(Person, {id: 2, name: "Toran Billups"});
-  person = store.find(Person, 2);
-  expectLoaded(person);
+//   store.load(Person, {id: 2, name: "Toran Billups"});
+//   person = store.find(Person, 2);
+//   expectLoaded(person);
 
-  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+//   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-  task = Task.createRecord({name: "Todo", owner: person});
-  expectNew(task);
+//   task = Task.createRecord({name: "Todo", owner: person});
+//   expectNew(task);
 
-  store.commit();
+//   store.commit();
 
-  expectUrlTypeData('/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+//   expectUrlTypeData('/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
 
-  ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
-  expectLoaded(task);
+//   ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
+//   expectLoaded(task);
 
-  store.adapter.nestedCommit = true;
-});
+//   store.adapter.nestedCommit = true;
+// });
 
 test("creating a person makes a POST to /people/ with the data hash", function() {
   person = store.createRecord(Person, { name: "Toran" });
@@ -430,10 +431,10 @@ test('serializer adds parent_key and parent_value during addBelongsTo method', f
   var hash = {};
   var key = 'owner';
   var type = Person;
-  var relationship = {key:key, type:type};
+  var relationship = {key:key};
   var record = store.find(Task, 1);
   serializer.addBelongsTo(hash, record, key, relationship);
-  equal(record.parent_type, type);
+  equal(record.parent_key, 'owner');
   equal(record.parent_value, 9);
   equal(hash.owner, 9);
 });
