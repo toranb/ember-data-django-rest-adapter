@@ -10,7 +10,7 @@
             var json = {}
             , root = this.rootForType(type)
             , data  = record.serialize()
-            , url = this.buildUrlWithParentWhenAvailable(record, this.buildURL(root));
+            , url = this.getCorrectPostUrl(record, this.buildURL(root));
 
             this.ajax(url, "POST", {
                 data: data,
@@ -143,9 +143,38 @@
             return this.buildUrlWithParentWhenAvailable(record, url);
         },
 
+        getBelongsTo: function(record) {
+            var totalParents = [];
+            record.eachRelationship(function(name, relationship) {
+                if (relationship.kind == 'belongsTo') {
+                    totalParents.push(name);
+                }
+            }, this);
+            return totalParents;
+        },
+
+        getNonEmptyRelationships: function(record, totalParents) {
+            var totalHydrated = [];
+            totalParents.forEach(function(item) {
+                if (record.get(item) !== null) {
+                    totalHydrated.push(item);
+                }
+            }, this);
+            return totalHydrated;
+        },
+
+        getCorrectPostUrl: function(record, url) {
+            var totalParents = this.getBelongsTo(record);
+            var totalHydrated = this.getNonEmptyRelationships(record, totalParents);
+            if (totalParents.length > 1 && totalHydrated.length <= 1) {
+                return this.buildUrlWithParentWhenAvailable(record, url);
+            }
+            return url;
+        },
+
         buildUrlWithParentWhenAvailable: function(record, url) {
-            var parent_key = record['parent_key'] || record.get('parent_key');
-            var parent_value = record['parent_value'] || record.get('parent_value');
+            var parent_key = record.parent_key || record.get('parent_key');
+            var parent_value = record.parent_value || record.get('parent_value');
             if (parent_key && parent_value) {
                 var endpoint = url.split('/').reverse()[1];
                 var parent_plural = this.pluralize(parent_key);
@@ -161,8 +190,8 @@
         */
         didError: function(store, type, record, xhr) {
             if (xhr.status === 400) {
-                var data = JSON.parse(xhr.responseText)
-                var errors = {}
+                var data = JSON.parse(xhr.responseText);
+                var errors = {};
 
                 // Convert error key names
                 // https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/store.js#L1010-L1012
@@ -184,9 +213,9 @@
                     }
                 }, this);
 
-                store.recordWasInvalid(record, errors)
+                store.recordWasInvalid(record, errors);
             } else {
-                this._super.apply(this, arguments)
+                this._super.apply(this, arguments);
             }
         }
     });

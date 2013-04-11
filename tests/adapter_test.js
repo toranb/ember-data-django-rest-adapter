@@ -5,6 +5,7 @@ var Person, person, people;
 var Role, role, roles;
 var Group, group;
 var Task, task;
+var User, user;
 
 var REVISION = 12; //ember-data revision
 
@@ -63,12 +64,24 @@ module("DjangoRESTAdapter", {
       owner: belongsTo(Person)
     });
 
+    User = DS.Model.extend({
+      username: attr('string')
+    });
+
+    Task.reopen({
+      zidentity: DS.belongsTo(User)
+    });
+
     Person.reopen({
       tasks: hasMany(Task)
     });
 
     Person.toString = function() {
       return "App.Person";
+    };
+
+    User.toString = function() {
+      return "App.User";
     };
 
     Role.toString = function() {
@@ -204,7 +217,25 @@ test("finding a role by ID makes a GET to /roles/:id/", function() {
   equal(role, store.find(Role, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
 });
 
-test("creating a task with associated person should invoke http post using the correct form data and url", function() {
+test("creating a task with only user results in http post to nested endpoint under zidentitys", function() {
+  store.load(User, {id: 9, username: "admin"});
+  user = store.find(User, 9);
+  expectLoaded(user);
+
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+
+  task = Task.createRecord({name: "Todo", zidentity: user});
+  expectNew(task);
+
+  store.commit();
+
+  expectUrlTypeData('/zidentitys/9/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, zidentity: "9" });
+
+  ajaxHash.success({ id: 1, name: "Todo", zidentity: 9 }, Task);
+  expectLoaded(task);
+});
+
+test("creating a task with only person results in http post to nested endpoint under owners", function() {
   store.load(Person, {id: 2, name: "Toran Billups"});
   person = store.find(Person, 2);
   expectLoaded(person);
@@ -223,27 +254,40 @@ test("creating a task with associated person should invoke http post using the c
   expectLoaded(task);
 });
 
-// test("creating a nested resource with nestedCommit disabled posts to the correct url", function() {
-//   store.adapter.nestedCommit = false;
+test("creating a task with both person and user results in http post to non-nested endpoint", function() {
+  store.load(User, {id: 9, username: "admin"});
+  store.load(Person, {id: 2, name: "Toran Billups"});
+  user = store.find(User, 9);
+  person = store.find(Person, 2);
+  expectLoaded(user);
+  expectLoaded(person);
 
-//   store.load(Person, {id: 2, name: "Toran Billups"});
-//   person = store.find(Person, 2);
-//   expectLoaded(person);
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-//   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+  task = Task.createRecord({name: "Todo", owner: person, zidentity: user});
+  expectNew(task);
 
-//   task = Task.createRecord({name: "Todo", owner: person});
-//   expectNew(task);
+  store.commit();
 
-//   store.commit();
+  expectUrlTypeData('/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2", zidentity: "9" });
 
-//   expectUrlTypeData('/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+  ajaxHash.success({ id: 1, name: "Todo", owner: 2, zidentity: 9 }, Task);
+  expectLoaded(task);
+});
 
-//   ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
-//   expectLoaded(task);
+test("creating a task without person and user results in http post to non-nested endpoint", function() {
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-//   store.adapter.nestedCommit = true;
-// });
+  task = Task.createRecord({name: "Todo"});
+  expectNew(task);
+
+  store.commit();
+
+  expectUrlTypeData('/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false });
+
+  ajaxHash.success({ id: 1, name: "Todo" }, Task);
+  expectLoaded(task);
+});
 
 test("creating a person makes a POST to /people/ with the data hash", function() {
   person = store.createRecord(Person, { name: "Toran" });
