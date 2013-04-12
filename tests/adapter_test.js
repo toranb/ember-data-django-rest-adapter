@@ -68,10 +68,6 @@ module("DjangoRESTAdapter", {
       username: attr('string')
     });
 
-    Task.reopen({
-      zidentity: DS.belongsTo(User)
-    });
-
     Person.reopen({
       tasks: hasMany(Task)
     });
@@ -218,6 +214,10 @@ test("finding a role by ID makes a GET to /roles/:id/", function() {
 });
 
 test("creating a task with only user results in http post to nested endpoint under users", function() {
+  Task.reopen({
+    zidentity: DS.belongsTo(User)
+  });
+
   store.load(User, {id: 9, username: "admin"});
   user = store.find(User, 9);
   expectLoaded(user);
@@ -236,6 +236,28 @@ test("creating a task with only user results in http post to nested endpoint und
 });
 
 test("creating a task with only person results in http post to nested endpoint under people", function() {
+  Task.reopen({
+    zidentity: DS.belongsTo(User)
+  });
+
+  store.load(Person, {id: 2, name: "Toran Billups"});
+  person = store.find(Person, 2);
+  expectLoaded(person);
+
+  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+
+  task = Task.createRecord({name: "Todo", owner: person});
+  expectNew(task);
+
+  store.commit();
+
+  expectUrlTypeData('/people/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+
+  ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
+  expectLoaded(task);
+});
+
+test("creating a task with only person when model has a single belongsTo results in http post to nested endpoint", function() {
   store.load(Person, {id: 2, name: "Toran Billups"});
   person = store.find(Person, 2);
   expectLoaded(person);
@@ -254,6 +276,10 @@ test("creating a task with only person results in http post to nested endpoint u
 });
 
 test("creating a task with both person and user results in http post to non-nested endpoint", function() {
+  Task.reopen({
+    zidentity: DS.belongsTo(User)
+  });
+
   store.load(User, {id: 9, username: "admin"});
   store.load(Person, {id: 2, name: "Toran Billups"});
   user = store.find(User, 9);
@@ -275,6 +301,10 @@ test("creating a task with both person and user results in http post to non-nest
 });
 
 test("creating a task without person and user results in http post to non-nested endpoint", function() {
+  Task.reopen({
+    zidentity: DS.belongsTo(User)
+  });
+
   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
   task = Task.createRecord({name: "Todo"});

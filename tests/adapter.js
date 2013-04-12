@@ -167,6 +167,8 @@
             var totalHydrated = this.getNonEmptyRelationships(record, totalParents);
             if (totalParents.length > 1 && totalHydrated.length <= 1) {
                 return this.buildUrlWithParentWhenAvailable(record, url);
+            } else if (totalParents.length === 1) {
+                return this.buildUrlWithParentWhenAvailable(record, url);
             }
             return url;
         },
