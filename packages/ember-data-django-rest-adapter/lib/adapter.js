@@ -137,8 +137,7 @@
             var root = this.rootForType(type);
             var url = this.buildURL(root);
             var parentType = store.typeForClientId(parent.get('clientId'));
-            var parentRoot = this.rootForType(parentType);
-            var record = {'parent_key': parentRoot, 'parent_value': parent.get('id')};
+            var record = Ember.Object.create({'parent_type': parentType, 'parent_value': parent.get('id')});
 
             return this.buildUrlWithParentWhenAvailable(record, url);
         },
@@ -173,9 +172,11 @@
         },
 
         buildUrlWithParentWhenAvailable: function(record, url) {
-            var parent_key = record.parent_key || record.get('parent_key');
+            var parent_type = record.parent_type || record.get('parent_type');
             var parent_value = record.parent_value || record.get('parent_value');
-            if (parent_key && parent_value) {
+
+            if (parent_type && parent_value) {
+                var parent_key = this.rootForType(parent_type);
                 var endpoint = url.split('/').reverse()[1];
                 var parent_plural = this.pluralize(parent_key);
                 url = url.replace(endpoint, parent_plural + "/" + parent_value + "/" + endpoint);

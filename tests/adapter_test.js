@@ -217,7 +217,7 @@ test("finding a role by ID makes a GET to /roles/:id/", function() {
   equal(role, store.find(Role, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
 });
 
-test("creating a task with only user results in http post to nested endpoint under zidentitys", function() {
+test("creating a task with only user results in http post to nested endpoint under users", function() {
   store.load(User, {id: 9, username: "admin"});
   user = store.find(User, 9);
   expectLoaded(user);
@@ -229,13 +229,13 @@ test("creating a task with only user results in http post to nested endpoint und
 
   store.commit();
 
-  expectUrlTypeData('/zidentitys/9/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, zidentity: "9" });
+  expectUrlTypeData('/users/9/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, zidentity: "9" });
 
   ajaxHash.success({ id: 1, name: "Todo", zidentity: 9 }, Task);
   expectLoaded(task);
 });
 
-test("creating a task with only person results in http post to nested endpoint under owners", function() {
+test("creating a task with only person results in http post to nested endpoint under people", function() {
   store.load(Person, {id: 2, name: "Toran Billups"});
   person = store.find(Person, 2);
   expectLoaded(person);
@@ -247,8 +247,7 @@ test("creating a task with only person results in http post to nested endpoint u
 
   store.commit();
 
-  //expectUrlTypeData('/people/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
-  expectUrlTypeData('/owners/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
+  expectUrlTypeData('/people/2/tasks/', 'create URL', 'POST', { name: "Todo", is_finished: false, owner: "2" });
 
   ajaxHash.success({ id: 1, name: "Todo", owner: 2 }, Task);
   expectLoaded(task);
@@ -475,10 +474,10 @@ test('serializer adds parent_key and parent_value during addBelongsTo method', f
   var hash = {};
   var key = 'owner';
   var type = Person;
-  var relationship = {key:key};
+  var relationship = {key:key, type:type};
   var record = store.find(Task, 1);
   serializer.addBelongsTo(hash, record, key, relationship);
-  equal(record.parent_key, 'owner');
+  equal(record.parent_type, type);
   equal(record.parent_value, 9);
   equal(hash.owner, 9);
 });
