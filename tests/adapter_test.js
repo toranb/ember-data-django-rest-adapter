@@ -419,9 +419,8 @@ test("finding a person by name uses findQuery", function() {
 });
 
 test("findMany generates http get request to fetch one-to-many relationship with the correct url", function() {
-  store.load(Person, {id: 9, name: "Toran Billups"});
+  store.load(Person, {id: 9, name: "Toran Billups", tasks: [1, 2]});
   person = store.find(Person, 9);
-  store.loadHasMany(person, 'tasks', [ 1, 2 ]);
   expectLoaded(person);
 
   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
@@ -447,9 +446,8 @@ test("findMany generates http get request to fetch one-to-many relationship with
 });
 
 test("findMany generates http get request to fetch m2m relationship with the correct url", function() {
-  store.load(Group, {id: 9, name: "Admin"});
+  store.load(Group, {id: 9, name: "Admin", people: [1,2,3]});
   group = store.find(Group, 9);
-  store.loadHasMany(group, 'people', [ 1, 2, 3 ]);
   expectLoaded(group);
 
   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
