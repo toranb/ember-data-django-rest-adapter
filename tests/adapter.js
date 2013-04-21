@@ -136,10 +136,14 @@
 
             var root = this.rootForType(type);
             var url = this.buildURL(root);
-            var parentType = store.typeForClientId(parent.get('clientId'));
+            var parentType = this.getTypeForModel(parent);
             var record = Ember.Object.create({'parent_type': parentType, 'parent_value': parent.get('id')});
 
             return this.buildUrlWithParentWhenAvailable(record, url);
+        },
+
+        getTypeForModel: function(model) {
+            return model.toString().split(":")[0].replace("<", "");
         },
 
         getBelongsTo: function(record) {

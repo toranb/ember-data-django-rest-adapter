@@ -489,6 +489,12 @@ test('serializer returns plural key without suffix for keyForHasMany method', fu
   equal(key, 'tasks');
 });
 
+test('getTypeForModel returns the objects type as a string', function() {
+  store.load(Person, {id: 9, name: "Toran Billups"});
+  person = store.find(Person, 9);
+  equal('App.Person', adapter.getTypeForModel(person));
+});
+
 test('serializer returns singular key without suffix for keyForBelongsTo method', function() {
   var serializer = DS.DjangoRESTSerializer.create();
   var type = Person;
