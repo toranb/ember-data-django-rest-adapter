@@ -1,48 +1,48 @@
 var get = Ember.get, set = Ember.set;
 
-var adapter, store, ajaxUrl, ajaxType, ajaxHash;
+var ajaxUrl, ajaxType, ajaxHash;
 var Person, person, people;
 var Role, role, roles;
 var Group, group;
 var Task, task;
 var User, user;
 
-var REVISION = 12; //ember-data revision
+var REVISION = 12;
+
+DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
+
+var adapter = DS.DjangoRESTAdapter.create({
+  ajax: function(url, type, hash) {
+    var success = hash.success, error = hash.error, self = this;
+
+    ajaxUrl = url;
+    ajaxType = type;
+    ajaxHash = hash;
+
+    if (success) {
+      hash.success = function(json, type) {
+        success.call(self, json);
+      };
+    }
+    if (error) {
+      hash.error = function(json, type) {
+        error.call(self, json);
+      };
+    }
+  }
+
+});
+
+var store = DS.Store.create({
+  adapter: adapter,
+  revision: REVISION
+});
 
 module("DjangoRESTAdapter", {
   setup: function() {
     ajaxUrl = undefined;
     ajaxType = undefined;
     ajaxHash = undefined;
-
-    DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
-
-    adapter = DS.DjangoRESTAdapter.create({
-      ajax: function(url, type, hash) {
-        var success = hash.success, error = hash.error, self = this;
-
-        ajaxUrl = url;
-        ajaxType = type;
-        ajaxHash = hash;
-
-        if (success) {
-          hash.success = function(json, type) {
-            success.call(self, json);
-          };
-        }
-        if (error) {
-          hash.error = function(json, type) {
-            error.call(self, json);
-          };
-        }
-      }
-
-    });
-
-    store = DS.Store.create({
-      adapter: adapter,
-      revision: REVISION
-    });
 
     var attr = DS.attr, hasMany = DS.hasMany, belongsTo = DS.belongsTo;
     Person = DS.Model.extend({
@@ -95,10 +95,10 @@ module("DjangoRESTAdapter", {
   },
 
   teardown: function() {
-    adapter.destroy();
-    store.destroy();
-
-    if (person) { person.destroy(); }
+    if (person) {
+        person.destroy();
+    }
+    person = null;
   }
 });
 
