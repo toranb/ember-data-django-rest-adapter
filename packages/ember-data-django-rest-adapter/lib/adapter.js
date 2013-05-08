@@ -112,7 +112,6 @@
         },
 
         ajax: function(url, type, hash) {
-        	var hash = hash || {};
             hash.url = url;
             hash.type = type;
             hash.cache = false;
