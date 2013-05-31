@@ -1,3 +1,7 @@
+function rejectionHandler(reason) {
+  Ember.Logger.error(reason, reason.message);
+  throw reason;
+}
 (function() {
     var get = Ember.get;
 

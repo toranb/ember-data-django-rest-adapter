@@ -8,117 +8,116 @@
 
         createRecord: function(store, type, record) {
             var json = {}
+            , adapter = this
             , root = this.rootForType(type)
             , data  = record.serialize()
             , url = this.getCorrectPostUrl(record, this.buildURL(root));
 
-            this.ajax(url, "POST", {
-                data: data,
-                context: this,
-                success: function(pre_json) {
-                    json[root] = pre_json;
-                    Ember.run(this, function(){
-                        this.didCreateRecord(store, type, record, json);
-                    });
-                },
-                error: function(xhr) {
-                    this.didError(store, type, record, xhr);
-                }
-            });
+            return this.ajax(url, "POST", {
+              data: data
+            }).then(function(pre_json){
+              json[root] = pre_json;
+              adapter.didCreateRecord(store, type, record, json);
+            }, function(xhr) {
+              adapter.didError(store, type, record, xhr);
+              throw xhr;
+            }).then(null, rejectionHandler);
         },
 
         updateRecord: function(store, type, record) {
             var json = {}
+            , adapter = this
             , id = get(record, 'id')
             , root = this.rootForType(type)
             , data  = record.serialize();
 
-            this.ajax(this.buildURL(root, id), "PUT", {
-                data: data,
-                context: this,
-                success: function(pre_json) {
-                    json[root] = pre_json;
-                    Ember.run(this, function(){
-                        this.didUpdateRecord(store, type, record, json);
-                    });
-                },
-                error: function(xhr) {
-                    this.didError(store, type, record, xhr);
-                }
-            });
+            return this.ajax(this.buildURL(root, id), "PUT",{
+              data: data
+            }).then(function(pre_json){
+              json[root] = pre_json;
+              adapter.didUpdateRecord(store, type, record, json);
+            }, function(xhr) {
+              adapter.didError(store, type, record, xhr);
+              throw xhr;
+            }).then(null, rejectionHandler);
         },
 
         findMany: function(store, type, ids, parent) {
             var json = {}
+            , adapter = this
             , root = this.rootForType(type)
             , plural = this.pluralize(root)
             , ids = this.serializeIds(ids)
             , url = this.buildFindManyUrlWithParent(store, type, ids, parent);
 
-            this.ajax(url, "GET", {
-                success: function(pre_json) {
-                    json[plural] = pre_json;
-                    Ember.run(this, function(){
-                        this.didFindMany(store, type, json);
-                    });
-                }
-            });
+            return this.ajax(url, "GET", {
+              data: {ids: ids}
+            }).then(function(pre_json) {
+              json[plural] = pre_json;
+              adapter.didFindMany(store, type, json);
+            }).then(null, rejectionHandler);
         },
 
         findAll: function(store, type, since) {
             var json = {}
+            , adapter = this
             , root = this.rootForType(type)
             , plural = this.pluralize(root);
 
-            this.ajax(this.buildURL(root), "GET", {
-                data: this.sinceQuery(since),
-                success: function(pre_json) {
-                    json[plural] = pre_json;
-                    Ember.run(this, function(){
-                        this.didFindAll(store, type, json);
-                    });
-                }
-            });
+            return this.ajax(this.buildURL(root), "GET",{
+              data: this.sinceQuery(since)
+            }).then(function(pre_json) {
+              json[plural] = pre_json;
+              adapter.didFindAll(store, type, json);
+            }).then(null, rejectionHandler);
         },
 
         findQuery: function(store, type, query, recordArray) {
             var json = {}
+            , adapter = this
             , root = this.rootForType(type)
             , plural = this.pluralize(root);
 
-            this.ajax(this.buildURL(root), "GET", {
-                data: query,
-                success: function(pre_json) {
-                    json[plural] = pre_json;
-                    Ember.run(this, function(){
-                        this.didFindQuery(store, type, json, recordArray);
-                    });
-                }
-            });
+            return this.ajax(this.buildURL(root), "GET", {
+              data: query
+            }).then(function(pre_json){
+              json[plural] = pre_json;
+              adapter.didFindQuery(store, type, json, recordArray);
+            }).then(null, rejectionHandler);
         },
 
         find: function(store, type, id) {
             var json = {}
+            , adapter = this
             , root = this.rootForType(type);
 
-            this.ajax(this.buildURL(root, id), "GET", {
-                success: function(pre_json) {
-                    json[root] = pre_json;
-                    Ember.run(this, function(){
-                        this.didFindRecord(store, type, json, id);
-                    });
-                }
-            });
+            return this.ajax(this.buildURL(root, id), "GET").
+              then(function(pre_json){
+                json[root] = pre_json;
+                adapter.didFindRecord(store, type, json, id);
+            }).then(null, rejectionHandler);
         },
 
         ajax: function(url, type, hash) {
+          var adapter = this;
+
+          return new Ember.RSVP.Promise(function(resolve, reject) {
             hash.url = url;
             hash.type = type;
-            hash.cache = false;
             hash.dataType = 'json';
-            hash.context = this;
+            hash.cache = false;
+            hash.context = adapter;
+
+            hash.success = function(json) {
+              Ember.run(null, resolve, json);
+            };
+
+            hash.error = function(jqXHR, textStatus, errorThrown) {
+              Ember.run(null, reject, errorThrown);
+            };
 
             jQuery.ajax(hash);
+          });
         },
 
         buildURL: function(record, suffix) {
