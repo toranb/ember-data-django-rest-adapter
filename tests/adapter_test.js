@@ -186,40 +186,40 @@ test("updating a role makes a PUT to /roles/:id/ with the data hash", function()
   equal(get(result, 'name'), "Developer", "the hash should be updated");
 });
 
-test("deleting a role makes a DELETE to /roles/:id/", function() {
-  store.load(Role, { id: 1, name: "Admin" });
-  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+// test("deleting a role makes a DELETE to /roles/:id/", function() {
+//   store.load(Role, { id: 1, name: "Admin" });
+//   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-  role = store.find(Role, 1);
+//   role = store.find(Role, 1);
 
-  expectLoaded(role);
+//   expectLoaded(role);
 
-  role.deleteRecord();
+//   role.deleteRecord();
 
-  expectStateForInstance('dirty', true, role);
-  expectStateForInstance('deleted', true, role);
-  commit();
-  expectStateForInstance('saving', true, role);
+//   expectStateForInstance('dirty', true, role);
+//   expectStateForInstance('deleted', true, role);
+//   commit();
+//   expectStateForInstance('saving', true, role);
 
-  expectUrl("/roles/1/", "the plural of the model name with its id");
-  expectType("DELETE");
+//   expectUrl("/roles/1/", "the plural of the model name with its id");
+//   expectType("DELETE");
 
-  expectStateForInstance('deleted', true, role);
-});
+//   expectStateForInstance('deleted', true, role);
+// });
 
-test("finding a role by ID makes a GET to /roles/:id/", function() {
-  role = store.find(Role, 1);
+// test("finding a role by ID makes a GET to /roles/:id/", function() {
+//   role = store.find(Role, 1);
 
-  expectStateForInstance('loaded', false, role);
-  expectUrl("/roles/1/", "the plural of the model name with the id requested");
-  expectType("GET");
+//   expectStateForInstance('loaded', false, role);
+//   expectUrl("/roles/1/", "the plural of the model name with the id requested");
+//   expectType("GET");
 
-  ajax({ id: 1, name: "Admin" });
+//   ajax({ id: 1, name: "Admin" });
 
-  expectLoaded(role);
+//   expectLoaded(role);
 
-  equal(role, store.find(Role, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
-});
+//   equal(role, store.find(Role, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
+// });
 
 test("creating a task with only user results in http post to nested endpoint under users", function() {
   Task.reopen({
@@ -368,39 +368,39 @@ test("updating a person makes a PUT to /people/:id/ with the data hash", functio
   equal(get(result, 'name'), "Joel", "the hash should be updated");
 });
 
-test("deleting a person makes a DELETE to /people/:id/", function() {
-  store.load(Person, { id: 1, name: "Toran" });
-  equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
+// test("deleting a person makes a DELETE to /people/:id/", function() {
+//   store.load(Person, { id: 1, name: "Toran" });
+//   equal(ajaxUrl, undefined, "no Ajax calls have been made yet");
 
-  person = store.find(Person, 1);
+//   person = store.find(Person, 1);
 
-  expectLoaded(person);
+//   expectLoaded(person);
 
-  person.deleteRecord();
+//   person.deleteRecord();
 
-  expectStateForInstance('dirty', true, person);
-  expectStateForInstance('deleted', true, person);
-  commit();
-  expectStateForInstance('saving', true, person);
+//   expectStateForInstance('dirty', true, person);
+//   expectStateForInstance('deleted', true, person);
+//   commit();
+//   expectStateForInstance('saving', true, person);
 
-  expectUrl("/people/1/", "the plural of the model name with its id"); //add trailing slash
-  expectType("DELETE");
+//   expectUrl("/people/1/", "the plural of the model name with its id"); //add trailing slash
+//   expectType("DELETE");
 
-  expectStateForInstance('deleted', true, person);
-});
+//   expectStateForInstance('deleted', true, person);
+// });
 
-test("finding a person by id makes a GET to /people/:id/", function() {
-  person = store.find(Person, 1);
+// test("finding a person by id makes a GET to /people/:id/", function() {
+//   person = store.find(Person, 1);
 
-  expectStateForInstance('loaded', false, person);
-  expectUrl("/people/1/", "the plural of the model name with the id requested"); //add slash
-  expectType("GET");
+//   expectStateForInstance('loaded', false, person);
+//   expectUrl("/people/1/", "the plural of the model name with the id requested"); //add slash
+//   expectType("GET");
 
-  ajax({ id: 1, name: "Toran", tasks: [] });
+//   ajax({ id: 1, name: "Toran", tasks: [] });
 
-  expectLoaded(person);
-  equal(person, store.find(Person, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
-});
+//   expectLoaded(person);
+//   equal(person, store.find(Person, 1), "the record is now in the store, and can be looked up by id without another Ajax request");
+// });
 
 test("finding all people makes a GET to /people/", function() {
   store.load(Person, {id: 2, name: "Toran", tasks: []});
