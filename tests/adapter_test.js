@@ -13,8 +13,9 @@ DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
 
 var TestAdapter = DS.DjangoRESTAdapter.extend({
   ajax: function(url, type, hash) {
-    var success = hash.success, error = hash.error, adapter = this;
-
+    var adapter = this;
+    hash = hash || {};
+    
     ajaxUrl = url;
     ajaxType = type;
     ajaxHash = hash;
