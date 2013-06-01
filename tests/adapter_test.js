@@ -7,15 +7,13 @@ var Group, group;
 var Task, task;
 var User, user;
 
-var REVISION = 12;
-
 DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
 
 var TestAdapter = DS.DjangoRESTAdapter.extend({
   ajax: function(url, type, hash) {
     var adapter = this;
     hash = hash || {};
-    
+
     ajaxUrl = url;
     ajaxType = type;
     ajaxHash = hash;
