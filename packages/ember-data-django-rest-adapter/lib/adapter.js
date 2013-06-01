@@ -100,6 +100,7 @@
 
         ajax: function(url, type, hash) {
           var adapter = this;
+          hash = hash || {};
 
           return new Ember.RSVP.Promise(function(resolve, reject) {
             hash.url = url;
