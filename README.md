@@ -142,6 +142,8 @@ Until ember.js and ember-data reach 1.0 a tag will be added with each new revisi
 ## Pending Issues
 This adapter does not currently support the hypermedia side of the django-rest-framework. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
 
+At this time the upgrade to ember-data 13 has broken error handling on the models
+
 ## Examples
 An example project that shows the adapter in action can be found below
 
