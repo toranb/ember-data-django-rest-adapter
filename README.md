@@ -20,14 +20,12 @@
 Basic code to use it with the last ember-data revision:
 
       App.Store = DS.Store.extend({
-        revision: 12,
         adapter: DS.DjangoRESTAdapter.create()
       });
 
 Creating with a namespace (not to be confused with Django namespace urls) that will be used as the root url:
 
       App.Store = DS.Store.extend({
-        revision: 12,
         adapter: DS.DjangoRESTAdapter.create({
           namespace: "codecamp"
         })
@@ -37,7 +35,6 @@ Creating with a custom plural dictionary that will be used when a custom plural 
 
       DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
       App.Store = DS.Store.extend({
-        revision: 12,
         adapter: DS.DjangoRESTAdapter.create()
       });
 
