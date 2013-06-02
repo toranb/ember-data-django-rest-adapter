@@ -99,26 +99,9 @@
         },
 
         ajax: function(url, type, hash) {
-          var adapter = this;
           hash = hash || {};
-
-          return new Ember.RSVP.Promise(function(resolve, reject) {
-            hash.url = url;
-            hash.type = type;
-            hash.dataType = 'json';
-            hash.cache = false;
-            hash.context = adapter;
-
-            hash.success = function(json) {
-              Ember.run(null, resolve, json);
-            };
-
-            hash.error = function(jqXHR, textStatus, errorThrown) {
-              Ember.run(null, reject, errorThrown);
-            };
-
-            jQuery.ajax(hash);
-          });
+          hash.cache = false;
+          return this._super(url, type, hash);
         },
 
         buildURL: function(record, suffix) {
