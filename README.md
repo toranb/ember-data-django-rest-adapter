@@ -97,6 +97,43 @@ To learn more about the filtering options available in the django-rest-framework
 [filtering]: http://django-rest-framework.org/api-guide/filtering.html#generic-filtering
 
 
+## Record Nesting
+When nesting resources, which is common in many-to-many or foreign-key relationships, the following conventions apply.
+
+Nested endpoints must be list only.  Any nested resources must also have their own top level endpoints for create / update / delete
+
+    class PeopleView(generics.ListCreateAPIView):
+        ...
+    
+    class PersonView(generics.RetrieveUpdateDestroyAPIView):
+        ...
+    
+    class NestedPeopleView(generics.ListAPIView):
+        ...
+    
+    class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+        ...
+    
+    urlpatterns = patterns('',
+        url(r'^/people/$', PeopleView.as_view()),
+        url(r'^/people/(?P<pk>\d+)/$', PersonView.as_view()),
+        url(r'^/groups/(?P<pk>\d+)/$', GroupDetailView.as_view()),
+        url(r'^/groups/(?P<group_pk>\d+)/people/$', NestedPeopleView.as_view()),
+    )
+
+Nested endpoints must match their relation field name
+
+    class Person(models.Model):
+        name = models.CharField(...)
+    
+    class Group(models.Model):
+        members = models.ManyToManyField(Person)
+    
+    urlpatterns = patterns('',
+        #/groups/:id/people/ WILL NOT WORK
+        url(r'^/groups/(?P<group_pk>\d+)/members/$', NestedPeopleView.as_view()),
+    )
+
 ## CSRF Support
 This adapter does not require you send a CSRF token with each $.ajax request
 
@@ -122,11 +159,11 @@ This adapter may be useful for someone in the ember.js/django community. If you 
 ## Unit tests
 
 ### Browser
-Go to the tests directory and type:
 
-    python -m SimpleHTTPServer
+    # run tests on http://localhost:9292/
+    rackup
 
-Go to http://localhost:8000/tests/ to run the Qunit tests.
+Go to http://localhost:9292/ to run the Qunit tests.
 
 ### Terminal (PhantomJS)
 
@@ -137,12 +174,11 @@ Go to http://localhost:8000/tests/ to run the Qunit tests.
     rake autotest
 
 ## Versions
-Until ember.js and ember-data reach 1.0 a tag will be added with each new revision starting at 10
+    ember.js 1.0.0-RC.5
+    ember-data v0.13
 
 ## Pending Issues
 This adapter does not currently support the hypermedia side of the django-rest-framework. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
-
-At this time the upgrade to ember-data 13 has broken error handling on the models
 
 ## Examples
 An example project that shows the adapter in action can be found below
