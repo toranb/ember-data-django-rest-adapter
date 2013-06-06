@@ -1,5 +1,5 @@
 function rejectionHandler(reason) {
-    Ember.Logger.error(reason, reason.message);
+    Ember.Logger.error(reason, reason.message || reason.responseText);
     throw reason;
 }
 
