@@ -1,7 +1,7 @@
 // boilerplate taken from ember-data rest adapter tests
 
 var get = Ember.get, set = Ember.set;
-var Adapter, Person, Group, Role, CamelCase, adapter, serializer, store, ajaxUrl, ajaxType, ajaxHash, recordArrayFlags, manyArrayFlags;
+var Adapter, Person, Group, Role, CamelCase, Animal, Herd, adapter, serializer, store, ajaxUrl, ajaxType, ajaxHash, recordArrayFlags, manyArrayFlags;
 var forEach = Ember.EnumerableUtils.forEach;
 
 // Note: You will need to ensure that you do not attempt to assert against flags that do not exist in this array (or else they will show positive).
@@ -147,6 +147,25 @@ module("Django REST Adapter", {
         CamelCase.toString = function() {
             return "App.CamelCase";
         };
+
+        Animal = DS.Model.extend({
+            name: DS.attr('string')
+        });
+
+        Animal.toString = function() {
+            return "App.Animal";
+        };
+
+        Herd = DS.Model.extend({
+            name: DS.attr('string'),
+            members: DS.hasMany(Animal),
+            outcasts: DS.hasMany(Animal)
+        });
+
+        Herd.toString = function() {
+            return "App.Herd";
+        };
+
     }
 });
 
@@ -381,6 +400,21 @@ test("finding all people in a camel_case makes a GET to /camel_cases/:id/camel_p
     
     // test
     expectUrl("/camel_cases/1/camel_people/", "the nested URL for the field name on the parent model");
+});
+
+test("finding all people in a group that contains multiple nested attributes of the same type makes a GET to the correct attribute-based URL", function() {
+    // setup
+    var herd, members, outcasts;
+    store.load(Herd, { id: 2, name: "Elephants", members: [ 3, 4 ], outcasts: [ 5, 6 ] });
+    herd = store.find(Herd, 2);
+
+    // test the first attribute
+    members = get(herd, 'members');
+    expectUrl("/herds/2/members/", "the nested URL for the field name on the parent model");
+
+    // check that both of the Animal attributes are retrieved correctly
+    outcasts = get(herd, 'outcasts');
+    expectUrl("/herds/2/outcasts/", "the nested URL for the field name on the parent model");
 });
 
 test("if you specify a namespace then it is prepended onto all URLs", function() {
