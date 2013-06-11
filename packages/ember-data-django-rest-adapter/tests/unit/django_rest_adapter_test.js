@@ -1,7 +1,7 @@
 // boilerplate taken from ember-data rest adapter tests
 
 var get = Ember.get, set = Ember.set;
-var Adapter, Person, Group, Role, adapter, serializer, store, ajaxUrl, ajaxType, ajaxHash, recordArrayFlags, manyArrayFlags;
+var Adapter, Person, Group, Role, CamelCase, adapter, serializer, store, ajaxUrl, ajaxType, ajaxHash, recordArrayFlags, manyArrayFlags;
 var forEach = Ember.EnumerableUtils.forEach;
 
 // Note: You will need to ensure that you do not attempt to assert against flags that do not exist in this array (or else they will show positive).
@@ -137,6 +137,15 @@ module("Django REST Adapter", {
 
         Role.toString = function() {
             return "App.Role";
+        };
+
+        CamelCase = DS.Model.extend({
+            name: DS.attr('string'),
+            camelPeople: DS.hasMany(Person)
+        });
+
+        CamelCase.toString = function() {
+            return "App.CamelCase";
         };
     }
 });
@@ -276,6 +285,28 @@ test("finding all people makes a GET to /people/", function() {
     equal(person, store.find(Person, 1), "the record is now in the store, and can be looked up by ID without another Ajax request");
 });
 
+test("properly un-CamelCase root object /camel_case/", function() {
+    // setup
+    var person, people;
+    people = store.find(CamelCase);
+
+    // test
+    enabledFlags(people, ['isLoaded', 'isValid'], recordArrayFlags);
+    expectUrl("/camel_cases/", "the plural of the model name, with trailing slash");
+    expectType("GET");
+
+    // setup
+    ajaxHash.success([{ id: 1, name: "John Doe" }]);
+    person = people.objectAt(0);
+
+    // test
+    statesEqual(people, 'loaded.saved');
+    stateEquals(person, 'loaded.saved');
+    enabledFlagsForArray(people, ['isLoaded', 'isValid']);
+    enabledFlags(person, ['isLoaded', 'isValid']);
+    equal(person, store.find(CamelCase, 1), "the record is now in the store, and can be looked up by ID without another Ajax request");
+});
+
 test("finding a person by ID makes a GET to /people/:id/", function() {
     // setup
     var person = store.find(Person, 1);
@@ -339,6 +370,17 @@ test("finding all people in a group makes a GET to /groups/:id/zpeople/", functi
     
     // test
     expectUrl("/groups/1/zpeople/", "the nested URL for the field name on the parent model");
+});
+
+test("finding all people in a camel_case makes a GET to /camel_cases/:id/camel_people/", function() {
+    // setup
+    var camel_case, people;
+    store.load(CamelCase, { id: 1, name: "Case full of camels", camel_people: [ 1, 2 ] });
+    camel_case = store.find(CamelCase, 1);
+    people = get(camel_case, 'camelPeople');
+    
+    // test
+    expectUrl("/camel_cases/1/camel_people/", "the nested URL for the field name on the parent model");
 });
 
 test("if you specify a namespace then it is prepended onto all URLs", function() {
