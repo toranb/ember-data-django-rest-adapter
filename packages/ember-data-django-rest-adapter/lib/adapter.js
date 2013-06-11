@@ -78,12 +78,16 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     buildFindManyUrlWithParent: function(type, parent) {
         var root, url, endpoint, parentType, parentValue;
 
-        parent.eachRelationship(function(name, relationship) {
-            if (relationship.kind === 'hasMany' && relationship.type === type) {
-                endpoint = relationship.key;
-                parentType = relationship.parentType;
-            }
-        });
+        endpoint = parent.get('findManyKey');
+        parentType = parent.get('findManyType');
+        if (typeof endpoint !== 'string') {
+            parent.eachRelationship(function(name, relationship) {
+                if (relationship.kind === 'hasMany' && relationship.type === type) {
+                    endpoint = relationship.key;
+                    parentType = relationship.parentType;
+                }
+            });
+        }
         
         Ember.assert("could not find a relationship for the specified child type", typeof endpoint !== "undefined");
 
