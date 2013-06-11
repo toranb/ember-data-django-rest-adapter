@@ -106,7 +106,7 @@ module("Django REST Adapter", {
 
         serializer = get(adapter, 'serializer');
 
-        store = DS.Store.create({
+        store = DS.DjangoRESTStore.create({
             adapter: adapter
         });
 
