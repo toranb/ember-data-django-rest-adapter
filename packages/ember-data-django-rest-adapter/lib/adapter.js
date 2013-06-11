@@ -86,7 +86,8 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
         });
         
         Ember.assert("could not find a relationship for the specified child type", typeof endpoint !== "undefined");
-        
+
+        endpoint = this.serializer.keyForAttributeName(parentType, endpoint);
         parentValue = parent.get('id');
         root = this.rootForType(parentType);
         url = this.buildURL(root, parentValue);
