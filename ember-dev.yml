@@ -11,5 +11,5 @@ testing_suites:
     - "package=all&extendprototypes=true&jquery=1.8.0&nojshint=true"
     - "package=all&dist=build&nojshint=true"
 testing_packages:
-  - ember-data
   - ember-data-django-rest-adapter
+testing_needs_ember_data: true

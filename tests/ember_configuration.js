@@ -89,7 +89,7 @@
   };
 
 
-  minispade.register('ember-data/~test-setup', function() {
+  minispade.register('ember-data-django-rest-adapter/~test-setup', function() {
     Ember.View.reopen({
       _insertElementLater: syncForTest()
     });
