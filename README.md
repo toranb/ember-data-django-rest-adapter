@@ -1,21 +1,17 @@
 # ember-data-django-rest-adapter [![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter)
 
 ## Motivation
-- The django-rest-framework is a great REST framework for python / django developers
-- The default ember-data RESTAdapter does not follow the conventions used by the django rest framework
+- The `django-rest-framework` is a great REST framework for python / django developers
+- The default `ember-data` `RESTAdapter` does not follow the conventions used by the django rest framework
 
+## Download
+pre-built releases are available on [cdnjs](http://cdnjs.com/)
+- __0.13__ [full](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13/ember-data-django-rest-adapter.js) [min](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13/ember-data-django-rest-adapter.min.js)
 
 ## Usage
 
 #### Javascript side
-
-- You can either:
-  - import the lib/serializer.js and lib/adapter.js files, or
-  - use the ember-data-django-rest-adapter package on your build process.
-  or
-  - use dist/adapter.js after running `bundle && bundle exec rakep build` or simply `rake dist`
-
-- To use the adapter with your store:
+- Include the `ember-data-django-rest-adapter.js` after `ember-data.js` in your HTML/build system
 
 Basic code to use it with the last ember-data revision:
 
@@ -40,7 +36,7 @@ Creating with a custom plural dictionary that will be used when a custom plural 
 
 
 #### python/django side
-This project requires the django-rest-framework 2.x branch (specifically 2.1.14 or newer)
+This project requires the `django-rest-framework` 2.x branch (specifically 2.1.14 or newer)
 
 i) The adapter assumes you have 2 different endpoints per django model
 
@@ -53,7 +49,7 @@ i) The adapter assumes you have 2 different endpoints per django model
         serializer_class = PersonSerializer
 
 
-ii) The above might have a urls.py something like the below
+ii) The above might have a `urls.py` something like the below
 
     urlpatterns = patterns('',
         url(r'^/people/(?P<pk>\d+)/$', Person.as_view()),
@@ -64,24 +60,24 @@ ii) The above might have a urls.py something like the below
 ## Filtering Support
 This adapter supports basic query string filtering
 
-On the client side you would apply a filter using the ember-data find api (this returns an DS.AdapterPopulatedRecordArray)
+On the client side you would apply a filter using the `ember-data` find api (this returns an DS.AdapterPopulatedRecordArray)
 
-	App.Person = DS.Model.extend({
-	    name: DS.attr('string')
-	});
-	var people = App.Person.find({name: 'Toran'});
+    App.Person = DS.Model.extend({
+        name: DS.attr('string')
+    });
+    var people = App.Person.find({name: 'Toran'});
 
-On the server side you first need to add the django-filter dependency
+On the server side you first need to add the `django-filter` dependency
 
     pip install django-filter
 
-Next you need to add a setting to tell the django-rest-framework that you intend to use this dependency as your filter backend
+Next you need to add a setting to tell the `django-rest-framework` that you intend to use this dependency as your filter backend
 
     REST_FRAMEWORK = {
         'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend'
     }
 
-Now you can apply the filter to your ListAPIView or ListCreateAPIView
+Now you can apply the filter to your `ListAPIView` or `ListCreateAPIView`
 
     class People(generics.ListCreateAPIView):
         model = Person
@@ -178,7 +174,7 @@ Go to http://localhost:9292/ to run the Qunit tests.
     ember-data v0.13
 
 ## Pending Issues
-This adapter does not currently support the hypermedia side of the django-rest-framework. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
+This adapter does not currently support the hypermedia side of the `django-rest-framework`. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
 
 ## Examples
 An example project that shows the adapter in action can be found below
