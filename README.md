@@ -185,3 +185,8 @@ https://github.com/toranb/complex-ember-data-example.git
 I took a large part of this project (including the motivation) from @escalant3 and his tastypie adapter
 
 https://github.com/escalant3/ember-data-tastypie-adapter/
+
+## License
+ember-data-django-rest-adapter is Copyright © 2013 Toran Billups http://toranbillups.com
+
+It is free software, and may be redistributed under the terms specified in the LICENSE file
