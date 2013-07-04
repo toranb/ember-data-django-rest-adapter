@@ -1,6 +1,5 @@
 syntax: glob
 
-Gemfile.lock
 dist
 tmp
 *swp
