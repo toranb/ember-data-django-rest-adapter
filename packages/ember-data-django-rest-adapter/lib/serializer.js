@@ -1,14 +1,16 @@
-var get = Ember.get;
-
 DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     patchInJSONRoot: function(json, type, many) {
         var pJSON, root;
+
+        pJSON = {};
         root = this.rootForType(type);
+
         if (many === true) {
             root = this.pluralize(root);
         }
-        pJSON = {};
+
         pJSON[root] = json;
+
         return pJSON;
     },
 

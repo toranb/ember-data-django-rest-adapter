@@ -3,8 +3,6 @@ function rejectionHandler(reason) {
     throw reason;
 }
 
-var get = Ember.get, set = Ember.set;
-
 DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     bulkCommit: false,
     serializer: DS.DjangoRESTSerializer,
@@ -18,7 +16,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
 
         return this.ajax(this.buildURL(root), "POST", {
             data: data
-        }).then(function(json){
+        }).then(function(json) {
             adapter.didCreateRecord(store, type, record, json);
         }, function(xhr) {
             adapter.didError(store, type, record, xhr);
@@ -29,14 +27,14 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     updateRecord: function(store, type, record) {
         var id, root, adapter, data;
 
-        id = get(record, 'id');
+        id = Ember.get(record, 'id');
         root = this.rootForType(type);
         adapter = this;
         data = this.serialize(record);
 
         return this.ajax(this.buildURL(root, id), "PUT", {
             data: data
-        }).then(function(json){
+        }).then(function(json) {
             adapter.didUpdateRecord(store, type, record, json);
         }, function(xhr) {
             adapter.didError(store, type, record, xhr);
@@ -64,14 +62,17 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     ajax: function(url, type, hash) {
       hash = hash || {};
       hash.cache = false;
+
       return this._super(url, type, hash);
     },
 
     buildURL: function(record, suffix) {
         var url = this._super(record, suffix);
+
         if (url.charAt(url.length -1) !== '/') {
             url += '/';
         }
+
         return url;
     },
 
@@ -80,6 +81,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
 
         endpoint = parent.get('findManyKey');
         parentType = parent.get('findManyType');
+
         if (typeof endpoint !== 'string') {
             parent.eachRelationship(function(name, relationship) {
                 if (relationship.kind === 'hasMany' && relationship.type === type) {
@@ -116,8 +118,9 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
                     errors[name] = data[attr];
                 }
             }, this);
+
             record.eachRelationship(function(name, relationship) {
-                var attr = null;
+                var attr;
                 if (relationship.kind === 'belongsTo') {
                     attr = this.serializer.keyForBelongsTo(type, name);
                 } else {
@@ -130,7 +133,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
 
             store.recordWasInvalid(record, errors);
         } else {
-            this._super.apply(this, arguments);
+            this._super(store, type, record, xhr);
         }
     }
 });

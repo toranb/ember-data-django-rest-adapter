@@ -18,7 +18,7 @@ function stateEquals(entity, expectedState) {
 
 // Used for testing the adapter state path on a collection of entities
 function statesEqual(entities, expectedState) {
-    forEach(entities, function(entity){
+    forEach(entities, function(entity) {
         stateEquals(entity, expectedState);
     });
 }
@@ -33,7 +33,7 @@ function enabledFlags(entity, expectedFlagArr, onlyCheckFlagArr) {
         possibleFlags = ['isLoading', 'isLoaded', 'isReloading', 'isDirty', 'isSaving', 'isDeleted', 'isError', 'isNew', 'isValid'];
     }
 
-    forEach(possibleFlags, function(flag){
+    forEach(possibleFlags, function(flag) {
         var expectedFlagValue, actualFlagValue;
 
         expectedFlagValue = expectedFlagArr.indexOf(flag) !== -1;
@@ -45,7 +45,7 @@ function enabledFlags(entity, expectedFlagArr, onlyCheckFlagArr) {
 
 // Used for testing all of the flags on a collection of entities
 function enabledFlagsForArray(entities, expectedFlagArr, onlyCheckFlagArr) {
-    forEach(entities, function(entity){
+    forEach(entities, function(entity) {
         enabledFlags(entity, expectedFlagArr, onlyCheckFlagArr);
     });
 }
@@ -78,11 +78,8 @@ module("Django REST Adapter", {
 
         adapter = Adapter.create({
             ajax: function(url, type, hash) {
-                var self = this;
                 return new Ember.RSVP.Promise(function(resolve, reject) {
                     hash = hash || {};
-                    var success = hash.success;
-
                     hash.context = adapter;
 
                     ajaxUrl = url;
@@ -90,13 +87,13 @@ module("Django REST Adapter", {
                     ajaxHash = hash;
 
                     hash.success = function(json) {
-                        Ember.run(function(){
+                        Ember.run(function() {
                             resolve(json);
                         });
                     };
 
                     hash.error = function(xhr) {
-                        Ember.run(function(){
+                        Ember.run(function() {
                             reject(xhr);
                         });
                     };
@@ -447,7 +444,7 @@ var restoreLogger = function() {
     Ember.Logger.error = originalLogger;
 };
 
-test("creating a record with a 400 error marks the records as invalid", function(){
+test("creating a record with a 400 error marks the records as invalid", function() {
     // setup
     var person, mockXHR;
     person = store.createRecord(Person, { name: "" });
@@ -467,7 +464,7 @@ test("creating a record with a 400 error marks the records as invalid", function
     deepEqual(person.get('errors'), { name: ["can't be blank"]}, "the person has the errors");
 });
 
-test("updating a record with a 400 error marks the records as invalid", function(){
+test("updating a record with a 400 error marks the records as invalid", function() {
     // setup
     var person, mockXHR;
     Person.reopen({
