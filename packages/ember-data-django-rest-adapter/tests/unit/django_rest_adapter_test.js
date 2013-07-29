@@ -245,6 +245,43 @@ test("updating a person makes a PUT to /people/:id/ with the data hash", functio
     equal(get(person, 'name'), "Jane Doe", "the hash should be updated");
 });
 
+test("updating a group makes a PUT to /groups/:id/ with the data hash", function() {
+    // setup
+    var group, people;
+    store.load(Group, { id: 1, name: "Doe Family", zpeople: [ 1, 2 ] });
+    group = store.find(Group, 1);
+
+    // test
+    stateEquals(group, 'loaded.saved');
+    enabledFlags(group, ['isLoaded', 'isValid']);
+
+    // setup
+    set(group, 'name', 'New Doe Family Name');
+
+    // test
+    stateEquals(group, 'loaded.updated.uncommitted');
+    enabledFlags(group, ['isLoaded', 'isDirty', 'isValid']);
+
+    // setup
+    store.commit();
+
+    // test
+    stateEquals(group, 'loaded.updated.inFlight');
+    enabledFlags(group, ['isLoaded', 'isDirty', 'isSaving', 'isValid']);
+    expectUrl("/groups/1/", "the plural of the model name with its ID, and trailing slash");
+    expectType("PUT");
+    expectData({ name: "New Doe Family Name", zpeople: [1,2] });
+
+    // setup
+    ajaxHash.success({ id: 1, name: "New Doe Family Name" });
+
+    // test
+    stateEquals(group, 'loaded.saved');
+    enabledFlags(group, ['isLoaded', 'isValid']);
+    equal(group, store.find(Group, 1), "the same group is retrieved by the same ID");
+    equal(get(group, 'name'), "New Doe Family Name", "the hash should be updated");
+});
+
 test("deleting a person makes a DELETE to /people/:id/", function() {
     // setup
     var person;
