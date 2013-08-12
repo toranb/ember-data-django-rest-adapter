@@ -6,6 +6,7 @@
 
 ## Download
 pre-built releases are available on [cdnjs](http://cdnjs.com/)
+- __0.13.1__ [full](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13.1/ember-data-django-rest-adapter.js) [min](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13.1/ember-data-django-rest-adapter.min.js)
 - __0.13__ [full](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13/ember-data-django-rest-adapter.js) [min](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13/ember-data-django-rest-adapter.min.js)
 
 ## Usage
