@@ -1,6 +1,15 @@
 DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
+    init: function() {
+        this._super();
+
+        this.configure({
+            pagination: 'pagination',
+        });
+    },
+
     patchInJSONRoot: function(json, type, many) {
-        var pJSON, root;
+        var pJSON, root, res,
+            meta = this.configOption(type, 'meta');
 
         pJSON = {};
         root = this.rootForType(type);
@@ -9,7 +18,35 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
             root = this.pluralize(root);
         }
 
-        pJSON[root] = json;
+        if (json['results'] && json['results'].constructor.name === 'Array') {
+            pJSON[root] = json['results'];
+
+            // try to compute current, next and previous page number
+            var page_match = new RegExp('page=([0-9]+)');
+            var page_current = 1;
+            var page_previous = false;
+            if(res = page_match.exec(json['previous'])) {
+                page_previous = parseInt(res[1], 10);
+                page_current = page_previous + 1;
+            }
+            var page_next = false;
+            if(res = page_match.exec(json['next'])) {
+                page_next = parseInt(res[1], 10);
+                page_current = page_next - 1;
+            }
+
+            // add a pagination object in metadata
+            pJSON[meta] = {
+                pagination: {
+                    count: json['count'],
+                    current: page_current,
+                    previous: page_previous,
+                    next: page_next,
+                },
+            };
+        } else {
+            pJSON[root] = json;
+        }
 
         return pJSON;
     },
