@@ -613,3 +613,97 @@ test("updating a record with a 500 error marks the record as error", function() 
     stateEquals(person, 'error');
     enabledFlags(person, ['isError', 'isValid']);
 });
+
+test("finding all people in a paginated result - first page", function() {
+    // setup
+    var people, userA, userB, metadata, pagination;
+    people = store.find(Person, {page: 1});
+    ajaxHash.success({
+        count: 7,
+        next: 'http://example.com/api/people/?page=2',
+        previous: null,
+        results: [
+            { id: 1, name: "User One" },
+            { id: 2, name: "User Two" },
+        ],
+    });
+    userA = people.objectAt(0);
+    userB = people.objectAt(1);
+    pagination = store.typeMapFor(Person).metadata.pagination;
+
+    // test
+    statesEqual([userA, userB], 'loaded.saved');
+    enabledFlags(people, ['isLoaded'], recordArrayFlags);
+    enabledFlagsForArray([userA, userB], ['isLoaded'], recordArrayFlags);
+    equal(get(people, 'length'), 2, "there are two people in the results");
+    equal(get(userA, 'name'), 'User One');
+    equal(get(userB, 'name'), 'User Two');
+    equal(get(userA, 'id'), 1);
+    equal(get(userB, 'id'), 2);
+    equal(pagination.count, 7);
+    equal(pagination.current, 1);
+    equal(pagination.next, 2);
+    equal(pagination.previous, false);
+});
+
+test("finding all people in a paginated result - second page", function() {
+    // setup
+    var people, userA, userB, metadata, pagination;
+    people = store.find(Person, {page: 2});
+    ajaxHash.success({
+        count: 7,
+        next: 'http://example.com/api/people/?page=3',
+        previous: 'http://example.com/api/people/?page=1',
+        results: [
+            { id: 3, name: "User Three" },
+            { id: 4, name: "User Four" },
+        ],
+    });
+    userA = people.objectAt(0);
+    userB = people.objectAt(1);
+    pagination = store.typeMapFor(Person).metadata.pagination;
+
+    // test
+    statesEqual([userA, userB], 'loaded.saved');
+    enabledFlags(people, ['isLoaded'], recordArrayFlags);
+    enabledFlagsForArray([userA, userB], ['isLoaded'], recordArrayFlags);
+    equal(get(people, 'length'), 2, "there are two people in the results");
+    equal(get(userA, 'name'), 'User Three');
+    equal(get(userB, 'name'), 'User Four');
+    equal(get(userA, 'id'), 3);
+    equal(get(userB, 'id'), 4);
+    equal(pagination.count, 7);
+    equal(pagination.current, 2);
+    equal(pagination.next, 3);
+    equal(pagination.previous, 1);
+
+});
+
+test("finding all people in a paginated result - last page", function() {
+    // setup
+    var people, user, metadata, pagination;
+    people = store.find(Person, {page: 4});
+    ajaxHash.success({
+        count: 7,
+        next: null,
+        previous: 'http://example.com/api/people/?page=3',
+        results: [
+            { id: 7, name: "User Seven" },
+        ],
+    });
+    user = people.objectAt(0);
+    pagination = store.typeMapFor(Person).metadata.pagination;
+
+    // test
+    statesEqual([user], 'loaded.saved');
+    enabledFlags(people, ['isLoaded'], recordArrayFlags);
+    enabledFlagsForArray([user], ['isLoaded'], recordArrayFlags);
+    equal(get(people, 'length'), 1, "there is one people in the results");
+    equal(get(user, 'name'), 'User Seven');
+    equal(get(user, 'id'), 7);
+    equal(pagination.count, 7);
+    equal(pagination.current, 4);
+    equal(pagination.next, false);
+    equal(pagination.previous, 3);
+
+});
