@@ -150,6 +150,72 @@ Next you need to add a snippet of javascript to ensure your application adds the
       });
     </script>
 
+## Pagination
+
+First you need to add a ListCreateAPIView or ListAPIView
+
+    class People(ListCreateAPIView):
+        model = Person
+        serializer_class = PersonSerializer
+
+Next you need to add pagination to your django settings
+
+    REST_FRAMEWORK = {
+        'PAGINATE_BY': 10,
+        'PAGINATE_BY_PARAM': 'page_size'
+    }
+
+Now in your ember app, add the following mixin to your ArrayController
+
+    PersonApp.PaginationMixins = Ember.Mixin.create({
+        pagination: function() {
+            if(this.get('model.isLoaded')) {
+                var modelType = this.get('model.type');
+                return this.get('store').typeMapFor(modelType).metadata.pagination;
+            }
+        }.property('model.isLoaded'),
+    });
+
+Next you need to add a route to handle the pagination
+
+    PersonApp.Router.map(function(match) {
+        this.resource("person", { path: "/" }, function() {
+            this.route('page', {path: '/page/:page'});
+        });
+    });
+
+    PersonApp.PersonIndexRoute = Ember.Route.extend({
+        redirect: function() {
+            this.transitionTo('person.page', 1);
+        },
+    });
+
+    PersonApp.PersonPageRoute = Ember.Route.extend({
+        model: function(params) {
+            return PersonApp.Person.find({page: params.page});
+        },
+    });
+
+Now in your handlebars template, loop over your controller
+
+    {{#each person in controller}}
+        {{person.username}}<br />
+    {{/each}}
+
+If you want to use the mixin to show a next or previous link
+
+    {{#if pagination.previous}}
+      {{#linkTo 'person.page' pagination.previous}}previous{{/linkTo}}
+    {{/if}}
+
+    {{#if pagination.next}}
+      {{#linkTo 'person.page' pagination.next}}next{{/linkTo}}
+    {{/if}}
+
+A full example of pagination with this adapter can be found below
+
+https://github.com/toranb/ember-django-pagination
+
 ## Contributing
 This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
 
