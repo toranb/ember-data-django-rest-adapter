@@ -204,12 +204,12 @@ Now in your handlebars template, loop over your controller
 
 If you want to use the mixin to show a next or previous link
 
-    {{#if pagination.previous}}
-      {{#linkTo 'person.page' pagination.previous}}previous{{/linkTo}}
+    {{#if pagination.page.previous}}
+      {{#linkTo 'person.page' pagination.page.previous}}previous{{/linkTo}}
     {{/if}}
 
-    {{#if pagination.next}}
-      {{#linkTo 'person.page' pagination.next}}next{{/linkTo}}
+    {{#if pagination.page.next}}
+      {{#linkTo 'person.page' pagination.page.next}}next{{/linkTo}}
     {{/if}}
 
 A full example of pagination with this adapter can be found below
