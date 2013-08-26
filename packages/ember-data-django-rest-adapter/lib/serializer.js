@@ -21,27 +21,57 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
         if (json['results'] && json['results'].constructor.name === 'Array') {
             pJSON[root] = json['results'];
 
-            // try to compute current, next and previous page number
+            // this is a paginated result, compute pagination properties
             var page_match = new RegExp('page=([0-9]+)');
-            var page_current = 1;
-            var page_previous = false;
+            var items = {
+                total: json['count'],
+                first: 1,
+                last: json['results'].length,
+                per_page: undefined,
+            };
+            var page = {
+                total: 1,
+                current: 1,
+                previous: false,
+                next: false,
+            };
+
+            // do we have a previous page?
             if(res = page_match.exec(json['previous'])) {
-                page_previous = parseInt(res[1], 10);
-                page_current = page_previous + 1;
+                page.previous = parseInt(res[1], 10);
+                page.current = page.previous + 1;
+
+                // the number of items per page is calculated from number of
+                // items in previous pages and the number of the previous page
+                items.per_page = (json['count'] - json['results'].length) / page.previous;
             }
-            var page_next = false;
+
+            // do we have a next page?
             if(res = page_match.exec(json['next'])) {
-                page_next = parseInt(res[1], 10);
-                page_current = page_next - 1;
+                page.next = parseInt(res[1], 10);
+                page.current = page.next - 1;
+
+                // as we have a next page, we know that the current page is
+                // full, so just count how many items are in the current page
+                items.per_page = json['results'].length;
+            }
+
+            if(items.per_page === undefined) {
+                // `items.per_page` is not set, this happen when there is only
+                // one page. And with only one page, we are not able to guess
+                // the server-side configured value for the number of items per
+                // page.
+            } else {
+                page.total = Math.ceil(json['count'] / items.per_page);
+                items.first = (page.current - 1) * items.per_page + 1;
+                items.last = items.first + json['results'].length - 1;
             }
 
             // add a pagination object in metadata
             pJSON[meta] = {
                 pagination: {
-                    count: json['count'],
-                    current: page_current,
-                    previous: page_previous,
-                    next: page_next,
+                    page: page,
+                    items: items,
                 },
             };
         } else {
