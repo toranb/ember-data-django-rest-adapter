@@ -640,10 +640,14 @@ test("finding all people in a paginated result - first page", function() {
     equal(get(userB, 'name'), 'User Two');
     equal(get(userA, 'id'), 1);
     equal(get(userB, 'id'), 2);
-    equal(pagination.count, 7);
-    equal(pagination.current, 1);
-    equal(pagination.next, 2);
-    equal(pagination.previous, false);
+    equal(pagination.items.total, 7);
+    equal(pagination.items.first, 1);
+    equal(pagination.items.last, 2);
+    equal(pagination.items.per_page, 2);
+    equal(pagination.page.total, 4);
+    equal(pagination.page.current, 1);
+    equal(pagination.page.next, 2);
+    equal(pagination.page.previous, false);
 });
 
 test("finding all people in a paginated result - second page", function() {
@@ -672,10 +676,14 @@ test("finding all people in a paginated result - second page", function() {
     equal(get(userB, 'name'), 'User Four');
     equal(get(userA, 'id'), 3);
     equal(get(userB, 'id'), 4);
-    equal(pagination.count, 7);
-    equal(pagination.current, 2);
-    equal(pagination.next, 3);
-    equal(pagination.previous, 1);
+    equal(pagination.items.total, 7);
+    equal(pagination.items.first, 3);
+    equal(pagination.items.last, 4);
+    equal(pagination.items.per_page, 2);
+    equal(pagination.page.total, 4);
+    equal(pagination.page.current, 2);
+    equal(pagination.page.next, 3);
+    equal(pagination.page.previous, 1);
 
 });
 
@@ -701,9 +709,48 @@ test("finding all people in a paginated result - last page", function() {
     equal(get(people, 'length'), 1, "there is one people in the results");
     equal(get(user, 'name'), 'User Seven');
     equal(get(user, 'id'), 7);
-    equal(pagination.count, 7);
-    equal(pagination.current, 4);
-    equal(pagination.next, false);
-    equal(pagination.previous, 3);
+    equal(pagination.items.total, 7);
+    equal(pagination.items.first, 7);
+    equal(pagination.items.last, 7);
+    equal(pagination.items.per_page, 2);
+    equal(pagination.page.total, 4);
+    equal(pagination.page.current, 4);
+    equal(pagination.page.next, false);
+    equal(pagination.page.previous, 3);
+
+});
+
+test("finding all people in a paginated result - only one page", function() {
+    // setup
+    var people, user, metadata, pagination;
+    people = store.find(Person, {page: 1});
+    ajaxHash.success({
+        count: 5,
+        next: null,
+        previous: null,
+        results: [
+            { id: 1, name: "User One" },
+            { id: 2, name: "User Two" },
+            { id: 3, name: "User Three" },
+            { id: 4, name: "User Four" },
+            { id: 5, name: "User Five" },
+        ],
+    });
+    user = people.objectAt(0);
+    pagination = store.typeMapFor(Person).metadata.pagination;
+
+    // test
+    statesEqual([user], 'loaded.saved');
+    enabledFlags(people, ['isLoaded'], recordArrayFlags);
+    enabledFlagsForArray([user], ['isLoaded'], recordArrayFlags);
+    equal(get(people, 'length'), 5, "there are five people in the results");
+    equal(pagination.items.total, 5);
+    equal(pagination.items.first, 1);
+    equal(pagination.items.last, 5);
+    equal(pagination.items.per_page, undefined);
+    equal(pagination.page.total, 1);
+    equal(pagination.page.current, 1);
+    equal(pagination.page.next, false);
+    equal(pagination.page.previous, false);
 
 });
