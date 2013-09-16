@@ -48,7 +48,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     getBelongsTo: function(record) {
         var totalParents = [];
         record.eachRelationship(function(name, relationship) {
-            if (relationship.kind == 'belongsTo') {
+            if (relationship.kind === 'belongsTo') {
                 totalParents.push(name);
             }
         }, this);

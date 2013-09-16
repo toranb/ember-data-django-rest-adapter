@@ -7,10 +7,11 @@ DS.DjangoRESTSerializer = DS.JSONSerializer.extend({
     },
 
     extractDjangoPayload: function(store, type, payload) {
-        for (item in payload) {
+        for (var item in payload) {
             if (typeof(payload[item][0]) !== 'number') {
                 if (payload[item].constructor.name === 'Array') {
                     var singular_type = Ember.String.singularize(item);
+                    /*jshint loopfunc:true*/
                     var ids = payload[item].map(function(related) {
                         store.push(singular_type, related);
                         return related.id; //todo find pk (not always id)
