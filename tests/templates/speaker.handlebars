@@ -1,0 +1,7 @@
+  {{input value=name}}<br />
+  {{input value=location}}<br />
+  <button {{action updateSpeaker model}}>Update Speaker</button><br />
+
+  {{#each persona in model.personas}}
+    {{persona.nickname}}<br />
+  {{/each}}

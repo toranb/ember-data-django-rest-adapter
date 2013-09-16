@@ -1,0 +1,6 @@
+  {{#each speaker in controller}}
+    {{speaker.name}}
+    {{#each persona in speaker.personas}}
+      {{persona.nickname}}<br />
+    {{/each}}
+  {{/each}}

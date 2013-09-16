@@ -1,0 +1,17 @@
+<table>
+{{#each other in controller}}
+<tr>
+  <td class="hat">{{other.hat}}</td>
+</tr>
+<tr class="speakers">
+  {{#each speaker in other.speakers}}
+  <td class="name">{{speaker.name}}</td>
+  {{/each}}
+</tr>
+<tr class="ratings">
+  {{#each rating in other.ratings}}
+  <td class="score">{{rating.score}}</td>
+  {{/each}}
+</tr>
+{{/each}}
+</table>
