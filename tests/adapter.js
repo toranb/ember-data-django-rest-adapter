@@ -96,11 +96,12 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
         return this.ajax(url, "POST", { data: data });
     },
 
-    // updateRecord: function(store, type, record) {
-    //     var data = store.serializerFor(type.typeKey).serialize(record);
-    //     var id = get(record, 'id'); //todo find pk (not always id)
-    //     return this.ajax(this.buildURL(type.typeKey, id), "PUT", { data: data });
-    // },
+    //untested code here
+    updateRecord: function(store, type, record) {
+        var data = store.serializerFor(type.typeKey).serialize(record);
+        var id = get(record, 'id'); //todo find pk (not always id)
+        return this.ajax(this.buildURL(type.typeKey, id), "PUT", { data: data });
+    },
 
     findMany: function(store, type, ids, parent) {
         var adapter, root, url;
