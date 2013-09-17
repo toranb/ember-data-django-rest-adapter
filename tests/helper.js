@@ -14,9 +14,17 @@ function missing(selector) {
     equal(element, 0, error);
 }
 
-function stubEndpointForHttpRequest(url, json) {
+function stubEndpointForHttpRequest(url, json, verb, status) {
+    if (verb == null) {
+        verb = "GET";
+    }
+    if (status == null) {
+        status = 200;
+    }
     $.mockjax({
+        type: verb,
         url: url,
+        status: status,
         dataType: 'json',
         responseText: json
     });

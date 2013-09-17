@@ -78,6 +78,12 @@ App.OthersRoute = Ember.Route.extend({
   }
 });
 
+App.RatingsRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('rating');
+  }
+});
+
 App.SessionsRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('session');
@@ -104,6 +110,22 @@ App.SpeakerController = Ember.ObjectController.extend({
   }
 });
 
+App.OtherController = Ember.ObjectController.extend({
+  actions: {
+      addRating: function(other) {
+        var score = this.get('score');
+        var feedback = this.get('feedback');
+        if (score === undefined || feedback === undefined || score.trim() === "" || feedback.trim() === "") {
+          return;
+        }
+        var rating = { score: score, feedback: feedback, other: other};
+        this.store.createRecord('rating', rating).save();
+        this.set('score', '');
+        this.set('feedback', '');
+      }
+  }
+});
+
 App.SessionController = Ember.ObjectController.extend({
   actions: {
       addSpeaker: function(session) {
@@ -118,13 +140,13 @@ App.SessionController = Ember.ObjectController.extend({
             self.store.createRecord('speaker', hash).save();
           });
       },
-      addRating: function(event) {
+      addRating: function(session) {
         var score = this.get('score');
         var feedback = this.get('feedback');
         if (score === undefined || feedback === undefined || score.trim() === "" || feedback.trim() === "") {
           return;
         }
-        var rating = { score: score, feedback: feedback, session: event};
+        var rating = { score: score, feedback: feedback, session: session};
         this.store.createRecord('rating', rating).save();
         this.set('score', '');
         this.set('feedback', '');
@@ -142,6 +164,7 @@ App.Router.map(function() {
   this.resource("other", { path : "/other/:other_id" });
   this.resource("associations", { path : "/associations" });
   this.resource("speakers", { path : "/speakers" });
+  this.resource("ratings", { path : "/ratings" });
   this.resource("session", { path : "/session/:session_id" });
   this.resource("speaker", { path : "/speaker/:speaker_id" });
 });

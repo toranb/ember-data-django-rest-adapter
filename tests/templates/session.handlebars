@@ -1,23 +1,29 @@
-{{model.name}}<br />
-{{model.room}}<br />
+<div class="model_name">{{model.name}}</div>
+<div class="room">{{model.room}}</div>
+
+<div class="speakers">
   {{#each speaker in model.speakers}}
-    {{speaker.name}}<br />
-    {{#linkTo 'speaker' speaker}}View Speaker Details{{/linkTo}}<br /><br />
+    <span class="name">{{speaker.name}}</span>
+    <span class="link">{{#linkTo 'speaker' speaker}}View Speaker Details{{/linkTo}}</span>
   {{/each}}
+</div>
+
+<div class="ratings">
   {{#each rating in model.ratings}}
-    {{rating.score}}<br />
-    {{rating.feedback}}<br/>
+    <span class="score">{{rating.score}}</span>
+    <span class="feedback">{{rating.feedback}}</span>
     <button {{action deleteRating rating}}>Delete Rating</button><br />
   {{/each}}
-  <br />
-  {{input placeholder='score' value=score}}
-  {{input placeholder='feedback' value=feedback}}
-  <button {{action addRating model}}>Add Rating</button>
+</div>
 
-  <br />
-  <hr>
-  <br />
+<div>
+  {{input class='score' placeholder='score' value=score}}
+  {{input class='feedback' placeholder='feedback' value=feedback}}
+  <button class="add_rating" {{action addRating model}}>Add Rating</button>
+</div>
 
+<div>
   {{input placeholder='speaker name' value=speaker}}
   {{input placeholder='speaker location' value=location}}
-  <button {{action addSpeaker model}}>Add Speaker</button>
+  <button class="add_speaker" {{action addSpeaker model}}>Add Speaker</button>
+</div>

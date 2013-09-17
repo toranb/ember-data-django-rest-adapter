@@ -1,12 +1,28 @@
-{{model.hat}}<br />
+<div class="hat">{{model.hat}}</div>
+
+<div class="speakers">
 {{#each speaker in model.speakers}}
-  {{speaker.name}}<br />
-  {{#linkTo 'speaker' speaker}}View Speaker Details{{/linkTo}}<br /><br />
+  <span class="name">{{speaker.name}}</span>
+  <span class="link">{{#linkTo 'speaker' speaker}}View Speaker Details{{/linkTo}}</span>
 {{/each}}
-{{#each rating in model.ratings}}
-  {{rating.score}}<br />
-  {{rating.feedback}}<br/>
+</div>
+
+<div class="tags">
+{{#each tag in model.tags}}
+  <span class="description">{{tag.description}}</span>
 {{/each}}
-<br />
-{{input placeholder="score" value=score}}
-{{input placeholder="feedback" value=feedback}}
+</div>
+
+<div class="ratings">
+  {{#each rating in model.ratings}}
+    <span class="score">{{rating.score}}</span>
+    <span class="feedback">{{rating.feedback}}</span>
+    <button {{action deleteRating rating}}>Delete Rating</button>
+  {{/each}}
+</div>
+
+<div>
+  {{input class='score' placeholder='score' value=score}}
+  {{input class='feedback' placeholder='feedback' value=feedback}}
+  <button class="add_rating" {{action addRating model}}>Add Rating</button>
+</div>
