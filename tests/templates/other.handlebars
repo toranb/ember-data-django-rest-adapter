@@ -1,0 +1,12 @@
+{{model.hat}}<br />
+{{#each speaker in model.speakers}}
+  {{speaker.name}}<br />
+  {{#linkTo 'speaker' speaker}}View Speaker Details{{/linkTo}}<br /><br />
+{{/each}}
+{{#each rating in model.ratings}}
+  {{rating.score}}<br />
+  {{rating.feedback}}<br/>
+{{/each}}
+<br />
+{{input placeholder="score" value=score}}
+{{input placeholder="feedback" value=feedback}}

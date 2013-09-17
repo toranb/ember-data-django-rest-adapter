@@ -17,13 +17,13 @@ test('ajax response with embedded hasMany renders correctly', function() {
     stubEndpointForHttpRequest('/api/others/', json);
     visit("/others").then(function() {
         var rows = find("table tr").length;
-        equal(rows, 3, "table had " + rows + " rows");
-        var hat = $("table tr:eq(0) td:eq(0)").text();
-        var speaker = $("table tr:eq(1) td:eq(0)").text();
-        var rating = $("table tr:eq(2) td:eq(0)").text();
+        equal(rows, 4, "table had " + rows + " rows");
+        var hat = $("table tr:eq(0) td:eq(0)").text().trim();
+        var speaker = $("table tr:eq(1) td:eq(0)").text().trim();
+        var tag = $("table tr:eq(2) td:eq(0)").text().trim();
         equal(hat, "zzz", "(other) hat was instead: " + hat);
         equal(speaker, "first", "speaker was instead: " + speaker);
-        equal(rating, "10", "rating was instead: " + rating);
+        equal(tag, "done", "tag was instead: " + tag);
     });
 });
 

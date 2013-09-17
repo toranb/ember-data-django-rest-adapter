@@ -139,6 +139,7 @@ App.SessionController = Ember.ObjectController.extend({
 App.Router.map(function() {
   this.resource("sessions", { path : "/" });
   this.resource("others", { path : "/others" });
+  this.resource("other", { path : "/other/:other_id" });
   this.resource("associations", { path : "/associations" });
   this.resource("speakers", { path : "/speakers" });
   this.resource("session", { path : "/session/:session_id" });
