@@ -3,6 +3,7 @@
     "grunt-karma": "*",
     "grunt-cli": "*",
     "grunt-contrib-concat": "*",
+    "grunt-contrib-jshint": "*",
     "grunt-ember-template-compiler": "1.0.6",
     "karma-qunit": "*",
     "karma": "0.10.0"

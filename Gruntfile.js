@@ -2,8 +2,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-ember-template-compiler');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
   grunt.initConfig({
+    jshint: {
+      all: ['tests/adapter.js']
+    },
     karma: {
       unit: {
         configFile: 'karma.conf.js'
@@ -37,5 +41,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.task.registerTask('test', ['emberhandlebars', 'concat:test', 'karma']);
+  grunt.task.registerTask('test', ['jshint', 'emberhandlebars', 'concat:test', 'karma']);
 }
