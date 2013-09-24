@@ -1,2 +1,2 @@
-require("ember-data-django-rest-adapter/serializer");
-require("ember-data-django-rest-adapter/adapter");
+require("packages/ember-data-django-rest-adapter/lib/serializer");
+require("packages/ember-data-django-rest-adapter/lib/adapter");
