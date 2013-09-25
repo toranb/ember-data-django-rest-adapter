@@ -216,6 +216,29 @@ A full example of pagination with this adapter can be found below
 
 https://github.com/toranb/ember-django-pagination
 
+## Building ember-data-django-rest-adapter
+
+To build the minified versions of ember-data-django-rest-adapter you will need [node](http://nodejs.org) installed.
+
+Install the [Grunt](http://gruntjs.com/) command line. This might require `sudo`.
+
+```shell
+npm install -g grunt-cli
+```
+
+Then, from the main project folder run this command. This should not require `sudo`.
+
+```shell
+npm install
+```
+
+At this point the dependencies have been installed and you can build ember-data-django-rest-adapter
+
+```shell
+grunt
+```
+
+
 ## Contributing
 This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
 
