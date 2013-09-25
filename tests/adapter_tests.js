@@ -15,6 +15,48 @@ module('integration tests', {
     }
 });
 
+test('attribute transforms are applied', function() {
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    var json = [{"id": 1, "transformed": "blah blah"}];
+    stubEndpointForHttpRequest('/api/transformers/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/transformers").then(function() {
+        var spans = find("span").length;
+        equal(spans, 1, "found " + spans + " spans");
+        var attribute = $("span.attribute").text().trim();
+        equal(attribute, "blah blahSILLYTRANSFORM", "attribute was instead: " + attribute);
+    });
+});
+
+test('models with camelCase converted to underscore urls', function() {
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    var json = [{"id": 1, "test": "foobar"}];
+    stubEndpointForHttpRequest('/api/camel_urls/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/camelUrls").then(function() {
+        var spans = find("span").length;
+        equal(spans, 1, "found " + spans + " spans");
+        var attribute = $("span.attribute").text().trim();
+        equal(attribute, "foobar", "attribute was instead: " + attribute);
+    });
+});
+
+test('keys with underscores converted to camelCase', function() {
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    stubEndpointForHttpRequest('/api/camels/1/tags/', tags_json);
+    var json = [{"id": 1, "camel_case_attribute": "foo", "camel_case_relationship": [7]}];
+    stubEndpointForHttpRequest('/api/camels/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/camels").then(function() {
+        var spans = find("span").length;
+        equal(spans, 2, "found " + spans + " spans");
+        var attribute = $("span.attribute").text().trim();
+        equal(attribute, "foo", "attribute was instead: " + attribute);
+        var tag = $("span.tag").text().trim();
+        equal(tag, "done", "tag was instead: " + tag);
+    });
+});
+
 test('ajax response with 1 session yields table with 1 row', function() {
     var json = [{"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [], "ratings": [], "tags": []}];
     stubEndpointForHttpRequest('/api/sessions/', json);

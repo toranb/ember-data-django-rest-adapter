@@ -49,7 +49,6 @@ module.exports = function(grunt) {
             'tests/lib/ember-data.js',
             'tests/lib/jquery.mockjax.js',
             'tests/lib/tmpl.min.js',
-            //'tests/adapter.js',
             'dist/ember-data-django-rest-adapter.js',
             'tests/app.js'],
           dest: 'tests/dist/deps.min.js'
