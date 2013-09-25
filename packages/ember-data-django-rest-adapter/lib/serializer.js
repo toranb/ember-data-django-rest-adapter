@@ -44,6 +44,40 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     },
 
     /**
+      This method allows you to push a single object payload.
+
+      It will first normalize the payload, so you can use this to push
+      in data streaming in from your server structured the same way
+      that fetches and saves are structured.
+
+      @param {DS.Store} store
+      @param {String} type
+      @param {Object} payload
+    */
+    pushSinglePayload: function(store, type, payload) {
+        type = store.modelFor(type);
+        payload = this.extract(store, type, payload, null, "find");
+        store.push(type, payload);
+    },
+
+    /**
+      This method allows you to push an array of object payloads.
+
+      It will first normalize the payload, so you can use this to push
+      in data streaming in from your server structured the same way
+      that fetches and saves are structured.
+
+      @param {DS.Store} store
+      @param {String} type
+      @param {Object} payload
+    */
+    pushArrayPayload: function(store, type, payload) {
+        type = store.modelFor(type);
+        payload = this.extract(store, type, payload, null, "findAll");
+        store.pushMany(type, payload);
+    },
+
+    /**
       Converts camelcased attributes to underscored when serializing.
 
       Stolen from DS.ActiveModelSerializer.
