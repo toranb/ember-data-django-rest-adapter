@@ -3,6 +3,26 @@ var get = Ember.get, set = Ember.set, isNone = Ember.isNone;
 DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     defaultSerializer: "DS/djangoREST",
 
+    /**
+      Overrides the `pathForType` method to build underscored URLs.
+
+      Stolen from ActiveModelAdapter
+
+      ```js
+        this.pathForType("famousPerson");
+        //=> "famous_people"
+      ```
+
+      @method pathForType
+      @param {String} type
+      @returns String
+    */
+    pathForType: function(type) {
+        var decamelized = Ember.String.decamelize(type);
+        return Ember.String.pluralize(decamelized);
+    },
+
+
     createRecord: function(store, type, record) {
         var url = this.getCorrectPostUrl(record, this.buildURL(type.typeKey));
         var data = store.serializerFor(type.typeKey).serialize(record);
