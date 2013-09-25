@@ -142,3 +142,37 @@ test('ajax response for single session will render correctly', function() {
         equal(ratings, 1, "table had " + ratings + " ratings");
     });
 });
+
+test('test pushSinglePayload', function() {
+    var json = {"id": 10, "description": "django"};
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    Ember.run(App, function(){
+        // load the object into the Ember data store
+        var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
+        store.serializerFor('tag').pushSinglePayload(store, 'tag', json);
+    });
+    Ember.run(App, 'advanceReadiness');
+    visit("/tag/10").then(function() {
+        var content = $("span").text().trim();
+        equal(content, "django", "name was instead: " + content);
+    });
+});
+
+test('test pushArrayPayload', function() {
+    var json = [{"id": 11, "description": "ember"}, {"id": 12, "description": "tomster"}];
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    Ember.run(App, function(){
+        // load the objects into the Ember data store
+        var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
+        store.serializerFor('tag').pushArrayPayload(store, 'tag', json);
+    });
+    Ember.run(App, 'advanceReadiness');
+    visit("/tag/12").then(function() {
+        var content = $("span").text().trim();
+        equal(content, "tomster", "name was instead: " + content);
+        return visit("/tag/11");
+    }).then(function(){
+        var content = $("span").text().trim();
+        equal(content, "ember", "name was instead: " + content);
+    });
+});
