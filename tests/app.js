@@ -2,6 +2,29 @@ App = Ember.Application.create({
   rootElement: '#ember'
 });
 
+App.SillyTransform = DS.Transform.extend({
+  text: "SILLYTRANSFORM",
+  deserialize: function(serialized) {
+    return serialized + this.text;
+  },
+  serialize: function(deserialized) {
+    return deserialized.slice(0, deserialized.length - this.text.length);
+  }
+});
+
+App.Transformer = DS.Model.extend({
+  transformed: DS.attr('silly')
+});
+
+App.CamelUrl = DS.Model.extend({
+  test: DS.attr('string')
+});
+
+App.Camel = DS.Model.extend({
+  camelCaseAttribute: DS.attr('string'),
+  camelCaseRelationship: DS.hasMany('tag', { async: true })
+});
+
 App.Session = DS.Model.extend({
   name: DS.attr('string'),
   room: DS.attr('string'),
@@ -81,6 +104,24 @@ App.OthersRoute = Ember.Route.extend({
 App.RatingsRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('rating');
+  }
+});
+
+App.TransformersRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('transformer');
+  }
+});
+
+App.CamelUrlsRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('camelUrl');
+  }
+});
+
+App.CamelsRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('camel');
   }
 });
 
@@ -167,6 +208,9 @@ App.Router.map(function() {
   this.resource("ratings", { path : "/ratings" });
   this.resource("session", { path : "/session/:session_id" });
   this.resource("speaker", { path : "/speaker/:speaker_id" });
+  this.resource("camels", { path : "/camels" });
+  this.resource("camelUrls", { path : "/camelUrls" });
+  this.resource("transformers", { path : "/transformers" });
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({

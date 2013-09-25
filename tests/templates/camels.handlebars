@@ -1,0 +1,6 @@
+  {{#each camel in controller}}
+    <span class="attribute">{{camel.camelCaseAttribute}}</span>
+    {{#each tag in camel.camelCaseRelationship}}
+      <span class="tag">{{tag.description}}</span
+    {{/each}}
+  {{/each}}
