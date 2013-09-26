@@ -212,6 +212,7 @@ App.Router.map(function() {
   this.resource("camelUrls", { path : "/camelUrls" });
   this.resource("transformers", { path : "/transformers" });
   this.resource("tag", { path : "/tag/:tag_id" });
+  this.resource("user", { path : "/user/:user_id" });
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({

@@ -176,3 +176,21 @@ test('test pushArrayPayload', function() {
         equal(content, "ember", "name was instead: " + content);
     });
 });
+
+test('finding nested attributes makes GET request to the correct attribute-based URL', function() {
+    var user = {"id": 1, "username": "foo", "aliases": [8, 9]};
+    var aliases = [{"id": 8, "name": "ember"}, {"id": 9, "name": "tomster"}];
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    stubEndpointForHttpRequest('/api/users/1/', user);
+    stubEndpointForHttpRequest('/api/users/1/speakers/', aliases); //TODO remove this
+    //stubEndpointForHttpRequest('/api/users/1/aliases/', aliases); //TODO add this instead
+    Ember.run(App, 'advanceReadiness');
+    visit("/user/1").then(function() {
+        var name = $(".username").text().trim();
+        equal(name, "foo", "name was instead: " + name);
+        var count = $(".alias").length;
+        equal(count, 2, "count was instead: " + count);
+        var alias = $(".alias:eq(0)").text().trim();
+        equal(alias, "ember", "alias was instead: " + alias);
+    });
+});
