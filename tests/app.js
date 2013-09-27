@@ -28,6 +28,15 @@ App.Preserialized = DS.Model.extend({
   config: DS.attr('object')
 });
 
+// handlebars helper that checks if the provided input is a Date object
+Ember.Handlebars.registerBoundHelper('isInstanceOfDate', function(input) {
+  return (input instanceof Date) ? "true" : "false";
+});
+
+App.Timestamp = DS.Model.extend({
+  start: DS.attr('isodate')
+});
+
 App.Transformer = DS.Model.extend({
   transformed: DS.attr('silly')
 });
@@ -127,6 +136,12 @@ App.RatingsRoute = Ember.Route.extend({
 App.PreserializedRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('preserialized');
+  }
+});
+
+App.TimestampsRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('timestamp');
   }
 });
 
@@ -253,6 +268,7 @@ App.Router.map(function() {
   this.resource("tag", { path : "/tag/:tag_id" });
   this.resource("user", { path : "/user/:user_id" });
   this.resource("preserialized", { path: "/preserialized" });
+  this.resource("timestamps", { path : "/timestamps" });
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
