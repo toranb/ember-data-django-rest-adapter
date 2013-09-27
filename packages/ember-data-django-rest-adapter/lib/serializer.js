@@ -1,5 +1,3 @@
-var get = Ember.get, set = Ember.set, isNone = Ember.isNone;
-
 DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     init: function() {

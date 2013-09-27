@@ -1,4 +1,4 @@
-var get = Ember.get, set = Ember.set, isNone = Ember.isNone;
+var get = Ember.get;
 
 DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     defaultSerializer: "DS/djangoREST",
@@ -36,12 +36,12 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     findMany: function(store, type, ids, parent) {
-        var adapter, root, url, endpoint;
+        var adapter, root, url, endpoint, attribute;
         adapter = this;
 
         if (parent) {
-            endpoint = this.getHasManyAttributeName(type, parent, ids);
-            endpoint = store.serializerFor(type.typeKey).keyForAttribute(endpoint);
+            attribute = this.getHasManyAttributeName(type, parent, ids);
+            endpoint = store.serializerFor(type.typeKey).keyForAttribute(attribute);
             url = this.buildFindManyUrlWithParent(type, parent, endpoint);
         } else {
             Ember.assert("You need to add belongsTo for type (" + type.typeKey + "). No Parent for this record was found");
@@ -116,7 +116,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     buildFindManyUrlWithParent: function(type, parent, endpoint) {
-        var root, url, endpoint, parentValue;
+        var root, url, parentValue;
 
         parentValue = parent.get('id'); //todo find pk (not always id)
         root = parent.constructor.typeKey;

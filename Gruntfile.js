@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     jshint: {
-      all: ['tests/adapter.js', 'tests/adapter_tests.js', 'tests/adapter_embedded_tests.js']
+      all: ['dist/ember-data-django-rest-adapter.js', 'tests/adapter_tests.js', 'tests/adapter_embedded_tests.js']
     },
     karma: {
       unit: {
