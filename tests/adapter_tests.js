@@ -15,6 +15,19 @@ module('integration tests', {
     }
 });
 
+test('arrays as result of transform should not be interpreted as embedded records', function() {
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    var json = [{"id": 1, "config": "[\"ember\",\"is\",\"neato\"]"}];
+    stubEndpointForHttpRequest('/api/preserializeds/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/preserialized").then(function() {
+        var divs = find("div.item").length;
+        equal(divs, 3, "found " + divs + " divs");
+        var items = $("div.item").text().trim();
+        equal(items, "emberisneato", "attribute was instead: " + items);
+    });
+});
+
 test('attribute transforms are applied', function() {
     stubEndpointForHttpRequest('/api/sessions/', []);
     var json = [{"id": 1, "transformed": "blah blah"}];
