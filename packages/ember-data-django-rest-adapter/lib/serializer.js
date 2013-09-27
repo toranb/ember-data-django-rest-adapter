@@ -5,19 +5,16 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     },
 
     extractDjangoPayload: function(store, type, payload) {
-        for (var item in payload) {
-            if (!Ember.isNone(payload[item]) && typeof(payload[item][0]) !== 'number') {
-                if (payload[item].constructor.name === 'Array') {
-                    var singular_type = Ember.String.singularize(item);
-                    /*jshint loopfunc:true*/
-                    var ids = payload[item].map(function(related) {
-                        store.push(singular_type, related);
-                        return related.id; //todo find pk (not always id)
-                    });
-                    payload[item] = ids;
+        type.eachRelationship(function(key, relationship){
+            // TODO should we check if relationship is marked as embedded?
+            if (!Ember.isNone(payload[key]) && typeof(payload[key][0]) !== 'number') {
+                if (payload[key].constructor.name === 'Array' && payload[key].length > 0) {
+                    var ids = payload[key].mapBy('id'); //todo find pk (not always id)
+                    this.pushArrayPayload(store, relationship.type, payload[key]);
+                    payload[key] = ids;
                 }
             }
-        }
+        }, this);
     },
 
     extractSingle: function(store, type, payload) {
