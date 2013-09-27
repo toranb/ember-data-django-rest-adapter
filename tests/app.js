@@ -12,6 +12,22 @@ App.SillyTransform = DS.Transform.extend({
   }
 });
 
+App.ObjectTransform = DS.Transform.extend({
+  deserialize: function(serialized) {
+    return Ember.isEmpty(serialized) ? {} : JSON.parse(serialized);
+  },
+  serialize: function(deserialized) {
+    return Ember.isNone(deserialized) ? '' : JSON.stringify(deserialized);
+  }
+});
+
+App.Preserialized = DS.Model.extend({
+  // This will contain JSON that will be deserialized by the App.ObjectTransform.
+  // If it deserializes to an array with anything other than numbers it will be 
+  // incorrectly interpreted by extractDjangoPayload as an embedded record.
+  config: DS.attr('object')
+});
+
 App.Transformer = DS.Model.extend({
   transformed: DS.attr('silly')
 });
@@ -104,6 +120,12 @@ App.OthersRoute = Ember.Route.extend({
 App.RatingsRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('rating');
+  }
+});
+
+App.PreserializedRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('preserialized');
   }
 });
 
@@ -213,6 +235,7 @@ App.Router.map(function() {
   this.resource("transformers", { path : "/transformers" });
   this.resource("tag", { path : "/tag/:tag_id" });
   this.resource("user", { path : "/user/:user_id" });
+  this.resource("preserialized", { path: "/preserialized" });
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
