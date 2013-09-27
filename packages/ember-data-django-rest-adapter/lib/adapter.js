@@ -36,11 +36,13 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     findMany: function(store, type, ids, parent) {
-        var adapter, root, url;
+        var adapter, root, url, endpoint;
         adapter = this;
 
         if (parent) {
-            url = this.buildFindManyUrlWithParent(type, parent);
+            endpoint = this.getHasManyAttributeName(type, parent, ids);
+            endpoint = store.serializerFor(type.typeKey).keyForAttribute(endpoint);
+            url = this.buildFindManyUrlWithParent(type, parent, endpoint);
         } else {
             Ember.assert("You need to add belongsTo for type (" + type.typeKey + "). No Parent for this record was found");
         }
@@ -113,15 +115,66 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
         return url;
     },
 
-    buildFindManyUrlWithParent: function(type, parent) {
+    buildFindManyUrlWithParent: function(type, parent, endpoint) {
         var root, url, endpoint, parentValue;
 
-        endpoint = Ember.String.pluralize(type.typeKey);
         parentValue = parent.get('id'); //todo find pk (not always id)
         root = parent.constructor.typeKey;
         url = this.buildURL(root, parentValue);
 
         return url + endpoint + '/';
+    },
+
+    /**
+      Extract the attribute name given the parent record, the ids of the referenced model, and the type of
+      the referenced model.
+
+      Given the model definition
+
+      ````
+      App.User = DS.Model.extend({
+          username: DS.attr('string'),
+          aliases: DS.hasMany('speaker', { async: true})
+          favorites: DS.hasMany('speaker', { async: true})
+      });
+      ````
+
+      with a model object
+
+      ````
+      user1 = {
+          id: 1,
+          name: 'name',
+          aliases: [2,3],
+          favorites: [4,5]
+      }
+      
+      type = App.Speaker;
+      parent = user1;
+      ids = [4,5]
+      name = getHasManyAttributeName(type, parent, ids) // name === "favorites"
+      ````
+
+      @method getHasManyAttributeName
+      @param {subclass of DS.Model} type
+      @param {DS.Model} parent
+      @param {Array} ids
+      @returns String
+    */
+    getHasManyAttributeName: function(type, parent, ids) {
+      var attributeName;
+
+      parent.eachRelationship(function(name, relationship){
+        var relationshipIds;
+        if (relationship.kind === "hasMany" && relationship.type.typeKey === type.typeKey) {
+          relationshipIds = parent._data[name].mapBy('id');
+          if (Ember.compare(ids, relationshipIds) === 0) {
+            attributeName = name;
+          }
+        }
+      });
+
+      return attributeName;
     }
 
 });

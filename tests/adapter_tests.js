@@ -43,7 +43,7 @@ test('models with camelCase converted to underscore urls', function() {
 
 test('keys with underscores converted to camelCase', function() {
     stubEndpointForHttpRequest('/api/sessions/', []);
-    stubEndpointForHttpRequest('/api/camels/1/tags/', tags_json);
+    stubEndpointForHttpRequest('/api/camels/1/camel_case_relationship/', tags_json);
     var json = [{"id": 1, "camel_case_attribute": "foo", "camel_case_relationship": [7]}];
     stubEndpointForHttpRequest('/api/camels/', json);
     Ember.run(App, 'advanceReadiness');
@@ -182,8 +182,7 @@ test('finding nested attributes makes GET request to the correct attribute-based
     var aliases = [{"id": 8, "name": "ember"}, {"id": 9, "name": "tomster"}];
     stubEndpointForHttpRequest('/api/sessions/', []);
     stubEndpointForHttpRequest('/api/users/1/', user);
-    stubEndpointForHttpRequest('/api/users/1/speakers/', aliases); //TODO remove this
-    //stubEndpointForHttpRequest('/api/users/1/aliases/', aliases); //TODO add this instead
+    stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
     Ember.run(App, 'advanceReadiness');
     visit("/user/1").then(function() {
         var name = $(".username").text().trim();
