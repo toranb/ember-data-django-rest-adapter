@@ -56,7 +56,8 @@ App.Speaker = DS.Model.extend({
     personas: DS.hasMany('persona', { async: true }),
     session: DS.belongsTo('session'),
     zidentity: DS.belongsTo('user'),
-    other: DS.belongsTo('other')
+    other: DS.belongsTo('other'),
+    errors: ''
 });
 
 App.Other = DS.Model.extend({
@@ -69,7 +70,7 @@ App.Other = DS.Model.extend({
 App.Speaker.reopen({
     becameError: function(errors) {
         var model = this.constructor.typeKey;
-        alert("operation failed for model: " + model);
+        this.set('errors', "operation failed for model: " + model);
     }
 });
 

@@ -206,3 +206,25 @@ test('finding nested attributes makes GET request to the correct attribute-based
         equal(alias, "ember", "alias was instead: " + alias);
     });
 });
+
+test('basic error handling will bubble to the model', function() {
+    var speaker = {"id": 1, "name": "wat", "location": "iowa", "session": 1, "association": 1, "personas": [1], "zidentity": 1};
+    var personas = [{"id": 1, "nickname": "magic", "speaker": 1, "company": 1}];
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    stubEndpointForHttpRequest('/api/speakers/1/', speaker);
+    stubEndpointForHttpRequest('/api/speakers/1/personas/', personas);
+    Ember.run(App, 'advanceReadiness');
+    visit("/speaker/1").then(function() {
+        var name = $("input.name").val();
+        equal(name, "wat", "name was instead: " + name);
+        var errors = $("#errors").text().trim();
+        equal(errors, "", "errors was instead: " + errors);
+        stubEndpointForHttpRequest('/api/speakers/1/', {}, 'PUT', 400);
+        return click(".update");
+    }).then(function() {
+        var name = $("input.name").val();
+        equal(name, "wat", "name was instead: " + name);
+        var errors = $("#errors").text().trim();
+        equal(errors, "operation failed for model: speaker", "errors was instead: " + errors);
+    });
+});
