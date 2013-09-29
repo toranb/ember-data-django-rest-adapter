@@ -14,6 +14,40 @@ function missing(selector) {
     equal(element, 0, error);
 }
 
+var expectUrlTypeHashEqual = function(url, type, hash) {
+    equal(ajaxUrl, url, "ajaxUrl was instead " + ajaxUrl);
+    equal(ajaxType, type, "ajaxType was instead " + ajaxType);
+    //hangs test runner? equal(ajaxHash, type, "ajaxHash was instead " + ajaxHash);
+};
+
+var expectSpeakerAddedToStore = function(pk, expectedName, expectedLocation) {
+    Ember.run(App, function(){
+        var store = App.__container__.lookup("store:main");
+        store.find('speaker', pk).then(function(speaker) {
+            var name = speaker.get('name');
+            equal(name, expectedName, "speaker added with name " + name);
+            var location = speaker.get('location');
+            equal(location, expectedLocation, "speaker added with location " + location);
+        });
+    });
+};
+
+var expectRatingAddedToStore = function(pk, expectedScore, expectedFeedback, expectedSession) {
+    Ember.run(App, function(){
+        var store = App.__container__.lookup("store:main");
+        store.find('rating', pk).then(function(rating) {
+            var primaryKey = rating.get('id');
+            equal(primaryKey, pk, "rating added with id " + primaryKey);
+            var score = rating.get('score');
+            equal(score, expectedScore, "rating added with score " + score);
+            var feedback = rating.get('feedback');
+            equal(feedback, expectedFeedback, "rating added with feedback " + feedback);
+            var sessionpk = rating.get('session').get('id');
+            equal(sessionpk, expectedSession, "rating added with session pk " + sessionpk);
+        });
+    });
+};
+
 function stubEndpointForHttpRequest(url, json, verb, status) {
     if (verb == null) {
         verb = "GET";

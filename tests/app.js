@@ -199,10 +199,16 @@ App.SessionController = Ember.ObjectController.extend({
           this.store.find('user', 1).then(function(user) {
             //to simulate a record create with multiple parents
             var hash = {zidentity: user, name: name, location: location, session: session};
-            //to create with a single parent use the below hash instead
-            //var hash = {name: name, location: location, session: session};
             self.store.createRecord('speaker', hash).save();
           });
+      },
+      addSpeakerWithSingleParent: function(session) {
+          var self = this;
+          var name = this.get('speaker');
+          var location = this.get('location');
+          //to simulate a record create with just a single parent
+          var hash = {name: name, location: location, session: session};
+          self.store.createRecord('speaker', hash).save();
       },
       addRating: function(session) {
         var score = this.get('score');
@@ -241,4 +247,17 @@ App.Router.map(function() {
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
     namespace: 'api'
+});
+
+//monkey patch the ajax method for testing
+var ajaxUrl, ajaxType, ajaxHash;
+DS.DjangoRESTAdapter.reopen({
+    ajax: function(url, type, hash) {
+        ajaxUrl = url;
+        ajaxType = type;
+        ajaxHash = hash;
+        hash = hash || {};
+        hash.cache = false;
+        return this._super(url, type, hash);
+    }
 });

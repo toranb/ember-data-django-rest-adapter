@@ -2,6 +2,9 @@ var speakers_json, ratings_json, tags_json;
 
 module('integration tests', {
     setup: function() {
+        ajaxUrl = undefined;
+        ajaxType = undefined;
+        ajaxHash = undefined;
         speakers_json = [{"id": 9, "name": "first", "session": 1}, {"id": 4, "name": "last", "session": 1}];
         ratings_json = [{"id": 8, "score": 10, "feedback": "nice", "session": 1}];
         tags_json = [{"id": 7, "description": "done"}];
@@ -144,7 +147,7 @@ test('ajax response for single session will render correctly', function() {
         equal(rating_one, "10", "rating_one was instead: " + rating_one);
         //setup the http post mock $.ajax
         //for some reason the 2 lines below are not used or needed?
-        var response = {"id": 3, "score": 2, "feedback": "abc", "session": 1};
+        var response = {"id": 4, "score": 2, "feedback": "abc", "session": 1};
         stubEndpointForHttpRequest('/api/sessions/1/ratings/', response, 'POST');
         fillIn(".score", "2");
         fillIn(".feedback", "abc");
@@ -153,6 +156,8 @@ test('ajax response for single session will render correctly', function() {
         //this is currently broken for non-embedded bound templates (should be 2)
         var ratings = find("div .ratings span.score").length;
         equal(ratings, 1, "table had " + ratings + " ratings");
+        expectUrlTypeHashEqual("/api/sessions/1/ratings/", "POST", {});
+        expectRatingAddedToStore(4, 2, 'abc', 1);
     });
 });
 
@@ -248,5 +253,60 @@ test('basic error handling will not fire when update is successful', function() 
         equal(name, "wat", "name was instead: " + name);
         var errors = $("#errors").text().trim();
         equal(errors, "", "errors was instead: " + errors);
+        expectUrlTypeHashEqual("/api/speakers/1/", "PUT", speaker);
+    });
+});
+
+test('ajax post with multiple parents will use singular endpoint', function() {
+    stubEndpointForHttpRequest('/api/sessions/1/speakers/', speakers_json);
+    stubEndpointForHttpRequest('/api/sessions/1/ratings/', ratings_json);
+    stubEndpointForHttpRequest('/api/sessions/1/tags/', tags_json);
+    var json = {"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [9,4], "ratings": [8], "tags": [7]};
+    var response = {"id": 3, "name": "tom", "location": "iowa", "session": 1, "association": null, "personas": [], "zidentity": 1};
+    stubEndpointForHttpRequest('/api/sessions/', [json]);
+    stubEndpointForHttpRequest('/api/sessions/1/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/session/1").then(function() {
+        var speakers = find("div .speakers span.name").length;
+        equal(speakers, 2, "template had " + speakers + " speakers");
+        //setup the http post mock $.ajax
+        var user = {"id": 1, "username": "toranb", "aliases": [1]};
+        stubEndpointForHttpRequest('/api/users/1/', user);
+        stubEndpointForHttpRequest('/api/speakers/', response, 'POST', 201);
+        fillIn(".speaker_name", "tom");
+        fillIn(".speaker_location", "iowa");
+        return click(".add_speaker");
+    }).then(function() {
+        //this is currently broken for non-embedded bound templates (should be 3)
+        var speakers = find("div .speakers span.name").length;
+        equal(speakers, 2, "template had " + speakers + " speakers");
+        expectUrlTypeHashEqual("/api/speakers/", "POST", response);
+        expectSpeakerAddedToStore(3, 'tom', 'iowa');
+    });
+});
+
+test('ajax post with single parent will use correctly nested endpoint', function() {
+    stubEndpointForHttpRequest('/api/sessions/1/speakers/', speakers_json);
+    stubEndpointForHttpRequest('/api/sessions/1/ratings/', ratings_json);
+    stubEndpointForHttpRequest('/api/sessions/1/tags/', tags_json);
+    var json = {"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [9,4], "ratings": [8], "tags": [7]};
+    var response = {"id": 3, "name": "axe", "location": "yo", "session": 1, "association": null, "personas": [], "zidentity": null};
+    stubEndpointForHttpRequest('/api/sessions/', [json]);
+    stubEndpointForHttpRequest('/api/sessions/1/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/session/1").then(function() {
+        var speakers = find("div .speakers span.name").length;
+        equal(speakers, 2, "template had " + speakers + " speakers");
+        //setup the http post mock $.ajax
+        stubEndpointForHttpRequest('/api/sessions/1/speakers/', response, 'POST', 201);
+        fillIn(".speaker_name", "tbill");
+        fillIn(".speaker_location", "ohio");
+        return click(".add_speaker_with_single_parent");
+    }).then(function() {
+        //this is currently broken for non-embedded bound templates (should be 3)
+        var speakers = find("div .speakers span.name").length;
+        equal(speakers, 2, "template had " + speakers + " speakers");
+        expectUrlTypeHashEqual("/api/sessions/1/speakers/", "POST", response);
+        expectSpeakerAddedToStore(3, 'axe', 'yo');
     });
 });

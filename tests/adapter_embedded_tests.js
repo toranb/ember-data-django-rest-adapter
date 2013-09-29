@@ -1,5 +1,8 @@
 module('embedded integration tests', {
     setup: function() {
+        ajaxUrl = undefined;
+        ajaxType = undefined;
+        ajaxHash = undefined;
         Ember.run(function() {
             App.reset();
             App.deferReadiness();

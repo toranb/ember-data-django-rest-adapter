@@ -23,7 +23,8 @@
 </div>
 
 <div>
-  {{input placeholder='speaker name' value=speaker}}
-  {{input placeholder='speaker location' value=location}}
+  {{input class='speaker_name' placeholder='speaker name' value=speaker}}
+  {{input class='speaker_location' placeholder='speaker location' value=location}}
   <button class="add_speaker" {{action addSpeaker model}}>Add Speaker</button>
+  <button class="add_speaker_with_single_parent" {{action addSpeakerWithSingleParent model}}>Add Speaker</button>
 </div>
