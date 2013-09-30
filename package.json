@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "grunt-neuter": "~0.6.0",
+    "grunt-banner": "*",
     "grunt-contrib-uglify": "~0.2.4",
     "grunt-text-replace": "~0.3.8"
   }
