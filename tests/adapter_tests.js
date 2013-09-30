@@ -148,7 +148,7 @@ test('ajax response for single session will render correctly', function() {
         //setup the http post mock $.ajax
         //for some reason the 2 lines below are not used or needed?
         var response = {"id": 4, "score": 2, "feedback": "abc", "session": 1};
-        stubEndpointForHttpRequest('/api/sessions/1/ratings/', response, 'POST');
+        stubEndpointForHttpRequest('/api/sessions/1/ratings/', response, 'POST', 201);
         fillIn(".score", "2");
         fillIn(".feedback", "abc");
         return click(".add_rating");
@@ -316,7 +316,7 @@ test('ajax post with different single parent will use correctly nested endpoint'
     stubEndpointForHttpRequest('/api/sessions/1/ratings/', ratings_json);
     stubEndpointForHttpRequest('/api/sessions/1/tags/', tags_json);
     var json = {"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [9,4], "ratings": [8], "tags": [7]};
-    var response = {"id": 3, "name": "who", "location": "dat", "session": 1, "association": null, "personas": [], "zidentity": 1};
+    var response = {"id": 3, "name": "who", "location": "dat", "session": null, "association": null, "personas": [], "zidentity": 1};
     stubEndpointForHttpRequest('/api/sessions/', [json]);
     stubEndpointForHttpRequest('/api/sessions/1/', json);
     Ember.run(App, 'advanceReadiness');
