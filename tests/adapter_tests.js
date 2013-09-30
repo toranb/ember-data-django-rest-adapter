@@ -310,3 +310,31 @@ test('ajax post with single parent will use correctly nested endpoint', function
         expectSpeakerAddedToStore(3, 'axe', 'yo');
     });
 });
+
+test('ajax post with different single parent will use correctly nested endpoint', function() {
+    stubEndpointForHttpRequest('/api/sessions/1/speakers/', speakers_json);
+    stubEndpointForHttpRequest('/api/sessions/1/ratings/', ratings_json);
+    stubEndpointForHttpRequest('/api/sessions/1/tags/', tags_json);
+    var json = {"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [9,4], "ratings": [8], "tags": [7]};
+    var response = {"id": 3, "name": "who", "location": "dat", "session": 1, "association": null, "personas": [], "zidentity": 1};
+    stubEndpointForHttpRequest('/api/sessions/', [json]);
+    stubEndpointForHttpRequest('/api/sessions/1/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/session/1").then(function() {
+        var speakers = find("div .speakers span.name").length;
+        equal(speakers, 2, "template had " + speakers + " speakers");
+        //setup the http post mock $.ajax
+        var user = {"id": 1, "username": "toranb", "aliases": [1]};
+        stubEndpointForHttpRequest('/api/users/1/', user);
+        stubEndpointForHttpRequest('/api/zidentities/1/speakers/', response, 'POST', 201);
+        fillIn(".speaker_name", "who");
+        fillIn(".speaker_location", "dat");
+        return click(".add_speaker_with_user_single_parent");
+    }).then(function() {
+        //this is currently broken for non-embedded bound templates (should be 3)
+        var speakers = find("div .speakers span.name").length;
+        equal(speakers, 2, "template had " + speakers + " speakers");
+        expectUrlTypeHashEqual("/api/zidentities/1/speakers/", "POST", response);
+        expectSpeakerAddedToStore(3, 'who', 'dat');
+    });
+});

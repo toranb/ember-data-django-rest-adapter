@@ -202,6 +202,16 @@ App.SessionController = Ember.ObjectController.extend({
             self.store.createRecord('speaker', hash).save();
           });
       },
+      addSpeakerWithUserSingleParent: function(session) {
+          var self = this;
+          var name = this.get('speaker');
+          var location = this.get('location');
+          this.store.find('user', 1).then(function(user) {
+            //to simulate a record create with single user parent
+            var hash = {zidentity: user, name: name, location: location};
+            self.store.createRecord('speaker', hash).save();
+          });
+      },
       addSpeakerWithSingleParent: function(session) {
           var self = this;
           var name = this.get('speaker');
