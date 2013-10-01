@@ -195,6 +195,28 @@ test('test pushArrayPayload', function() {
     });
 });
 
+test('finding nested attributes when some requested records are already loaded makes GET request to the correct attribute-based URL', function() {
+    var user = {"id": 1, "username": "foo", "aliases": [8, 9]};
+    var aliases = [{"id": 8, "name": "ember"}, {"id": 9, "name": "tomster"}];
+    Ember.run(App, function(){
+        // load the object into the Ember data store
+        var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
+        store.serializerFor('speaker').pushSinglePayload(store, 'speaker', aliases[0]); // pre-load the first alias object before find
+    });
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    stubEndpointForHttpRequest('/api/users/1/', user);
+    stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
+    Ember.run(App, 'advanceReadiness');
+    visit("/user/1").then(function() {
+        var name = $(".username").text().trim();
+        equal(name, "foo", "name was instead: " + name);
+        var count = $(".alias").length;
+        equal(count, 2, "count was instead: " + count);
+        var alias = $(".alias:eq(0)").text().trim();
+        equal(alias, "ember", "alias was instead: " + alias);
+    });
+});
+
 test('finding nested attributes makes GET request to the correct attribute-based URL', function() {
     var user = {"id": 1, "username": "foo", "aliases": [8, 9]};
     var aliases = [{"id": 8, "name": "ember"}, {"id": 9, "name": "tomster"}];
