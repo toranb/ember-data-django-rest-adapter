@@ -53,19 +53,21 @@ test('ajax response with single embedded record renders hasMany correctly', func
 
 test('add rating will do http post and append rating to template', function() {
     var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}]};
+    var rating = {"id": 3, "score": 4, "feedback": "def", "other": 1};
     stubEndpointForHttpRequest('/api/others/1/', json);
     visit("/other/1").then(function() {
         var before = find("div .ratings span.score").length;
         equal(before, 1, "initially the table had " + before + " ratings");
         //setup the http post mock $.ajax
         //for some reason the 2 lines below are not used or needed?
-        var response = {"id": 3, "score": 4, "feedback": "def", "other": 1};
-        stubEndpointForHttpRequest('/api/others/1/ratings/', response, 'POST');
+        stubEndpointForHttpRequest('/api/others/1/ratings/', rating, 'POST', 201);
         fillIn(".score", "4");
         fillIn(".feedback", "def");
         return click(".add_rating");
     }).then(function() {
         var after = find("div .ratings span.score").length;
         equal(after, 2, "table had " + after + " ratings after create");
+        expectUrlTypeHashEqual("/api/others/1/ratings/", "POST", rating);
+        expectRatingAddedToStore(3, 4, 'def', 1, 'other');
     });
 });

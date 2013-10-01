@@ -32,7 +32,10 @@ var expectSpeakerAddedToStore = function(pk, expectedName, expectedLocation) {
     });
 };
 
-var expectRatingAddedToStore = function(pk, expectedScore, expectedFeedback, expectedSession) {
+var expectRatingAddedToStore = function(pk, expectedScore, expectedFeedback, expectedParent, parentName) {
+    if (parentName == null) {
+        parentName = "session";
+    }
     Ember.run(App, function(){
         var store = App.__container__.lookup("store:main");
         store.find('rating', pk).then(function(rating) {
@@ -42,8 +45,8 @@ var expectRatingAddedToStore = function(pk, expectedScore, expectedFeedback, exp
             equal(score, expectedScore, "rating added with score " + score);
             var feedback = rating.get('feedback');
             equal(feedback, expectedFeedback, "rating added with feedback " + feedback);
-            var sessionpk = rating.get('session').get('id');
-            equal(sessionpk, expectedSession, "rating added with session pk " + sessionpk);
+            var parentpk = rating.get(parentName).get('id');
+            equal(parentpk, expectedParent, "rating added with parent pk " + parentpk);
         });
     });
 };
