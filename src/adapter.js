@@ -163,12 +163,12 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     */
     getHasManyAttributeName: function(type, parent, ids) {
       var attributeName;
-
       parent.eachRelationship(function(name, relationship){
         var relationshipIds;
         if (relationship.kind === "hasMany" && relationship.type.typeKey === type.typeKey) {
           relationshipIds = parent._data[name].mapBy('id');
-          if (Ember.compare(ids, relationshipIds) === 0) {
+          // check if all of the requested ids are covered by this attribute
+          if (Ember.EnumerableUtils.intersection(ids, relationshipIds).length === ids.length) {
             attributeName = name;
           }
         }
