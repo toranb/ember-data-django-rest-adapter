@@ -238,6 +238,53 @@ At this point the dependencies have been installed and you can build ember-data-
 grunt
 ```
 
+## Integration with Ember App Kit
+
+Using Ember Data Django REST Adapter with [Ember App Kit][] is easy!
+Add the source file to the `/vendor/` directory, and add an exception to
+`.gitignore`:
+
+```
+!/vendor/ember-data-django-rest-adapter.js
+```
+
+Then include the adapter in both `public/index.html` and
+`tests/index.html`:
+
+```html
+<script src="/vendor/ember-data-django-rest-adapter.js"></script>
+```
+
+Finally, initialize the adapter by replacing the contents of
+`app/adapters/application.js` with:
+
+```js
+var AppAdapter = DS.DjangoRESTAdapter.extend();
+
+export default AppAdapter;
+```
+
+And initialize the serializer by adding the file
+`app/serializers/application.js` with the contents:
+
+```js
+var AppSerializer = DS.DjangoRESTSerializer.extend();
+
+export default AppSerializer;
+```
+
+Your project will now use the Django REST Adapter.  If you are serving
+your API on a separate domain (or even a separate PORT!) you will need
+to configure this in the adapter instantiation—in
+`app/adapters/application.js`.  For example:
+
+```js
+var AppAdapter = DS.DjangoRESTAdapter.extend({
+  host: 'http://api.mydomain.com'
+});
+
+export default AppAdapter;
+```
 
 ## Contributing
 This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
@@ -280,3 +327,7 @@ https://github.com/escalant3/ember-data-tastypie-adapter/
 Copyright © 2013 Toran Billups http://toranbillups.com
 
 Licensed under the MIT License
+
+
+[Ember App Kit]: https://github.com/stefanpenner/ember-app-kit
+
