@@ -16,7 +16,8 @@ module('embedded integration tests', {
 });
 
 test('ajax response with array of embedded records renders hasMany correctly', function() {
-    var json = [{"id": 1, "hat": "zzz", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}]}];
+    var json = [{"id": 1, "hat": "zzz", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}], "location": {"id": 1, "name": "US"}}];
+
     stubEndpointForHttpRequest('/api/others/', json);
     visit("/others").then(function() {
         var rows = find("table tr").length;
@@ -39,7 +40,7 @@ test('ajax response with no embedded records yields empty table', function() {
 });
 
 test('ajax response with single embedded record renders hasMany correctly', function() {
-    var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}]};
+    var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}], "location": {"id": 1, "name": "US"}};
     stubEndpointForHttpRequest('/api/others/1/', json);
     visit("/other/1").then(function() {
         var hat = $("div .hat").text().trim();
@@ -51,8 +52,17 @@ test('ajax response with single embedded record renders hasMany correctly', func
     });
 });
 
+test('ajax response with single embedded record renders belongsTo correctly', function() {
+    var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}], "location": {"id": 1, "name": "US"}};
+    stubEndpointForHttpRequest('/api/others/1/', json);
+    visit("/other/1").then(function() {
+        var location = $("div .location").text().trim();
+        equal(location, "US", "location was instead: " + location);
+    });
+});
+
 test('add rating will do http post and append rating to template', function() {
-    var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}]};
+    var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}], "location": {"id": 1, "name": "US"}};
     var rating = {"id": 3, "score": 4, "feedback": "def", "other": 1};
     stubEndpointForHttpRequest('/api/others/1/', json);
     visit("/other/1").then(function() {

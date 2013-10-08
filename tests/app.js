@@ -41,6 +41,10 @@ App.Camel = DS.Model.extend({
   camelCaseRelationship: DS.hasMany('tag', { async: true })
 });
 
+App.Location = DS.Model.extend({
+  name:DS.attr('string')
+});
+
 App.Session = DS.Model.extend({
   name: DS.attr('string'),
   room: DS.attr('string'),
@@ -64,7 +68,8 @@ App.Other = DS.Model.extend({
   hat: DS.attr('string'),
   tags: DS.hasMany('tag'),
   speakers: DS.hasMany('speaker'),
-  ratings: DS.hasMany('rating')
+  ratings: DS.hasMany('rating'),
+  location: DS.belongsTo('location')
 });
 
 App.Speaker.reopen({
