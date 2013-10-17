@@ -105,7 +105,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     buildUrlWithParentWhenAvailable: function(record, url, totalHydrated) {
-        if (record && url && totalHydrated) {
+        if (record && url && totalHydrated && totalHydrated.length > 0) {
             var parent_type = totalHydrated[0];
             var parent_pk = record.get(parent_type).get('id'); //todo find pk (not always id)
             var parent_plural = Ember.String.pluralize(parent_type);
