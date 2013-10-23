@@ -147,12 +147,12 @@ test('ajax response for single session will render correctly', function() {
     });
 });
 
-test('test pushSinglePayload', function() {
+test('test pushPayload with single payload', function() {
     var json = {"id": 10, "description": "django"};
     Ember.run(App, function(){
         // load the object into the Ember data store
         var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
-        store.serializerFor('tag').pushSinglePayload(store, 'tag', json);
+        store.pushPayload('tag', json);
     });
     visit("/tag/10").then(function() {
         var content = $("span").text().trim();
@@ -160,12 +160,12 @@ test('test pushSinglePayload', function() {
     });
 });
 
-test('test pushArrayPayload', function() {
+test('test pushPayload with array payload', function() {
     var json = [{"id": 11, "description": "ember"}, {"id": 12, "description": "tomster"}];
     Ember.run(App, function(){
         // load the objects into the Ember data store
         var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
-        store.serializerFor('tag').pushArrayPayload(store, 'tag', json);
+        store.pushPayload('tag', json);
     });
     visit("/tag/12").then(function() {
         var content = $("span").text().trim();
@@ -183,7 +183,7 @@ test('finding nested attributes when some requested records are already loaded m
     Ember.run(App, function(){
         // load the object into the Ember data store
         var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
-        store.serializerFor('speaker').pushSinglePayload(store, 'speaker', aliases[0]); // pre-load the first alias object before find
+        store.pushPayload('speaker', aliases[0]); // pre-load the first alias object before find
     });
     stubEndpointForHttpRequest('/api/users/1/', user);
     stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
@@ -339,10 +339,9 @@ test('multiword hasMany key is serialized correctly on save', function() {
         {'id': 1, 'car_parts': [1,2]}, 'PUT');
 
     Ember.run(function(){
-        var serializer = store.serializerFor('car');
-        serializer.pushSinglePayload(store, 'car',
+        store.pushPayload('car',
             {'id': 1, 'car_parts': []});
-        serializer.pushArrayPayload(store, 'carPart',
+        store.pushPayload('carPart',
             [{'id': 1, 'cars': []}, {'id': 2, 'cars': []}]);
 
         store.find('car', 1).then(function(result){
