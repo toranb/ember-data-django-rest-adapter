@@ -11,9 +11,7 @@
 
 Basic code to use it with the last ember-data revision:
 
-      App.Store = DS.DjangoRESTStore.extend({
-        adapter: DS.DjangoRESTAdapter.create()
-      });
+      App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({});
 
 Creating with a namespace (not to be confused with Django namespace urls) that will be used as the root url:
 
