@@ -3,12 +3,7 @@ module('embedded integration tests', {
         ajaxUrl = undefined;
         ajaxType = undefined;
         ajaxHash = undefined;
-        Ember.run(function() {
-            App.reset();
-            App.deferReadiness();
-        });
-        stubEndpointForHttpRequest('/api/sessions/', []);
-        Ember.run(App, 'advanceReadiness');
+        App.reset();
     },
     teardown: function() {
         $.mockjaxClear();

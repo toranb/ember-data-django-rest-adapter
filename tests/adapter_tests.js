@@ -8,10 +8,7 @@ module('integration tests', {
         speakers_json = [{"id": 9, "name": "first", "session": 1}, {"id": 4, "name": "last", "session": 1}];
         ratings_json = [{"id": 8, "score": 10, "feedback": "nice", "session": 1}];
         tags_json = [{"id": 7, "description": "done"}];
-        Ember.run(function() {
-            App.reset();
-            App.deferReadiness();
-        });
+        App.reset();
     },
     teardown: function() {
         $.mockjaxClear();
@@ -19,10 +16,8 @@ module('integration tests', {
 });
 
 test('arrays as result of transform should not be interpreted as embedded records', function() {
-    stubEndpointForHttpRequest('/api/sessions/', []);
     var json = [{"id": 1, "config": "[\"ember\",\"is\",\"neato\"]"}];
     stubEndpointForHttpRequest('/api/preserializeds/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/preserialized").then(function() {
         var divs = find("div.item").length;
         equal(divs, 3, "found " + divs + " divs");
@@ -32,10 +27,8 @@ test('arrays as result of transform should not be interpreted as embedded record
 });
 
 test('attribute transforms are applied', function() {
-    stubEndpointForHttpRequest('/api/sessions/', []);
     var json = [{"id": 1, "transformed": "blah blah"}];
     stubEndpointForHttpRequest('/api/transformers/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/transformers").then(function() {
         var spans = find("span").length;
         equal(spans, 1, "found " + spans + " spans");
@@ -45,10 +38,8 @@ test('attribute transforms are applied', function() {
 });
 
 test('models with camelCase converted to underscore urls', function() {
-    stubEndpointForHttpRequest('/api/sessions/', []);
     var json = [{"id": 1, "test": "foobar"}];
     stubEndpointForHttpRequest('/api/camel_urls/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/camelUrls").then(function() {
         var spans = find("span").length;
         equal(spans, 1, "found " + spans + " spans");
@@ -58,11 +49,9 @@ test('models with camelCase converted to underscore urls', function() {
 });
 
 test('keys with underscores converted to camelCase', function() {
-    stubEndpointForHttpRequest('/api/sessions/', []);
     stubEndpointForHttpRequest('/api/camels/1/camel_case_relationship/', tags_json);
     var json = [{"id": 1, "camel_case_attribute": "foo", "camel_case_relationship": [7]}];
     stubEndpointForHttpRequest('/api/camels/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/camels").then(function() {
         var spans = find("span").length;
         equal(spans, 2, "found " + spans + " spans");
@@ -76,8 +65,7 @@ test('keys with underscores converted to camelCase', function() {
 test('ajax response with 1 session yields table with 1 row', function() {
     var json = [{"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [], "ratings": [], "tags": []}];
     stubEndpointForHttpRequest('/api/sessions/', json);
-    Ember.run(App, 'advanceReadiness');
-    visit("/").then(function() {
+    visit("/sessions").then(function() {
         var rows = find("table tr").length;
         equal(rows, 6, "table had " + rows + " rows");
         var name = $("table td.name").text().trim();
@@ -87,8 +75,7 @@ test('ajax response with 1 session yields table with 1 row', function() {
 
 test('ajax response with no session records yields empty table', function() {
     stubEndpointForHttpRequest('/api/sessions/', []);
-    Ember.run(App, 'advanceReadiness');
-    visit("/").then(function() {
+    visit("/sessions").then(function() {
         var rows = find("table tr").length;
         equal(rows, 0, "table had " + rows + " rows");
     });
@@ -100,8 +87,7 @@ test('ajax response with async hasMany relationship renders correctly', function
     stubEndpointForHttpRequest('/api/sessions/1/tags/', tags_json);
     var json = [{"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [9,4], "ratings": [8], "tags": [7]}];
     stubEndpointForHttpRequest('/api/sessions/', json);
-    Ember.run(App, 'advanceReadiness');
-    visit("/").then(function() {
+    visit("/sessions").then(function() {
         //speakers
         var speakers = find("table td.speaker").length;
         equal(speakers, 2, "table had " + speakers + " speakers");
@@ -129,7 +115,6 @@ test('ajax response for single session will render correctly', function() {
     var json = {"id": 1, "name": "foo", "room": "bar", "desc": "test", "speakers": [9,4], "ratings": [8], "tags": [7]};
     stubEndpointForHttpRequest('/api/sessions/', [json]);
     stubEndpointForHttpRequest('/api/sessions/1/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/session/1").then(function() {
         var name = $("div .model_name").text().trim();
         equal(name, "foo", "name was instead: " + name);
@@ -163,13 +148,11 @@ test('ajax response for single session will render correctly', function() {
 
 test('test pushSinglePayload', function() {
     var json = {"id": 10, "description": "django"};
-    stubEndpointForHttpRequest('/api/sessions/', []);
     Ember.run(App, function(){
         // load the object into the Ember data store
         var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
         store.serializerFor('tag').pushSinglePayload(store, 'tag', json);
     });
-    Ember.run(App, 'advanceReadiness');
     visit("/tag/10").then(function() {
         var content = $("span").text().trim();
         equal(content, "django", "name was instead: " + content);
@@ -178,13 +161,11 @@ test('test pushSinglePayload', function() {
 
 test('test pushArrayPayload', function() {
     var json = [{"id": 11, "description": "ember"}, {"id": 12, "description": "tomster"}];
-    stubEndpointForHttpRequest('/api/sessions/', []);
     Ember.run(App, function(){
         // load the objects into the Ember data store
         var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
         store.serializerFor('tag').pushArrayPayload(store, 'tag', json);
     });
-    Ember.run(App, 'advanceReadiness');
     visit("/tag/12").then(function() {
         var content = $("span").text().trim();
         equal(content, "tomster", "name was instead: " + content);
@@ -203,10 +184,8 @@ test('finding nested attributes when some requested records are already loaded m
         var store = App.__container__.lookup("store:main");  // pretty sure this is not the right way to do this...
         store.serializerFor('speaker').pushSinglePayload(store, 'speaker', aliases[0]); // pre-load the first alias object before find
     });
-    stubEndpointForHttpRequest('/api/sessions/', []);
     stubEndpointForHttpRequest('/api/users/1/', user);
     stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
-    Ember.run(App, 'advanceReadiness');
     visit("/user/1").then(function() {
         var name = $(".username").text().trim();
         equal(name, "foo", "name was instead: " + name);
@@ -220,10 +199,8 @@ test('finding nested attributes when some requested records are already loaded m
 test('finding nested attributes makes GET request to the correct attribute-based URL', function() {
     var user = {"id": 1, "username": "foo", "aliases": [8, 9]};
     var aliases = [{"id": 8, "name": "ember"}, {"id": 9, "name": "tomster"}];
-    stubEndpointForHttpRequest('/api/sessions/', []);
     stubEndpointForHttpRequest('/api/users/1/', user);
     stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
-    Ember.run(App, 'advanceReadiness');
     visit("/user/1").then(function() {
         var name = $(".username").text().trim();
         equal(name, "foo", "name was instead: " + name);
@@ -237,10 +214,8 @@ test('finding nested attributes makes GET request to the correct attribute-based
 test('basic error handling will bubble to the model', function() {
     var speaker = {"id": 1, "name": "wat", "location": "iowa", "session": 1, "association": 1, "personas": [1], "zidentity": 1};
     var personas = [{"id": 1, "nickname": "magic", "speaker": 1, "company": 1}];
-    stubEndpointForHttpRequest('/api/sessions/', []);
     stubEndpointForHttpRequest('/api/speakers/1/', speaker);
     stubEndpointForHttpRequest('/api/speakers/1/personas/', personas);
-    Ember.run(App, 'advanceReadiness');
     visit("/speaker/1").then(function() {
         var name = $("input.name").val();
         equal(name, "wat", "name was instead: " + name);
@@ -259,10 +234,8 @@ test('basic error handling will bubble to the model', function() {
 test('basic error handling will not fire when update is successful', function() {
     var speaker = {"id": 1, "name": "wat", "location": "iowa", "session": 1, "association": 1, "personas": [1], "zidentity": 1};
     var personas = [{"id": 1, "nickname": "magic", "speaker": 1, "company": 1}];
-    stubEndpointForHttpRequest('/api/sessions/', []);
     stubEndpointForHttpRequest('/api/speakers/1/', speaker);
     stubEndpointForHttpRequest('/api/speakers/1/personas/', personas);
-    Ember.run(App, 'advanceReadiness');
     visit("/speaker/1").then(function() {
         var name = $("input.name").val();
         equal(name, "wat", "name was instead: " + name);
@@ -287,7 +260,6 @@ test('ajax post with multiple parents will use singular endpoint', function() {
     var response = {"id": 3, "name": "tom", "location": "iowa", "session": 1, "association": null, "personas": [], "zidentity": 1};
     stubEndpointForHttpRequest('/api/sessions/', [json]);
     stubEndpointForHttpRequest('/api/sessions/1/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/session/1").then(function() {
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
@@ -315,7 +287,6 @@ test('ajax post with single parent will use correctly nested endpoint', function
     var response = {"id": 3, "name": "axe", "location": "yo", "session": 1, "association": null, "personas": [], "zidentity": null};
     stubEndpointForHttpRequest('/api/sessions/', [json]);
     stubEndpointForHttpRequest('/api/sessions/1/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/session/1").then(function() {
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
@@ -341,7 +312,6 @@ test('ajax post with different single parent will use correctly nested endpoint'
     var response = {"id": 3, "name": "who", "location": "dat", "session": null, "association": null, "personas": [], "zidentity": 1};
     stubEndpointForHttpRequest('/api/sessions/', [json]);
     stubEndpointForHttpRequest('/api/sessions/1/', json);
-    Ember.run(App, 'advanceReadiness');
     visit("/session/1").then(function() {
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
