@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                 src: [
                     'tests/lib/jquery-1.9.1.js',
                     'tests/lib/handlebars-1.0.0.js',
-                    'tests/lib/ember-1.0.0.js',
+                    'tests/lib/ember.js',
                     'tests/lib/ember-data.js',
                     'tests/lib/jquery.mockjax.js',
                     'tests/lib/tmpl.min.js',
