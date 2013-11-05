@@ -4,11 +4,6 @@
 - The `django-rest-framework` is a great REST framework for python / django developers
 - The default `ember-data` `RESTAdapter` does not follow the conventions used by the django rest framework
 
-## Download
-pre-built releases are available on [cdnjs](http://cdnjs.com/)
-- __0.13.1__ [full](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13.1/ember-data-django-rest-adapter.js) [min](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13.1/ember-data-django-rest-adapter.min.js)
-- __0.13__ [full](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13/ember-data-django-rest-adapter.js) [min](http://cdnjs.cloudflare.com/ajax/libs/ember-data-django-rest-adapter/0.13/ember-data-django-rest-adapter.min.js)
-
 ## Usage
 
 #### Javascript side
@@ -22,19 +17,9 @@ Basic code to use it with the last ember-data revision:
 
 Creating with a namespace (not to be confused with Django namespace urls) that will be used as the root url:
 
-      App.Store = DS.DjangoRESTStore.extend({
-        adapter: DS.DjangoRESTAdapter.create({
-          namespace: "codecamp"
-        })
+      App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
+          namespace: 'codecamp'
       });
-
-Creating with a custom plural dictionary that will be used when a custom plural is needed:
-
-      DS.DjangoRESTAdapter.configure("plurals", {"person" : "people"});
-      App.Store = DS.DjangoRESTStore.extend({
-        adapter: DS.DjangoRESTAdapter.create()
-      });
-
 
 #### python/django side
 This project requires the `django-rest-framework` 2.x branch (specifically 2.1.14 or newer)
@@ -150,83 +135,11 @@ Next you need to add a snippet of javascript to ensure your application adds the
       });
     </script>
 
-## Pagination
-
-First you need to add a ListCreateAPIView or ListAPIView
-
-    class People(ListCreateAPIView):
-        model = Person
-        serializer_class = PersonSerializer
-
-Next you need to add pagination to your django settings
-
-    REST_FRAMEWORK = {
-        'PAGINATE_BY': 10,
-        'PAGINATE_BY_PARAM': 'page_size'
-    }
-
-Now in your ember app, add the following mixin to your ArrayController
-
-    PersonApp.PaginationMixins = Ember.Mixin.create({
-        pagination: function() {
-            if(this.get('model.isLoaded')) {
-                var modelType = this.get('model.type');
-                return this.get('store').typeMapFor(modelType).metadata.pagination;
-            }
-        }.property('model.isLoaded'),
-    });
-
-Next you need to add a route to handle the pagination
-
-    PersonApp.Router.map(function(match) {
-        this.resource("person", { path: "/" }, function() {
-            this.route('page', {path: '/page/:page'});
-        });
-    });
-
-    PersonApp.PersonIndexRoute = Ember.Route.extend({
-        redirect: function() {
-            this.transitionTo('person.page', 1);
-        },
-    });
-
-    PersonApp.PersonPageRoute = Ember.Route.extend({
-        model: function(params) {
-            return PersonApp.Person.find({page: params.page});
-        },
-    });
-
-Now in your handlebars template, loop over your controller
-
-    {{#each person in controller}}
-        {{person.username}}<br />
-    {{/each}}
-
-If you want to use the mixin to show a next or previous link
-
-    {{#if pagination.page.previous}}
-      {{#linkTo 'person.page' pagination.page.previous}}previous{{/linkTo}}
-    {{/if}}
-
-    {{#if pagination.page.next}}
-      {{#linkTo 'person.page' pagination.page.next}}next{{/linkTo}}
-    {{/if}}
-
-A full example of pagination with this adapter can be found below
-
-https://github.com/toranb/ember-django-pagination
-
 ## Building ember-data-django-rest-adapter
 
-To build the minified versions of ember-data-django-rest-adapter you will need [node](http://nodejs.org) installed.
+To build the minified versions of ember-data-django-rest-adapter you will need [node.js](http://nodejs.org)
 
-Install the [Grunt](http://gruntjs.com/) command line. This might require `sudo`.
-
-```shell
-npm install -g grunt-cli
-```
-
-Then, from the main project folder run this command. This should not require `sudo`.
+From the main project folder run the command below (This does not require `sudo`)
 
 ```shell
 npm install
@@ -236,6 +149,12 @@ At this point the dependencies have been installed and you can build ember-data-
 
 ```shell
 grunt
+```
+
+If you don't have all the node modules available on your path you can do this manually (ie- the grunt command does not work)
+
+```shell
+export PATH="./node_modules/.bin:$PATH"
 ```
 
 ## Integration with Ember App Kit
@@ -287,28 +206,16 @@ export default AppAdapter;
 ```
 
 ## Contributing
-This adapter may be useful for someone in the ember.js/django community. If you want to extend it, please open an issue or send a pull request.
+This adapter was built by the community for the community. If you would like to extend it or fix a bug, please open an issue or create a pull request. If you can provide a test case for the issue in question, it will help the core team solve the issue more quickly.
 
 ## Unit tests
 
-### Browser
-
-    # run tests on http://localhost:9292/
-    rackup
-
-Go to http://localhost:9292/ to run the Qunit tests.
-
-### Terminal (PhantomJS)
-
-    # Run once
-    rake test
-
-    # Run continuosly listening for changes (OS X only)
-    rake autotest
+    npm install
+    grunt test
 
 ## Versions
-    ember.js 1.0.0-RC.5
-    ember-data v0.13
+    ember.js 1.1.2
+    ember-data 1.0 beta 3+ (master build as of 10/22)
 
 ## Pending Issues
 This adapter does not currently support the hypermedia side of the `django-rest-framework`. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
