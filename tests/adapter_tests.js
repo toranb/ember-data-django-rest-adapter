@@ -26,6 +26,17 @@ test('arrays as result of transform should not be interpreted as embedded record
     });
 });
 
+test('isodate transform correctly deserializes to Date', function() {
+    stubEndpointForHttpRequest('/api/sessions/', []);
+    var json = [{"id": 1, "start": "2013-09-27T00:00:00Z"}];
+    stubEndpointForHttpRequest('/api/timestamps/', json);
+    Ember.run(App, 'advanceReadiness');
+    visit("/timestamps").then(function() {
+        var isDate = $("span.start").text().trim();
+        equal(isDate, "true", "was not a Date object: " + isDate);
+    });
+});
+
 test('attribute transforms are applied', function() {
     var json = [{"id": 1, "transformed": "blah blah"}];
     stubEndpointForHttpRequest('/api/transformers/', json);
