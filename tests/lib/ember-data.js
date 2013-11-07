@@ -2310,7 +2310,7 @@ DS.Store = Ember.Object.extend(DS._Mappable, {
 
   pushPayload: function (type, payload) {
     var serializer = this.serializerFor(type);
-    serializer.pushPayload(this, payload);
+    serializer.pushPayload(this, type, payload);
   },
 
   update: function(type, data) {
@@ -6568,9 +6568,10 @@ DS.RESTSerializer = DS.JSONSerializer.extend({
 
     @method pushPayload
     @param {DS.Store} store
+    @param {subclass of DS.Model} type
     @param {Object} payload
   */
-  pushPayload: function(store, payload) {
+  pushPayload: function(store, primaryType, payload) {
     payload = this.normalizePayload(null, payload);
 
     for (var prop in payload) {

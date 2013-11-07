@@ -10,13 +10,13 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
             if (!Ember.isNone(payload[key]) && typeof(payload[key][0]) !== 'number' && relationship.kind ==='hasMany') {
                 if (payload[key].constructor.name === 'Array' && payload[key].length > 0) {
                     var ids = payload[key].mapBy('id'); //todo find pk (not always id)
-                    this.pushArrayPayload(store, relationship.type, payload[key]);
+                    this.pushPayload(store, relationship.type, payload[key]);
                     payload[key] = ids;
                 }
             }
             else if (!Ember.isNone(payload[key]) && typeof(payload[key]) === 'object' && relationship.kind ==='belongsTo') {
                 var id=payload[key].id;
-                this.pushSinglePayload(store,relationship.type,payload[key]);
+                this.pushPayload(store,relationship.type,payload[key]);
                 payload[key]=id;
             }
         }, this);
@@ -44,7 +44,8 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     },
 
     /**
-      This method allows you to push a single object payload.
+      This method allows you to push a single object payload or an array of 
+      object payloads.
 
       It will first normalize the payload, so you can use this to push
       in data streaming in from your server structured the same way
@@ -54,27 +55,20 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
       @param {String} type
       @param {Object} payload
     */
-    pushSinglePayload: function(store, type, payload) {
+    pushPayload: function(store, type, payload) {
+        var extractType;
+
         type = store.modelFor(type);
-        payload = this.extract(store, type, payload, null, "find");
-        store.push(type, payload);
-    },
 
-    /**
-      This method allows you to push an array of object payloads.
+        if (payload instanceof Array) {
+          extractType = "find";
+        } else {
+          extractType = "findAll";
+          payload = [payload];
+        }
 
-      It will first normalize the payload, so you can use this to push
-      in data streaming in from your server structured the same way
-      that fetches and saves are structured.
-
-      @param {DS.Store} store
-      @param {String} type
-      @param {Object} payload
-    */
-    pushArrayPayload: function(store, type, payload) {
-        type = store.modelFor(type);
-        payload = this.extract(store, type, payload, null, "findAll");
-        store.pushMany(type, payload);
+        payload = this.extract(store, type, payload, null, extractType);
+        store.pushMany(type, payload);  
     },
 
     /**
