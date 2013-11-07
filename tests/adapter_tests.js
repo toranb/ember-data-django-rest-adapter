@@ -133,7 +133,7 @@ test('ajax response for single session will render correctly', function() {
         //setup the http post mock $.ajax
         //for some reason the 2 lines below are not used or needed?
         var response = {"id": 4, "score": 2, "feedback": "abc", "session": 1};
-        stubEndpointForHttpRequest('/api/sessions/1/ratings/', response, 'POST', 201);
+        stubEndpointForHttpRequest('/api/ratings/', response, 'POST', 201);
         fillIn(".score", "2");
         fillIn(".feedback", "abc");
         return click(".add_rating");
@@ -141,7 +141,7 @@ test('ajax response for single session will render correctly', function() {
         //this is currently broken for non-embedded bound templates (should be 2)
         var ratings = find("div .ratings span.score").length;
         equal(ratings, 1, "table had " + ratings + " ratings");
-        expectUrlTypeHashEqual("/api/sessions/1/ratings/", "POST", {});
+        expectUrlTypeHashEqual("/api/ratings/", "POST", {});
         expectRatingAddedToStore(4, 2, 'abc', 1);
     });
 });
@@ -291,7 +291,7 @@ test('ajax post with single parent will use correctly nested endpoint', function
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
         //setup the http post mock $.ajax
-        stubEndpointForHttpRequest('/api/sessions/1/speakers/', response, 'POST', 201);
+        stubEndpointForHttpRequest('/api/speakers/', response, 'POST', 201);
         fillIn(".speaker_name", "tbill");
         fillIn(".speaker_location", "ohio");
         return click(".add_speaker_with_single_parent");
@@ -299,7 +299,7 @@ test('ajax post with single parent will use correctly nested endpoint', function
         //this is currently broken for non-embedded bound templates (should be 3)
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
-        expectUrlTypeHashEqual("/api/sessions/1/speakers/", "POST", response);
+        expectUrlTypeHashEqual("/api/speakers/", "POST", response);
         expectSpeakerAddedToStore(3, 'axe', 'yo');
     });
 });
@@ -318,7 +318,7 @@ test('ajax post with different single parent will use correctly nested endpoint'
         //setup the http post mock $.ajax
         var user = {"id": 1, "username": "toranb", "aliases": [1]};
         stubEndpointForHttpRequest('/api/users/1/', user);
-        stubEndpointForHttpRequest('/api/zidentities/1/speakers/', response, 'POST', 201);
+        stubEndpointForHttpRequest('/api/speakers/', response, 'POST', 201);
         fillIn(".speaker_name", "who");
         fillIn(".speaker_location", "dat");
         return click(".add_speaker_with_user_single_parent");
@@ -326,7 +326,7 @@ test('ajax post with different single parent will use correctly nested endpoint'
         //this is currently broken for non-embedded bound templates (should be 3)
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
-        expectUrlTypeHashEqual("/api/zidentities/1/speakers/", "POST", response);
+        expectUrlTypeHashEqual("/api/speakers/", "POST", response);
         expectSpeakerAddedToStore(3, 'who', 'dat');
     });
 });
