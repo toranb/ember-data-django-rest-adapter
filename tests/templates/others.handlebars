@@ -1,0 +1,25 @@
+<table>
+{{#each other in controller}}
+<tr class="hat">
+  <td>{{other.hat}}</td>
+</tr>
+<tr class="speakers">
+  {{#each speaker in other.speakers}}
+  <td>
+    {{speaker.name}}
+  </td>
+  {{/each}}
+</tr>
+<tr class="ratings">
+  {{#each tag in other.tags}}
+  <td>
+    {{tag.description}}<br />
+  </td>
+  {{/each}}
+<tr>
+  <td>
+    {{#linkTo 'other' other}}View Other Details{{/linkTo}}
+  </td>
+</tr>
+{{/each}}
+</table>

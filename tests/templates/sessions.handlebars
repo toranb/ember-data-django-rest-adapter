@@ -1,0 +1,36 @@
+<table>
+{{#each session in controller}}
+<tr>
+  <td class="name">{{session.name}}</td>
+</tr>
+<tr>
+  <td class="room">{{session.room}}</td>
+</tr>
+<tr>
+  {{#each speaker in session.speakers}}
+  <td class="speaker">{{speaker.name}}</td>
+  {{/each}}
+</tr>
+<tr>
+  {{#each rating in session.ratings}}
+  <td class="rating">{{rating.score}}</td>
+  {{/each}}
+</tr>
+<tr>
+  {{#each tag in session.tags}}
+  <td class="tag">{{tag.description}}</td>
+  {{/each}}
+</tr>
+<tr>
+  <td>{{#linkTo 'session' session}}View Session Details{{/linkTo}}</td>
+</tr>
+{{/each}}
+</table>
+
+<div class="associations">
+{{#linkTo 'associations'}}View All Associations{{/linkTo}}
+</div>
+
+<div class="joel">
+{{#linkTo 'speakers'}}View Details About Joel{{/linkTo}}
+</div>

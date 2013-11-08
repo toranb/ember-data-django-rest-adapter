@@ -1,0 +1,14 @@
+{{#each association in controller}}
+  Association: {{association.name}}<br />
+  {{#each speaker in association.speakers}}
+    Speaker: {{speaker.name}}<br />
+    {{#each persona in speaker.personas}}
+      Persona: {{persona.nickname}}<br />
+      Company: {{persona.company.name}}<br />
+      {{#each sponsor in persona.company.sponsors}}
+        Sponsor: {{sponsor.name}}<br />
+      {{/each}}
+    {{/each}}
+  {{/each}}
+{{/each}}
+
