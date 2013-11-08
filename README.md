@@ -219,7 +219,8 @@ This adapter was built by the community for the community. If you would like to 
     ember-data 1.0 beta 3+ (master build as of 10/22)
 
 ## Pending Issues
-This adapter does not currently support the hypermedia side of the `django-rest-framework`. I believe another adapter that is hypermedia focused would be a great stand alone adapter (outside of this project).
+1.) When you add a child element the parent will not reflect this change until you refresh the browser
+2.) Date and DateTime are not built in just yet (see the WIP PR for a workaround)
 
 ## Examples
 An example project that shows the adapter in action can be found below
