@@ -1,8 +1,5 @@
 # ember-data-django-rest-adapter [![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter)
 
-## Not yet ember-data 1.0 beta 2 friendly
-- If you need an adapter that works with ember.js 1.0 and ember-data 1.0 beta 2+ checkout the branch "ember1.0"
-
 ## Motivation
 - The `django-rest-framework` is a great REST framework for python / django developers
 - The default `ember-data` `RESTAdapter` does not follow the conventions used by the django rest framework
