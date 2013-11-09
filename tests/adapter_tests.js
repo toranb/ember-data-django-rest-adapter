@@ -330,3 +330,32 @@ test('ajax post with different single parent will use correctly nested endpoint'
         expectSpeakerAddedToStore(3, 'who', 'dat');
     });
 });
+
+test('multiword hasMany key is serialized correctly on save', function() {
+    var store = App.__container__.lookup('store:main'),
+        car;
+    stubEndpointForHttpRequest('/api/cars/1/',
+        {'id': 1, 'car_parts': [1,2]}, 'PUT');
+
+    Ember.run(function(){
+        var serializer = store.serializerFor('car');
+        serializer.pushSinglePayload(store, 'car',
+            {'id': 1, 'car_parts': []});
+        serializer.pushArrayPayload(store, 'carPart',
+            [{'id': 1, 'cars': []}, {'id': 2, 'cars': []}]);
+
+        store.find('car', 1).then(function(result){
+            car = result;
+            return Ember.RSVP.all(
+                [store.find('carPart', 1), store.find('carPart', 2)]) ;
+        }).then(function(carParts){
+            car.set('carParts', carParts);
+            return car.save();
+        }).then(function(car){
+            equal(ajaxHash.data, '{"car_parts":[]}');
+            return;
+        });
+    });
+
+    wait();
+});

@@ -92,9 +92,9 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     /**
       Underscores relationship names when serializing relationship keys.
-  
+
       Stolen from DS.ActiveModelSerializer.
-      
+
       @method keyForRelationship
       @param {String} key
       @param {String} kind
@@ -102,6 +102,22 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     */
     keyForRelationship: function(key, kind) {
         return Ember.String.decamelize(key);
+    },
+
+    /**
+      Underscore relationship names when serializing hasManyRelationships
+
+      @method serializeHasMany
+    */
+    serializeHasMany: function(record, json, relationship) {
+        var key = relationship.key,
+            json_key = this.keyForRelationship(key, "hasMany"),
+            relationshipType = DS.RelationshipChange.determineRelationshipType(
+                record.constructor, relationship);
+
+        if (relationshipType === 'manyToNone' ||
+            relationshipType === 'manyToMany')
+            json[json_key] = record.get(key).mapBy('id');
     }
 
 });

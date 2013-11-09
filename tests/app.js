@@ -117,6 +117,9 @@ App.Sponsor = DS.Model.extend({
     company: DS.belongsTo('company')
 });
 
+App.CarPart = DS.Model.extend({ cars: DS.hasMany('car', {async: true})});
+App.Car = DS.Model.extend({ carParts: DS.hasMany('carPart', {async: true})});
+
 App.OthersRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('other');
