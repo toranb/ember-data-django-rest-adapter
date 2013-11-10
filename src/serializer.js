@@ -105,6 +105,31 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     },
 
     /**
+      Underscore relationship names when serializing belongsToRelationships
+
+      @method serializeBelongsTo
+    */
+    serializeBelongsTo: function(record, json, relationship) {
+        var key = relationship.key;
+        var belongsTo = record.get(key);
+        var json_key = this.keyForRelationship ? this.keyForRelationship(key, "belongsTo") : key;
+
+        if (Ember.isNone(belongsTo)) {
+          json[json_key] = belongsTo;
+        } else {
+          if (typeof(record.get(key)) === 'string') {
+            json[json_key] = record.get(key);
+          }else{
+            json[json_key] = record.get(key).get('id');
+          }
+        }
+
+        if (relationship.options.polymorphic) {
+          this.serializePolymorphicType(record, json, relationship);
+        }
+    },
+
+    /**
       Underscore relationship names when serializing hasManyRelationships
 
       @method serializeHasMany

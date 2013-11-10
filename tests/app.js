@@ -120,10 +120,36 @@ App.Sponsor = DS.Model.extend({
 App.CarPart = DS.Model.extend({ cars: DS.hasMany('car', {async: true})});
 App.Car = DS.Model.extend({ carParts: DS.hasMany('carPart', {async: true})});
 
+App.CamelParent = DS.Model.extend({
+    name: DS.attr('string'),
+    camelKids: DS.hasMany('camelKid', {async: true})
+});
+
+App.CamelKid = DS.Model.extend({
+    description: DS.attr('string'),
+    camelParent: DS.belongsTo('camelParent')
+});
+
 App.OthersRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('other');
   }
+});
+
+App.CamelParentRoute = Ember.Route.extend({
+  model: function() {
+    return this.store.find('camelParent', 1);
+  }
+});
+
+App.CamelParentController = Ember.ObjectController.extend({
+    actions: {
+        addCamelKid: function() {
+            var parent = this.store.all('camelParent').objectAt(0);
+            var hash = {'description': 'firstkid', 'camelParent': parent};
+            this.store.createRecord('camelKid', hash).save();
+        }
+    }
 });
 
 App.RatingsRoute = Ember.Route.extend({
@@ -256,6 +282,7 @@ App.Router.map(function() {
   this.resource("session", { path : "/session/:session_id" });
   this.resource("speaker", { path : "/speaker/:speaker_id" });
   this.resource("camels", { path : "/camels" });
+  this.resource("camelParent", { path : "/camelParent" });
   this.resource("camelUrls", { path : "/camelUrls" });
   this.resource("transformers", { path : "/transformers" });
   this.resource("tag", { path : "/tag/:tag_id" });

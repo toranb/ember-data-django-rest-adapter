@@ -143,6 +143,7 @@ test('ajax response for single session will render correctly', function() {
         equal(ratings, 1, "table had " + ratings + " ratings");
         expectUrlTypeHashEqual("/api/ratings/", "POST", {});
         expectRatingAddedToStore(4, 2, 'abc', 1);
+        equal(ajaxHash.data, '{"score":2,"feedback":"abc","session":"1","other":null}');
     });
 });
 
@@ -358,4 +359,14 @@ test('multiword hasMany key is serialized correctly on save', function() {
     });
 
     wait();
+});
+
+test('camelCase belongsTo key is serialized with underscores on save', function() {
+    var store = App.__container__.lookup('store:main');
+    stubEndpointForHttpRequest('/api/camel_parents/1/', {'id': 1, 'name': 'parent'});
+    visit("/camelParent").then(function() {
+        return click(".add");
+    }).then(function() {
+        equal(ajaxHash.data, '{"description":"firstkid","camel_parent":"1"}');
+    });
 });
