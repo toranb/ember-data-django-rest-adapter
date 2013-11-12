@@ -162,14 +162,14 @@ Add the source file to the `/vendor/` directory, and add an exception to
 `.gitignore`:
 
 ```
-!/vendor/ember-data-django-rest-adapter.js
+!/vendor/ember-data-django-rest-adapter.prod.js
 ```
 
-Then include the adapter in both `public/index.html` and
-`tests/index.html`:
+Then include the adapter in `app/index.html` somewhere after the
+Ember Data include:
 
 ```html
-<script src="/vendor/ember-data-django-rest-adapter.js"></script>
+<script src="/vendor/ember-data-django-rest-adapter.prod.js"></script>
 ```
 
 Finally, initialize the adapter by replacing the contents of
