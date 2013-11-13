@@ -216,8 +216,10 @@ This adapter was built by the community for the community. If you would like to 
     ember-data 1.0 beta 3+ (master build as of 10/22)
 
 ## Pending Issues
-1.) When you add a child element the parent will not reflect this change until you refresh the browser
-2.) Date and DateTime are not built in just yet (see the WIP PR for a workaround)
+
+i) Date and DateTime are not yet built into the adapter (see the WIP PR for a workaround)
+
+ii) Pagination is not yet supported
 
 ## Examples
 An example project that shows the adapter in action can be found below
