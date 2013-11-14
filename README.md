@@ -49,7 +49,7 @@ On the client side you would apply a filter using the `ember-data` find api (thi
     App.Person = DS.Model.extend({
         name: DS.attr('string')
     });
-    var people = App.Person.find({name: 'Toran'});
+    var people = this.store.find('person', {name: 'Toran'});
 
 On the server side you first need to add the `django-filter` dependency
 
@@ -66,7 +66,7 @@ Now you can apply the filter to your `ListAPIView` or `ListCreateAPIView`
     class People(generics.ListCreateAPIView):
         model = Person
         serializer_class = PersonSerializer
-        filter_fields = ['name']
+        filter_fields = ('name', )
 
 If you have this setup correctly you should see an ajax request that looks something like the below
 
