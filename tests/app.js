@@ -38,7 +38,8 @@ App.CamelUrl = DS.Model.extend({
 
 App.Camel = DS.Model.extend({
   camelCaseAttribute: DS.attr('string'),
-  camelCaseRelationship: DS.hasMany('tag', { async: true })
+  camelCaseRelationship: DS.hasMany('tag', { async: true }),
+  belongsToAsyncRelationship: DS.belongsTo('tag', { async: true })
 });
 
 App.Location = DS.Model.extend({

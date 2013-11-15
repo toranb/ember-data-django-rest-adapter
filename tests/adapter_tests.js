@@ -370,3 +370,71 @@ test('camelCase belongsTo key is serialized with underscores on save', function(
         equal(ajaxHash.data, '{"description":"firstkid","camel_parent":"1"}');
     });
 });
+
+asyncTest('async hasMany relationship is serialized', function() {
+    var store,
+        assertion;
+
+    stubEndpointForHttpRequest('/api/camels/', {}, 'POST');  // avoid a failed request
+
+    store = App.__container__.lookup('store:main');
+    Ember.run(App, function(){
+        store.serializerFor('tag').pushSinglePayload(store, 'tag', {"id": 10, "description": "django"});
+    });
+    
+    visit("/").then(function() {
+        return store.find('tag', 10);
+    }).then(function(tag){
+        var camel;
+        camel = store.createRecord('camel', {
+            camelCaseAttribute: 'awesome stuff in here',
+            camelCaseRelationship: [tag],
+            belongsToAsyncRelationship: null
+        });
+
+        return camel.save().then(
+                assertion, 
+                assertion
+            );  // check the assertion regardless of success or failure of camel.save()
+    });
+
+    assertion = function() {
+        equal(ajaxHash.data, '{"camel_case_attribute":"awesome stuff in here","camel_case_relationship":["10"],"belongs_to_async_relationship":null}');
+        start();  // end the asyncTest
+    };
+    
+});
+
+asyncTest('async belongsTo relationship is serialized', function() {
+    var store,
+        assertion;
+
+    stubEndpointForHttpRequest('/api/camels/', {}, 'POST');  // avoid a failed request
+
+    store = App.__container__.lookup('store:main');
+    Ember.run(App, function(){
+        store.serializerFor('tag').pushSinglePayload(store, 'tag', {"id": 10, "description": "django"});
+    });
+    
+    visit("/").then(function() {
+        return store.find('tag', 10);
+    }).then(function(tag){
+        var camel;
+        camel = store.createRecord('camel', {
+            camelCaseAttribute: 'awesome stuff in here',
+            camelCaseRelationship: null,
+            belongsToAsyncRelationship: tag
+        });
+        
+        return camel.save().then(
+                assertion, 
+                assertion
+            );  // check the assertion regardless of success or failure of camel.save()
+    });
+
+    assertion = function() {
+        equal(ajaxHash.data, '{"camel_case_attribute":"awesome stuff in here","camel_case_relationship":[],"belongs_to_async_relationship":"10"}');
+        start();  // end the asyncTest
+    };
+    
+});
