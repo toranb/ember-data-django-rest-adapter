@@ -6,4 +6,8 @@
     {{persona.nickname}}<br />
   {{/each}}
 
+  {{#each badge in model.badges}}
+    <span {{bindAttr class="badge.city"}}>{{badge.city}}</span><br />
+  {{/each}}
+
   <div id="errors">{{model.errors}}</div>
