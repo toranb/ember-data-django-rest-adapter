@@ -117,18 +117,12 @@ Nested endpoints must match their relation field name
 ## CSRF Support
 This adapter does not require you send a CSRF token with each $.ajax request
 
-If you want to send the token with each request, first add it to your html page as a meta tag
-
-    <!-- inside our page's <head> tag -->
-    <meta name="csrf-token" content="{{csrf_token}}">
-
-Next you need to add a snippet of javascript to ensure your application adds the csrf token to the http headers
+If you want to send the token with each request, add a snippet of javascript to ensure your application adds the csrf token to the http headers
 
     <script type="text/javascript">
       jQuery(document).ajaxSend(function(event, xhr, settings) {
         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-          var token = $('meta[name="csrf-token"]').attr('content');
-          xhr.setRequestHeader("X-CSRFToken", token);
+          xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
         }
       });
     </script>
