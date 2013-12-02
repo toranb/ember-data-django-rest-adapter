@@ -370,3 +370,15 @@ test('camelCase belongsTo key is serialized with underscores on save', function(
         equal(ajaxHash.data, '{"description":"firstkid","camel_parent":"1"}');
     });
 });
+
+test('string ids are allowed', function() {
+    var speaker = {"id": 1, "name": "wat", "location": "iowa", "session": 1, "badges": ["bna"], "association": 1, "personas": [1], "zidentity": 1};
+    var badges = [{"id": "bna", "city": "Nashville"}];
+    stubEndpointForHttpRequest('/api/speakers/1/', speaker);
+    stubEndpointForHttpRequest('/api/speakers/1/badges/', badges);
+    visit("/speaker/1").then(function() {
+        var city = $(".Nashville");
+        equal(city.length, 1, "One city was found");
+        equal(city.text(), "Nashville", "name was found: " + city.text());
+    });
+});

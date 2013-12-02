@@ -23,7 +23,7 @@ App.ObjectTransform = DS.Transform.extend({
 
 App.Preserialized = DS.Model.extend({
   // This will contain JSON that will be deserialized by the App.ObjectTransform.
-  // If it deserializes to an array with anything other than numbers it will be 
+  // If it deserializes to an array with anything other than numbers it will be
   // incorrectly interpreted by extractDjangoPayload as an embedded record.
   config: DS.attr('object')
 });
@@ -58,6 +58,7 @@ App.Speaker = DS.Model.extend({
     location: DS.attr('string'),
     association: DS.belongsTo('association'),
     personas: DS.hasMany('persona', { async: true }),
+    badges: DS.hasMany('badge', { async: true }),
     session: DS.belongsTo('session'),
     zidentity: DS.belongsTo('user'),
     other: DS.belongsTo('other'),
@@ -110,6 +111,11 @@ App.Persona = DS.Model.extend({
     nickname: DS.attr('string'),
     speaker: DS.belongsTo('speaker'),
     company: DS.belongsTo('company')
+});
+
+App.Badge = DS.Model.extend({
+    city: DS.attr('string'),
+    speaker: DS.belongsTo('speaker')
 });
 
 App.Sponsor = DS.Model.extend({

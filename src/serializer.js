@@ -6,13 +6,15 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     extractDjangoPayload: function(store, type, payload) {
         type.eachRelationship(function(key, relationship){
-            // TODO should we check if relationship is marked as embedded?
-            if (!Ember.isNone(payload[key]) && typeof(payload[key][0]) !== 'number' && relationship.kind ==='hasMany') {
-                if (payload[key].constructor.name === 'Array' && payload[key].length > 0) {
-                    var ids = payload[key].mapBy('id'); //todo find pk (not always id)
-                    this.pushArrayPayload(store, relationship.type, payload[key]);
-                    payload[key] = ids;
-                }
+            if (!Ember.isNone(payload[key]) &&
+                typeof(payload[key][0]) !== 'number' &&
+                typeof(payload[key][0]) !== 'string' &&
+                relationship.kind ==='hasMany') {
+              if (payload[key].constructor.name === 'Array' && payload[key].length > 0) {
+                var ids = payload[key].mapBy('id'); //todo find pk (not always id)
+                this.pushArrayPayload(store, relationship.type, payload[key]);
+                payload[key] = ids;
+              }
             }
             else if (!Ember.isNone(payload[key]) && typeof(payload[key]) === 'object' && relationship.kind ==='belongsTo') {
                 var id=payload[key].id;
@@ -25,7 +27,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     extractSingle: function(store, type, payload) {
         // using normalize from RESTSerializer applies transforms and allows
         // us to define keyForAttribute and keyForRelationship to handle
-        // camelization correctly. 
+        // camelization correctly.
         this.normalize(type, payload);
         this.extractDjangoPayload(store, type, payload);
         return payload;
