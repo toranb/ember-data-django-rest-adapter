@@ -10,7 +10,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                 typeof(payload[key][0]) !== 'number' &&
                 typeof(payload[key][0]) !== 'string' &&
                 relationship.kind ==='hasMany') {
-              if (payload[key].constructor.name === 'Array' && payload[key].length > 0) {
+              if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
                 var ids = payload[key].mapBy('id'); //todo find pk (not always id)
                 this.pushArrayPayload(store, relationship.type, payload[key]);
                 payload[key] = ids;
