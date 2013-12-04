@@ -8,7 +8,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
         type.eachRelationship(function(key, relationship){
             // TODO should we check if relationship is marked as embedded?
             if (!Ember.isNone(payload[key]) && typeof(payload[key][0]) !== 'number' && relationship.kind ==='hasMany') {
-                if (payload[key].constructor.name === 'Array' && payload[key].length > 0) {
+                if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
                     var ids = payload[key].mapBy('id'); //todo find pk (not always id)
                     this.pushArrayPayload(store, relationship.type, payload[key]);
                     payload[key] = ids;
