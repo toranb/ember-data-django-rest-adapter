@@ -21,7 +21,7 @@ test('arrays as result of transform should not be interpreted as embedded record
     visit("/preserialized").then(function() {
         var divs = find("div.item").length;
         equal(divs, 3, "found " + divs + " divs");
-        var items = $("div.item").text().trim();
+        var items = Ember.$.trim($("div.item").text());
         equal(items, "emberisneato", "attribute was instead: " + items);
     });
 });
@@ -32,7 +32,7 @@ test('attribute transforms are applied', function() {
     visit("/transformers").then(function() {
         var spans = find("span").length;
         equal(spans, 1, "found " + spans + " spans");
-        var attribute = $("span.attribute").text().trim();
+        var attribute = Ember.$.trim($("span.attribute").text());
         equal(attribute, "blah blahSILLYTRANSFORM", "attribute was instead: " + attribute);
     });
 });
@@ -43,7 +43,7 @@ test('models with camelCase converted to underscore urls', function() {
     visit("/camelUrls").then(function() {
         var spans = find("span").length;
         equal(spans, 1, "found " + spans + " spans");
-        var attribute = $("span.attribute").text().trim();
+        var attribute = Ember.$.trim($("span.attribute").text());
         equal(attribute, "foobar", "attribute was instead: " + attribute);
     });
 });
@@ -55,9 +55,9 @@ test('keys with underscores converted to camelCase', function() {
     visit("/camels").then(function() {
         var spans = find("span").length;
         equal(spans, 2, "found " + spans + " spans");
-        var attribute = $("span.attribute").text().trim();
+        var attribute = Ember.$.trim($("span.attribute").text());
         equal(attribute, "foo", "attribute was instead: " + attribute);
-        var tag = $("span.tag").text().trim();
+        var tag = Ember.$.trim($("span.tag").text());
         equal(tag, "done", "tag was instead: " + tag);
     });
 });
@@ -68,7 +68,7 @@ test('ajax response with 1 session yields table with 1 row', function() {
     visit("/sessions").then(function() {
         var rows = find("table tr").length;
         equal(rows, 6, "table had " + rows + " rows");
-        var name = $("table td.name").text().trim();
+        var name = Ember.$.trim($("table td.name").text());
         equal(name, "foo", "name was instead: " + name);
     });
 });
@@ -91,19 +91,19 @@ test('ajax response with async hasMany relationship renders correctly', function
         //speakers
         var speakers = find("table td.speaker").length;
         equal(speakers, 2, "table had " + speakers + " speakers");
-        var speaker_one = $("table td.speaker:eq(0)").text().trim();
+        var speaker_one = Ember.$.trim($("table td.speaker:eq(0)").text());
         equal(speaker_one, "first", "speaker_one was instead: " + speaker_one);
-        var speaker_two = $("table td.speaker:eq(1)").text().trim();
+        var speaker_two = Ember.$.trim($("table td.speaker:eq(1)").text());
         equal(speaker_two, "last", "speaker_two was instead: " + speaker_two);
         //ratings
         var ratings = find("table td.rating").length;
         equal(ratings, 1, "table had " + ratings + " ratings");
-        var rating_one = $("table td.rating:eq(0)").text().trim();
+        var rating_one = Ember.$.trim($("table td.rating:eq(0)").text());
         equal(rating_one, "10", "rating_one was instead: " + rating_one);
         //tags
         var tags = find("table td.tag").length;
         equal(tags, 1, "table had " + tags + " tags");
-        var tag_one = $("table td.tag:eq(0)").text().trim();
+        var tag_one = Ember.$.trim($("table td.tag:eq(0)").text());
         equal(tag_one, "done", "tag_one was instead: " + tag_one);
     });
 });
@@ -116,19 +116,19 @@ test('ajax response for single session will render correctly', function() {
     stubEndpointForHttpRequest('/api/sessions/', [json]);
     stubEndpointForHttpRequest('/api/sessions/1/', json);
     visit("/session/1").then(function() {
-        var name = $("div .model_name").text().trim();
+        var name = Ember.$.trim($("div .model_name").text());
         equal(name, "foo", "name was instead: " + name);
         //speakers
         var speakers = find("div .speakers span.name").length;
         equal(speakers, 2, "template had " + speakers + " speakers");
-        var speaker_one = $("div .speakers span.name:eq(0)").text().trim();
+        var speaker_one = Ember.$.trim($("div .speakers span.name:eq(0)").text());
         equal(speaker_one, "first", "speaker_one was instead: " + speaker_one);
-        var speaker_two = $("div .speakers span.name:eq(1)").text().trim();
+        var speaker_two = Ember.$.trim($("div .speakers span.name:eq(1)").text());
         equal(speaker_two, "last", "speaker_two was instead: " + speaker_two);
         //ratings
         var ratings = find("div .ratings span.score").length;
         equal(ratings, 1, "table had " + ratings + " ratings");
-        var rating_one = $("div .ratings span.score:eq(0)").text().trim();
+        var rating_one = Ember.$.trim($("div .ratings span.score:eq(0)").text());
         equal(rating_one, "10", "rating_one was instead: " + rating_one);
         //setup the http post mock $.ajax
         //for some reason the 2 lines below are not used or needed?
@@ -155,7 +155,7 @@ test('test pushSinglePayload', function() {
         store.serializerFor('tag').pushSinglePayload(store, 'tag', json);
     });
     visit("/tag/10").then(function() {
-        var content = $("span").text().trim();
+        var content = Ember.$.trim($("span").text());
         equal(content, "django", "name was instead: " + content);
     });
 });
@@ -168,11 +168,11 @@ test('test pushArrayPayload', function() {
         store.serializerFor('tag').pushArrayPayload(store, 'tag', json);
     });
     visit("/tag/12").then(function() {
-        var content = $("span").text().trim();
+        var content = Ember.$.trim($("span").text());
         equal(content, "tomster", "name was instead: " + content);
         return visit("/tag/11");
     }).then(function(){
-        var content = $("span").text().trim();
+        var content = Ember.$.trim($("span").text());
         equal(content, "ember", "name was instead: " + content);
     });
 });
@@ -188,11 +188,11 @@ test('finding nested attributes when some requested records are already loaded m
     stubEndpointForHttpRequest('/api/users/1/', user);
     stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
     visit("/user/1").then(function() {
-        var name = $(".username").text().trim();
+        var name = Ember.$.trim($(".username").text());
         equal(name, "foo", "name was instead: " + name);
         var count = $(".alias").length;
         equal(count, 2, "count was instead: " + count);
-        var alias = $(".alias:eq(0)").text().trim();
+        var alias = Ember.$.trim($(".alias:eq(0)").text());
         equal(alias, "ember", "alias was instead: " + alias);
     });
 });
@@ -203,11 +203,11 @@ test('finding nested attributes makes GET request to the correct attribute-based
     stubEndpointForHttpRequest('/api/users/1/', user);
     stubEndpointForHttpRequest('/api/users/1/aliases/', aliases);
     visit("/user/1").then(function() {
-        var name = $(".username").text().trim();
+        var name = Ember.$.trim($(".username").text());
         equal(name, "foo", "name was instead: " + name);
         var count = $(".alias").length;
         equal(count, 2, "count was instead: " + count);
-        var alias = $(".alias:eq(0)").text().trim();
+        var alias = Ember.$.trim($(".alias:eq(0)").text());
         equal(alias, "ember", "alias was instead: " + alias);
     });
 });
@@ -222,7 +222,7 @@ test('basic error handling will bubble to the model', function() {
     visit("/speaker/1").then(function() {
         var name = $("input.name").val();
         equal(name, "wat", "name was instead: " + name);
-        var errors = $("#errors").text().trim();
+        var errors = Ember.$.trim($("#errors").text());
         equal(errors, "", "errors was instead: " + errors);
         stubEndpointForHttpRequest('/api/speakers/1/', {}, 'PUT', 400);
     });
@@ -230,7 +230,7 @@ test('basic error handling will bubble to the model', function() {
     // }).then(function() {
         // var name = $("input.name").val();
         // equal(name, "wat", "name was instead: " + name);
-        // var errors = $("#errors").text().trim();
+        // var errors = Ember.$.trim($("#errors").text());
         // equal(errors, "operation failed for model: speaker", "errors was instead: " + errors);
     // });
 });
@@ -246,7 +246,7 @@ test('basic error handling will not fire when update is successful', function() 
     visit("/speaker/1").then(function() {
         var name = $("input.name").val();
         equal(name, "wat", "name was instead: " + name);
-        var errors = $("#errors").text().trim();
+        var errors = Ember.$.trim($("#errors").text());
         equal(errors, "", "errors was instead: " + errors);
     });
         // stubEndpointForHttpRequest('/api/speakers/1/', speaker, 'PUT', 200);
@@ -254,7 +254,7 @@ test('basic error handling will not fire when update is successful', function() 
     // }).then(function() {
         // var name = $("input.name").val();
         // equal(name, "wat", "name was instead: " + name);
-        // var errors = $("#errors").text().trim();
+        // var errors = Ember.$.trim($("#errors").text());
         // equal(errors, "", "errors was instead: " + errors);
         // expectUrlTypeHashEqual("/api/speakers/1/", "PUT", speaker);
     // });

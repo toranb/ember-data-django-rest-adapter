@@ -219,7 +219,7 @@ App.OtherController = Ember.ObjectController.extend({
       addRating: function(other) {
         var score = this.get('score');
         var feedback = this.get('feedback');
-        if (score === undefined || feedback === undefined || score.trim() === "" || feedback.trim() === "") {
+        if (score === undefined || feedback === undefined || Ember.$.trim(score) === "" || Ember.$.trim(feedback) === "") {
           return;
         }
         var rating = { score: score, feedback: feedback, other: other};
@@ -263,7 +263,7 @@ App.SessionController = Ember.ObjectController.extend({
       addRating: function(session) {
         var score = this.get('score');
         var feedback = this.get('feedback');
-        if (score === undefined || feedback === undefined || score.trim() === "" || feedback.trim() === "") {
+        if (score === undefined || feedback === undefined || Ember.$.trim(score) === "" || Ember.$.trim(feedback) === "") {
           return;
         }
         var rating = { score: score, feedback: feedback, session: session};
