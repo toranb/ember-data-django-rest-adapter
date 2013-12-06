@@ -17,9 +17,9 @@ test('ajax response with array of embedded records renders hasMany correctly', f
     visit("/others").then(function() {
         var rows = find("table tr").length;
         equal(rows, 4, "table had " + rows + " rows");
-        var hat = $("table tr:eq(0) td:eq(0)").text().trim();
-        var speaker = $("table tr:eq(1) td:eq(0)").text().trim();
-        var tag = $("table tr:eq(2) td:eq(0)").text().trim();
+        var hat = Ember.$.trim($("table tr:eq(0) td:eq(0)").text());
+        var speaker = Ember.$.trim($("table tr:eq(1) td:eq(0)").text());
+        var tag = Ember.$.trim($("table tr:eq(2) td:eq(0)").text());
         equal(hat, "zzz", "(other) hat was instead: " + hat);
         equal(speaker, "first", "speaker was instead: " + speaker);
         equal(tag, "done", "tag was instead: " + tag);
@@ -38,11 +38,11 @@ test('ajax response with single embedded record renders hasMany correctly', func
     var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}], "location": {"id": 1, "name": "US"}};
     stubEndpointForHttpRequest('/api/others/1/', json);
     visit("/other/1").then(function() {
-        var hat = $("div .hat").text().trim();
+        var hat = Ember.$.trim($("div .hat").text());
         equal(hat, "eee", "hat was instead: " + hat);
-        var speaker = $("div .name").text().trim();
+        var speaker = Ember.$.trim($("div .name").text());
         equal(speaker, "first", "speaker was instead: " + speaker);
-        var tag = $("div .description").text().trim();
+        var tag = Ember.$.trim($("div .description").text());
         equal(tag, "done", "tag was instead: " + tag);
     });
 });
@@ -51,7 +51,7 @@ test('ajax response with single embedded record renders belongsTo correctly', fu
     var json = {"id": 1, "hat": "eee", "speakers": [{"id": 1, "name": "first", "other": 1}], "ratings": [{"id": 1, "score": 10, "feedback": "nice", "other": 1}], "tags": [{"id": 1, "description": "done"}], "location": {"id": 1, "name": "US"}};
     stubEndpointForHttpRequest('/api/others/1/', json);
     visit("/other/1").then(function() {
-        var location = $("div .location").text().trim();
+        var location = Ember.$.trim($("div .location").text());
         equal(location, "US", "location was instead: " + location);
     });
 });
