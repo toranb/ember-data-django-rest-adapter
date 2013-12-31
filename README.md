@@ -206,14 +206,16 @@ This adapter was built by the community for the community. If you would like to 
     grunt test
 
 ## Versions
-    ember.js 1.1.2
-    ember-data 1.0 beta 3+ (master build as of 10/22)
+    ember.js 1.2.0
+    ember-data 1.0 beta 4+ *master build as of 12/19
 
 ## Pending Issues
 
-i) Date and DateTime are not yet built into the adapter (see the WIP PR for a workaround)
+    i) Date and DateTime are not yet built into the adapter (see the WIP PR for a workaround)
 
-ii) Pagination is not yet supported
+    ii) Async belongsTo/hasMany requires a pull-request be merged into ember-data core
+
+    iii) Pagination is not yet supported
 
 ## Examples
 An example project that shows the adapter in action can be found below
