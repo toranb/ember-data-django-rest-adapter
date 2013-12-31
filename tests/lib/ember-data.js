@@ -6,7 +6,7 @@
  */
 
 
- // Version: 1.0.0-beta.5+canary.d0a704a0
+ // Version: 1.0.0-beta.5+canary.bbe45eb6
 
 (function() {
 var define, requireModule;
@@ -61,7 +61,7 @@ var define, requireModule;
 var DS;
 if ('undefined' === typeof DS) {
   DS = Ember.Namespace.create({
-    VERSION: '1.0.0-beta.5+canary.d0a704a0'
+    VERSION: '1.0.0-beta.5+canary.bbe45eb6'
   });
 
   if ('undefined' !== typeof window) {
@@ -332,10 +332,13 @@ DS.JSONSerializer = Ember.Object.extend({
     @return {Object} json
   */
   serialize: function(record, options) {
-    var json = {};
+    var json = {},
+        promises = [],
+        finalizer = function () { return json; },
+        id;
 
     if (options && options.includeId) {
-      var id = get(record, 'id');
+      id = get(record, 'id');
 
       if (id) {
         json[get(this, 'primaryKey')] = get(record, 'id');
@@ -348,13 +351,13 @@ DS.JSONSerializer = Ember.Object.extend({
 
     record.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'belongsTo') {
-        this.serializeBelongsTo(record, json, relationship);
+        promises.push(this.serializeBelongsTo(record, json, relationship));
       } else if (relationship.kind === 'hasMany') {
-        this.serializeHasMany(record, json, relationship);
+        promises.push(this.serializeHasMany(record, json, relationship));
       }
     }, this);
 
-    return json;
+    return Ember.RSVP.all(promises).then(finalizer);
   },
 
   /**
@@ -422,9 +425,10 @@ DS.JSONSerializer = Ember.Object.extend({
    @param {Object} relationship
   */
   serializeBelongsTo: function(record, json, relationship) {
-    var key = relationship.key;
-
-    var belongsTo = get(record, key);
+    var key = relationship.key,
+        belongsTo = get(record, key),
+        self = this,
+        finalizer = function () { return json; };
 
     key = this.keyForRelationship ? this.keyForRelationship(key, "belongsTo") : key;
 
@@ -435,7 +439,9 @@ DS.JSONSerializer = Ember.Object.extend({
     }
 
     if (relationship.options.polymorphic) {
-      this.serializePolymorphicType(record, json, relationship);
+      return Ember.RSVP.resolve(belongsTo).then(function(record) {
+               self.serializePolymorphicType(record, json, relationship);
+             }).then(finalizer);
     }
   },
 
@@ -968,7 +974,7 @@ DS.Transform = Ember.Object.extend({
     }
     ```
 
-    @method deserialized
+    @method deserialize
     @param serialized The serialized value
     @return The deserialized value
   */
@@ -1359,7 +1365,7 @@ var get = Ember.get, set = Ember.set;
   A record array is an array that contains records of a certain type. The record
   array materializes records as needed when they are retrieved for the first
   time. You should not create record arrays yourself. Instead, an instance of
-  DS.RecordArray or its subclasses will be returned by your application's store
+  `DS.RecordArray` or its subclasses will be returned by your application's store
   in response to queries.
 
   @class RecordArray
@@ -1377,24 +1383,87 @@ DS.RecordArray = Ember.ArrayProxy.extend(Ember.Evented, {
   */
   type: null,
 
-  // The array of client ids backing the record array. When a
-  // record is requested from the record array, the record
-  // for the client id at the same index is materialized, if
-  // necessary, by the store.
+  /**
+    The array of client ids backing the record array. When a
+    record is requested from the record array, the record
+    for the client id at the same index is materialized, if
+    necessary, by the store.
+
+    @property content
+    @private
+    @type Ember.Array
+  */
   content: null,
 
+  /**
+    The flag to signal a `RecordArray` is currently loading data.
+
+    Example
+
+    ```javascript
+    var people = store.all(App.Person);
+    people.get('isLoaded'); // true
+    ```
+
+    @property isLoaded
+    @type Boolean
+  */
   isLoaded: false,
+  /**
+    The flag to signal a `RecordArray` is currently loading data.
+
+    Example
+
+    ```javascript
+    var people = store.all(App.Person);
+    people.get('isUpdating'); // false
+    people.update();
+    people.get('isUpdating'); // true
+    ```
+
+    @property isUpdating
+    @type Boolean
+  */
   isUpdating: false,
 
-  // The store that created this record array.
+  /**
+    The store that created this record array.
+
+    @property store
+    @private
+    @type DS.Store
+  */
   store: null,
 
+  /**
+    Retrieves an object from the content by index.
+
+    @method objectAtContent
+    @private
+    @param {Number} index
+    @return {DS.Model} record
+  */
   objectAtContent: function(index) {
     var content = get(this, 'content');
 
     return content.objectAt(index);
   },
 
+  /**
+    Used to get the latest version of all of the records in this array
+    from the adapter.
+
+    Example
+
+    ```javascript
+    var people = store.all(App.Person);
+    people.get('isUpdating'); // false
+    people.update();
+    people.get('isUpdating'); // true
+    ```
+
+    @method update
+  */
   update: function() {
     if (get(this, 'isUpdating')) { return; }
 
@@ -1404,14 +1473,44 @@ DS.RecordArray = Ember.ArrayProxy.extend(Ember.Evented, {
     store.fetchAll(type, this);
   },
 
+  /**
+    Adds a record to the `RecordArray`.
+
+    @method addRecord
+    @private
+    @param {DS.Model} record
+  */
   addRecord: function(record) {
     get(this, 'content').addObject(record);
   },
 
+  /**
+    Removes a record to the `RecordArray`.
+
+    @method removeRecord
+    @private
+    @param {DS.Model} record
+  */
   removeRecord: function(record) {
     get(this, 'content').removeObject(record);
   },
 
+  /**
+    Saves all of the records in the `RecordArray`.
+
+    Example
+
+    ```javascript
+    var messages = store.all(App.Message);
+    messages.forEach(function(message) {
+      message.set('hasBeenSeen', true);
+    });
+    messages.save();
+    ```
+
+    @method save
+    @return {DS.PromiseArray} promise
+  */
   save: function() {
     var promiseLabel = "DS: RecordArray#save " + get(this, 'type');
     var promise = Ember.RSVP.all(this.invoke("save"), promiseLabel).then(function(array) {
@@ -1507,10 +1606,10 @@ var get = Ember.get, set = Ember.set;
 var map = Ember.EnumerableUtils.map;
 
 /**
-  A ManyArray is a RecordArray that represents the contents of a has-many
+  A `ManyArray` is a `RecordArray` that represents the contents of a has-many
   relationship.
 
-  The ManyArray is instantiated lazily the first time the relationship is
+  The `ManyArray` is instantiated lazily the first time the relationship is
   requested.
 
   ### Inverses
@@ -1519,13 +1618,15 @@ var map = Ember.EnumerableUtils.map;
   an inverse. For example, imagine the following models are
   defined:
 
-      App.Post = DS.Model.extend({
-        comments: DS.hasMany('comment')
-      });
+  ```javascript
+  App.Post = DS.Model.extend({
+    comments: DS.hasMany('comment')
+  });
 
-      App.Comment = DS.Model.extend({
-        post: DS.belongsTo('post')
-      });
+  App.Comment = DS.Model.extend({
+    post: DS.belongsTo('post')
+  });
+  ```
 
   If you created a new instance of `App.Post` and added
   a `App.Comment` record to its `comments` has-many
@@ -1549,7 +1650,7 @@ DS.ManyArray = DS.RecordArray.extend({
   /**
     The property name of the relationship
 
-    @property {String}
+    @property {String} name
     @private
   */
   name: null,
@@ -1557,7 +1658,7 @@ DS.ManyArray = DS.RecordArray.extend({
   /**
     The record to which this relationship belongs.
 
-    @property {DS.Model}
+    @property {DS.Model} owner
     @private
   */
   owner: null,
@@ -1565,7 +1666,7 @@ DS.ManyArray = DS.RecordArray.extend({
   /**
     `true` if the relationship is polymorphic, `false` otherwise.
 
-    @property {Boolean}
+    @property {Boolean} isPolymorphic
     @private
   */
   isPolymorphic: false,
@@ -1578,15 +1679,24 @@ DS.ManyArray = DS.RecordArray.extend({
     Used for async `hasMany` arrays
     to keep track of when they will resolve.
 
-    @property {Ember.RSVP.Promise}
+    @property {Ember.RSVP.Promise} promise
     @private
   */
   promise: null,
 
+  /**
+    @method loadingRecordsCount
+    @param {Number} count
+    @private
+  */
   loadingRecordsCount: function(count) {
     this.loadingRecordsCount = count;
   },
 
+  /**
+    @method loadedRecord
+    @private
+  */
   loadedRecord: function() {
     this.loadingRecordsCount--;
     if (this.loadingRecordsCount === 0) {
@@ -1595,6 +1705,10 @@ DS.ManyArray = DS.RecordArray.extend({
     }
   },
 
+  /**
+    @method fetch
+    @private
+  */
   fetch: function() {
     var records = get(this, 'content'),
         store = get(this, 'store'),
@@ -1690,7 +1804,14 @@ DS.ManyArray = DS.RecordArray.extend({
     }
   },
 
-  // Create a child record within the owner
+  /**
+    Create a child record within the owner
+
+    @method createRecord
+    @private
+    @param {Object} hash
+    @return {DS.Model} record
+  */
   createRecord: function(hash) {
     var owner = get(this, 'owner'),
         store = get(owner, 'store'),
@@ -3272,7 +3393,7 @@ function _findQuery(adapter, store, type, query, recordArray) {
       serializer = serializerForAdapter(adapter, type);
 
   return resolve(promise, "DS: Handle Adapter#findQuery of " + type).then(function(payload) {
-    payload = serializer.extract(store, type, payload, null, 'findAll');
+    payload = serializer.extract(store, type, payload, null, 'findQuery');
 
     Ember.assert("The response from a findQuery must be an Array, not " + Ember.inspect(payload), Ember.typeOf(payload) === 'array');
 
@@ -7292,13 +7413,15 @@ DS.FixtureAdapter = DS.Adapter.extend({
     @param  record
   */
   createRecord: function(store, type, record) {
-    var fixture = this.mockJSON(store, type, record);
+    var self = this;
 
-    this.updateFixtures(type, fixture);
-
-    return this.simulateRemoteCall(function() {
-      return fixture;
-    }, this);
+    return this.mockJSON(store, type, record)
+                 .then(function(fixture) {
+                   self.updateFixtures(type, fixture);
+                   return self.simulateRemoteCall(function() {
+                     return fixture;
+                   }, self);
+                 });
   },
 
   /**
@@ -7308,13 +7431,15 @@ DS.FixtureAdapter = DS.Adapter.extend({
     @param  record
   */
   updateRecord: function(store, type, record) {
-    var fixture = this.mockJSON(store, type, record);
+    var self = this;
 
-    this.updateFixtures(type, fixture);
-
-    return this.simulateRemoteCall(function() {
-      return fixture;
-    }, this);
+    return this.mockJSON(store, type, record)
+                 .then(function(fixture) {
+                   self.updateFixtures(type, fixture);
+                   return self.simulateRemoteCall(function() {
+                     return fixture;
+                   }, self);
+                 });
   },
 
   /**
@@ -7324,14 +7449,16 @@ DS.FixtureAdapter = DS.Adapter.extend({
     @param  record
   */
   deleteRecord: function(store, type, record) {
-    var fixture = this.mockJSON(store, type, record);
+    var self = this;
 
-    this.deleteLoadedFixture(type, fixture);
-
-    return this.simulateRemoteCall(function() {
-      // no payload in a deletion
-      return null;
-    });
+    return this.mockJSON(store, type, record)
+                 .then(function(fixture) {
+                   self.deleteLoadedFixture(type, fixture);
+                   return self.simulateRemoteCall(function() {
+                     // no payload in a deletion
+                     return null;
+                   });
+                 });
   },
 
   /*
@@ -7366,8 +7493,8 @@ DS.FixtureAdapter = DS.Adapter.extend({
   /*
     @method findFixtureById
     @private
-    @param type
-    @param record
+    @param fixtures
+    @param id
   */
   findFixtureById: function(fixtures, id) {
     return Ember.A(fixtures).find(function(r) {
@@ -8117,7 +8244,10 @@ DS.RESTSerializer = DS.JSONSerializer.extend({
     App.ApplicationSerializer = DS.RESTSerializer.extend({
       serializeIntoHash: function(data, type, record, options) {
         var root = Ember.String.decamelize(type.typeKey);
-        data[root] = this.serialize(record, options);
+        this.serialize(record, options).then(function(serialized) {
+          data[root] = serialized;
+          return data;
+        });
       }
     });
     ```
@@ -8129,7 +8259,11 @@ DS.RESTSerializer = DS.JSONSerializer.extend({
     @param {Object} options
   */
   serializeIntoHash: function(hash, type, record, options) {
-    hash[type.typeKey] = this.serialize(record, options);
+    return this.serialize(record, options)
+                 .then(function(serialized) {
+                   hash[type.typeKey] = serialized;
+                   return hash;
+                 });
   },
 
   /**
@@ -8143,10 +8277,9 @@ DS.RESTSerializer = DS.JSONSerializer.extend({
     @param {Object} relationship
   */
   serializePolymorphicType: function(record, json, relationship) {
-    var key = relationship.key,
-        belongsTo = get(record, key);
+    var key = relationship.key;
     key = this.keyForAttribute ? this.keyForAttribute(key) : key;
-    json[key + "Type"] = belongsTo.constructor.typeKey;
+    json[key + "Type"] = record.constructor.typeKey;
   }
 });
 
@@ -8369,7 +8502,7 @@ DS.RESTAdapter = DS.Adapter.extend({
     @param {Array<String>} ids
     @returns Promise
   */
-  findMany: function(store, type, ids, owner) {
+  findMany: function(store, type, ids) {
     return this.ajax(this.buildURL(type.typeKey), 'GET', { data: { ids: ids } });
   },
 
@@ -8472,12 +8605,15 @@ DS.RESTAdapter = DS.Adapter.extend({
     @returns Promise
   */
   createRecord: function(store, type, record) {
-    var data = {};
-    var serializer = store.serializerFor(type.typeKey);
+    var data = {},
+        serializer = store.serializerFor(type.typeKey),
+        url = this.buildURL(type.typeKey),
+        self = this;
 
-    serializer.serializeIntoHash(data, type, record, { includeId: true });
-
-    return this.ajax(this.buildURL(type.typeKey), "POST", { data: data });
+    return serializer.serializeIntoHash(data, type, record, { includeId: true })
+                     .then(function(serialized) {
+                       return self.ajax(url, "POST", { data: serialized });
+                     });
   },
 
   /**
@@ -8500,14 +8636,16 @@ DS.RESTAdapter = DS.Adapter.extend({
     @returns Promise
   */
   updateRecord: function(store, type, record) {
-    var data = {};
-    var serializer = store.serializerFor(type.typeKey);
+    var data = {},
+        serializer = store.serializerFor(type.typeKey),
+        id = get(record, 'id'),
+        url = this.buildURL(type.typeKey, id),
+        self = this;
 
-    serializer.serializeIntoHash(data, type, record);
-
-    var id = get(record, 'id');
-
-    return this.ajax(this.buildURL(type.typeKey, id), "PUT", { data: data });
+    return serializer.serializeIntoHash(data, type, record)
+                     .then(function(serialized) {
+                       return self.ajax(url, "PUT", { data: serialized });
+                     });
   },
 
   /**
@@ -9204,7 +9342,11 @@ DS.ActiveModelSerializer = DS.RESTSerializer.extend({
   */
   serializeIntoHash: function(data, type, record, options) {
     var root = Ember.String.decamelize(type.typeKey);
-    data[root] = this.serialize(record, options);
+
+    return this.serialize(record, options).then(function(serialized) {
+      data[root] = serialized;
+      return data;
+    });
   },
 
   /**
@@ -9216,10 +9358,9 @@ DS.ActiveModelSerializer = DS.RESTSerializer.extend({
     @param relationship
   */
   serializePolymorphicType: function(record, json, relationship) {
-    var key = relationship.key,
-        belongsTo = get(record, key);
+    var key = relationship.key;
     key = this.keyForAttribute(key);
-    json[key + "_type"] = Ember.String.capitalize(belongsTo.constructor.typeKey);
+    json[key + "_type"] = Ember.String.capitalize(record.constructor.typeKey);
   },
 
   // EXTRACT
@@ -9388,17 +9529,24 @@ DS.EmbeddedRecordsMixin = Ember.Mixin.create({
   serializeHasMany: function(record, json, relationship) {
     var key   = relationship.key,
         attrs = get(this, 'attrs'),
-        embed = attrs && attrs[key] && attrs[key].embedded === 'always';
+        embed = attrs && attrs[key] && attrs[key].embedded === 'always',
+        jsonKey = this.keyForAttribute(key),
+        promises;
 
     if (embed) {
-      json[this.keyForAttribute(key)] = get(record, key).map(function(relation) {
-        var data = relation.serialize(),
-            primaryKey = get(this, 'primaryKey');
+      promises = get(record, key).map(function(relation) {
+        var self = this;
 
-        data[primaryKey] = get(relation, primaryKey);
-
-        return data;
+        return relation.serialize().then(function(data) {
+          var primaryKey = get(self, 'primaryKey');
+          data[primaryKey] = get(relation, primaryKey);
+          return data;
+        });
       }, this);
+
+      return Ember.RSVP.all(promises).then(function(serializedRelationships) {
+        json[jsonKey] = serializedRelationships;
+      });
     }
   },
 
@@ -9478,6 +9626,7 @@ function updatePayloadWithEmbedded(store, serializer, type, partial, payload) {
     }
   }, serializer);
 }
+
 })();
 
 

@@ -112,22 +112,23 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
       @method serializeBelongsTo
     */
     serializeBelongsTo: function(record, json, relationship) {
+        var self = this;
         var key = relationship.key;
         var belongsTo = record.get(key);
-        var json_key = this.keyForRelationship ? this.keyForRelationship(key, "belongsTo") : key;
+        var finalizer = function () { return json; };
 
         if (Ember.isNone(belongsTo)) {
-          json[json_key] = belongsTo;
+          json[key] = belongsTo;
         } else {
-          if (typeof(record.get(key)) === 'string') {
-            json[json_key] = record.get(key);
-          }else{
-            json[json_key] = record.get(key).get('id');
-          }
+            return Ember.RSVP.resolve(belongsTo).then(function(record) {
+                json[key] = record.get('id');
+            }).then(finalizer);
         }
 
         if (relationship.options.polymorphic) {
-          this.serializePolymorphicType(record, json, relationship);
+          return Ember.RSVP.resolve(belongsTo).then(function(record) {
+                   self.serializePolymorphicType(record, json, relationship);
+                 }).then(finalizer);
         }
     },
 

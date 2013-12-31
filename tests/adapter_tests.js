@@ -143,7 +143,7 @@ test('ajax response for single session will render correctly', function() {
         equal(ratings, 1, "table had " + ratings + " ratings");
         expectUrlTypeHashEqual("/api/ratings/", "POST", {});
         expectRatingAddedToStore(4, 2, 'abc', 1);
-        equal(ajaxHash.data, '{"score":2,"feedback":"abc","session":"1","other":null}');
+        equal(ajaxHash.data, '{"score":2,"feedback":"abc","other":null,"session":"1"}');
     });
 });
 
@@ -377,7 +377,7 @@ test('camelCase belongsTo key is serialized with underscores on save', function(
         stubEndpointForHttpRequest('/api/camel_kids/', {"description":"firstkid","camel_parent":"1"}, 'POST', 201);
         return click(".add");
     }).then(function() {
-        equal(ajaxHash.data, '{"description":"firstkid","camel_parent":"1"}');
+        equal(ajaxHash.data, '{"description":"firstkid","camelParent":"1"}');
     });
 });
 
@@ -391,4 +391,60 @@ test('string ids are allowed', function() {
         equal(city.length, 1, "One city was found");
         equal(city.text(), "Nashville", "name was found: " + city.text());
     });
+});
+
+asyncTest('async belongsTo relationship will POST serialized data', function() {
+    var store,
+    assertion;
+
+    store = App.__container__.lookup('store:main');
+    Ember.run(App, function(){
+        store.serializerFor('customer').pushSinglePayload(store, 'customer', {"id": 10, "name": "toranb", "appointments": []});
+    });
+    
+    visit("/").then(function() {
+        return store.find('customer', 10);
+    }).then(function(customer){
+        var appointment;
+        appointment = store.createRecord('appointment', {
+            start: 'today',
+            details: 'more',
+            customer: customer
+        });
+        return appointment.save().then(
+                assertion,
+                assertion
+            ); // check the assertion regardless of success or failure of appointment.save()
+    });
+
+    assertion = function() {
+        equal(ajaxHash.data, '{"start":"today","details":"more","customer":"10"}');
+        start(); // end the asyncTest
+    };
+});
+
+asyncTest('async belongsTo relationship will PUT serialized data', function() {
+    var store,
+    assertion;
+
+    store = App.__container__.lookup('store:main');
+    Ember.run(App, function(){
+        store.serializerFor('customer').pushSinglePayload(store, 'customer', {"id": 10, "name": "toranb", "appointments": [2]});
+        store.serializerFor('appointment').pushSinglePayload(store, 'appointment', {"id": 2, "start": "x", "details": "y", "customer": 10});
+    });
+    
+    visit("/").then(function() {
+        return store.find('appointment', 2);
+    }).then(function(appointment){
+        appointment.set('start', 'updated');
+        return appointment.save().then(
+                assertion,
+                assertion
+            ); // check the assertion regardless of success or failure of appointment.save()
+    });
+
+    assertion = function() {
+        equal(ajaxHash.data, '{"start":"updated","details":"y","customer":"10"}');
+        start(); // end the asyncTest
+    };
 });

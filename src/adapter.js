@@ -22,17 +22,24 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
         return Ember.String.pluralize(decamelized);
     },
 
-
     createRecord: function(store, type, record) {
+        var data = {};
+        var self = this;
         var url = this.buildURL(type.typeKey);
-        var data = store.serializerFor(type.typeKey).serialize(record);
-        return this.ajax(url, "POST", { data: data });
+        var serializer = store.serializerFor(type.typeKey);
+        return serializer.serializeIntoHash(data, type, record).then(function(serialized) {
+            return self.ajax(url, "POST", { data: serialized[type.typeKey] });
+        });
     },
 
     updateRecord: function(store, type, record) {
-        var data = store.serializerFor(type.typeKey).serialize(record);
-        var id = get(record, 'id'); //todo find pk (not always id)
-        return this.ajax(this.buildURL(type.typeKey, id), "PUT", { data: data });
+        var data = {};
+        var self = this;
+        var id = get(record, 'id');
+        var serializer = store.serializerFor(type.typeKey);
+        return serializer.serializeIntoHash(data, type, record).then(function(serialized) {
+            return self.ajax(self.buildURL(type.typeKey, id), "PUT", { data: serialized[type.typeKey] });
+        });
     },
 
     findMany: function(store, type, ids, parent) {

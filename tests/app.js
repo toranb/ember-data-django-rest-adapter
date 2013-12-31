@@ -136,6 +136,17 @@ App.CamelKid = DS.Model.extend({
     camelParent: DS.belongsTo('camelParent')
 });
 
+App.Customer = DS.Model.extend({
+    name: DS.attr('string'),
+    appointments: DS.hasMany('appointment', { async: true})
+});
+
+App.Appointment = DS.Model.extend({
+    start: DS.attr('string'),
+    details: DS.attr('string'),
+    customer: DS.belongsTo('customer', { async: true}),
+});
+
 App.OthersRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('other');
