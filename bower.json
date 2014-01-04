@@ -1,0 +1,25 @@
+{
+  "name": "ember-data-django-rest-adapter",
+  "version": "0.13.1",
+  "homepage": "https://github.com/dhilipsiva/ember-data-django-rest-adapter",
+  "authors": [
+    "dhilipsiva <dhilipsiva@gmail.com>"
+  ],
+  "description": "An ember-data adapter for django web applications powered by the django-rest-framework",
+  "main": "src/main.js",
+  "keywords": [
+    "ember",
+    "data",
+    "django",
+    "rest",
+    "adapter"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
