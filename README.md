@@ -225,7 +225,7 @@ This adapter was built by the community for the community. If you would like to 
 
     i) Date and DateTime are not yet built into the adapter (see the WIP PR for a workaround)
 
-    ii) Async belongsTo/hasMany requires a pull-request be merged into ember-data core
+    ii) Async belongsTo/hasMany requires a pull-request be merged into ember-data core (see the WIP branch for a workaround)
 
     iii) Pagination is not yet supported
 
