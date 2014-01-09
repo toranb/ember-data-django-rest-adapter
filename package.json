@@ -6,7 +6,8 @@
     "grunt-contrib-jshint": "*",
     "grunt-ember-template-compiler": "1.3.0",
     "karma-qunit": "*",
-    "karma": "0.10.0"
+    "karma": "0.10.0",
+    "load-grunt-config": "*"
   },
   "scripts": {
     "test": "grunt test"
