@@ -153,6 +153,8 @@ export PATH="./node_modules/.bin:$PATH"
 
 ## Integration with Ember App Kit
 
+### Install manually
+
 Using Ember Data Django REST Adapter with [Ember App Kit][] is easy!
 Add the source file to the `/vendor/` directory, and add an exception to
 `.gitignore`:
@@ -160,6 +162,13 @@ Add the source file to the `/vendor/` directory, and add an exception to
 ```
 !/vendor/ember-data-django-rest-adapter.prod.js
 ```
+### Install through bower
+
+```
+bower install --save ember-data-django-rest-adapter
+```
+
+### Configure
 
 Then include the adapter in `app/index.html` somewhere after the
 Ember Data include:
