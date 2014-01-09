@@ -1,6 +1,7 @@
 # ember-data-django-rest-adapter 
 
-[![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/) [![get this with bower](https://benschwarz.github.io/bower-badges/badge@2x.png)](http://sindresorhus.com/bower-components/#!/search/ember-data-django-rest-adapter)
+
 
 ## Motivation
 - The `django-rest-framework` is a great REST framework for python / django developers
