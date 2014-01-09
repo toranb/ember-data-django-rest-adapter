@@ -218,8 +218,8 @@ This adapter was built by the community for the community. If you would like to 
     grunt test
 
 ## Versions
-    ember.js 1.2.0
-    ember-data 1.0 beta 4+ *master build as of 12/19
+    ember.js 1.3.0
+    ember-data 1.0 beta 4
 
 ## Pending Issues
 
