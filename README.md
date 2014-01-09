@@ -1,6 +1,6 @@
 # ember-data-django-rest-adapter 
 
-[![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/) [![get this with bower](https://benschwarz.github.io/bower-badges/badge@2x.png)](http://sindresorhus.com/bower-components/#!/search/ember-data-django-rest-adapter)
+[![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/) <img src="badge@2x.png" width="130" height="30">
 
 
 ## Motivation
