@@ -9,7 +9,7 @@
   "main": "src/main.js",
   "dependencies": {
       "ember.js": "1.3.0",
-      "ember-data": "058baf2d5dd543924fc9c0d3d79b12a6e8b99ef7"
+      "ember-data": "1.0.0-beta.4"
   },
   "keywords": [
     "ember",
