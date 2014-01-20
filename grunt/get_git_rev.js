@@ -10,18 +10,20 @@ module.exports = function(grunt) {
                 exec('git log -n 1 --format="%h (%ci)"',
                     function (sha_error, sha_stdout, sha_stderr) {
                         var sha = sha_stdout,
-                            gitRev = '';
+                            gitRevTags = '',
+                            gitRevSha = '';
 
                         if (!tags_error) {
-                            gitRev = gitRev + "// " + tags;
+                            gitRevTags = "// " + tags;
                         }
 
                         if (!sha_error) {
-                            gitRev = gitRev + "// " + sha;
+                            gitRevSha = "// " + sha;
                         }
 
                         // mega hax
-                        grunt.gitRev = gitRev;
+                        grunt.gitRevTags = gitRevTags;
+                        grunt.gitRevSha = gitRevSha;
                         done();
                     });
             });
