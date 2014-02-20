@@ -6,7 +6,7 @@
     "Toran Billups <toranb@gmail.com>"
   ],
   "description": "An ember-data adapter for django web applications powered by the django-rest-framework",
-  "main": "src/main.js",
+  "main": "build/ember-data-django-rest-adapter.js",
   "dependencies": {
       "ember": "~1.4.0",
       "ember-data": "~1.0.0-beta.5"

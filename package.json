@@ -1,4 +1,5 @@
 {
+  "version": "1.0.0",
   "dependencies": {
     "grunt-karma": "*",
     "grunt-cli": "*",
@@ -17,6 +18,8 @@
     "grunt-neuter": "~0.6.0",
     "grunt-banner": "*",
     "grunt-contrib-uglify": "~0.2.4",
-    "grunt-text-replace": "~0.3.8"
+    "grunt-text-replace": "~0.3.8",
+    "grunt-bump": "0.0.13",
+    "grunt-contrib-copy": "~0.5.0"
   }
 }
