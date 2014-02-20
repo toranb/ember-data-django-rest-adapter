@@ -4,6 +4,18 @@
 
 <img src="badge@2x.png" width="130" height="30"> bower install ember-data-django-rest-adapter
 
+## Install
+
+    npm install bower
+    bower install ember-data-django-rest-adapter
+    add the following scripts to your application
+
+    <script type="text/javascript" src="/bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/bower_components/handlebars/handlebars.js"></script>
+    <script type="text/javascript" src="/bower_components/ember/ember.js"></script>
+    <script type="text/javascript" src="/bower_components/ember-data/ember-data.js"></script>
+    <script type="text/javascript" src="/bower_components/ember-data-django-rest-adapter/src/serializer.js"></script>
+    <script type="text/javascript" src="/bower_components/ember-data-django-rest-adapter/src/adapter.js"></script>
 
 ## Motivation
 - The `django-rest-framework` is a great REST framework for python / django developers
