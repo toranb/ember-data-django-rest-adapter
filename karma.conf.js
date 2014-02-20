@@ -14,6 +14,6 @@ module.exports = function(karma) {
         singleRun: true,
         autoWatch: false,
 
-        frameworks: ["qunit"]
+        frameworks: ['qunit', 'qunit-sb']
     });
 };
