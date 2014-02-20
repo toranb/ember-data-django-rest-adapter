@@ -1,6 +1,6 @@
   {{input class="name" value=name}}<br />
   {{input class="location" value=location}}<br />
-  <button class="update" {{action updateSpeaker model}}>Update Speaker</button><br />
+  <button class="update" {{action 'updateSpeaker' model}}>Update Speaker</button><br />
 
   {{#each persona in model.personas}}
     {{persona.nickname}}<br />
