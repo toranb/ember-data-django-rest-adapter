@@ -220,8 +220,8 @@ This adapter was built by the community for the community. If you would like to 
     grunt test
 
 ## Versions
-    ember.js 1.3.0
-    ember-data 1.0 beta 4
+    ember.js 1.4.0
+    ember-data 1.0 beta 5
 
 ## Pending Issues
 
@@ -242,7 +242,7 @@ I took a large part of this project (including the motivation) from @escalant3 a
 https://github.com/escalant3/ember-data-tastypie-adapter/
 
 ## License
-Copyright © 2013 Toran Billups http://toranbillups.com
+Copyright © 2014 Toran Billups http://toranbillups.com
 
 Licensed under the MIT License
 
