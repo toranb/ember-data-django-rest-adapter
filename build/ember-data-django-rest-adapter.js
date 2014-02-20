@@ -5,8 +5,8 @@
 // ==========================================================================
 
 
-// v1.0.0
-// d45d071 (2014-01-08 21:19:17 -0600)
+// v1.0.1
+// dec38a1 (2014-02-20 08:53:32 -0500)
 
 
 (function() {
@@ -299,6 +299,21 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     }
 
 });
+
+
+})();
+
+(function() {
+
+var VERSION = "1.0.1";
+
+DS.DjangoRESTSerializer.VERSION = VERSION;
+DS.DjangoRESTAdapter.VERSION = VERSION;
+
+if (Ember.libraries) {
+  Ember.libraries.register("ember-data-django-rest-adapter", VERSION);
+}
+
 
 
 })();
