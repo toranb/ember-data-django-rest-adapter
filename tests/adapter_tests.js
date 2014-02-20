@@ -225,14 +225,13 @@ test('basic error handling will bubble to the model', function() {
         var errors = Ember.$.trim($("#errors").text());
         equal(errors, "", "errors was instead: " + errors);
         stubEndpointForHttpRequest('/api/speakers/1/', {}, 'PUT', 400);
+        return click(".update");
+    }).then(function() {
+        var name = $("input.name").val();
+        equal(name, "wat", "name was instead: " + name);
+        var errors = Ember.$.trim($("#errors").text());
+        equal(errors, "operation failed for model: speaker", "errors was instead: " + errors);
     });
-        // return click(".update");
-    // }).then(function() {
-        // var name = $("input.name").val();
-        // equal(name, "wat", "name was instead: " + name);
-        // var errors = Ember.$.trim($("#errors").text());
-        // equal(errors, "operation failed for model: speaker", "errors was instead: " + errors);
-    // });
 });
 
 test('basic error handling will not fire when update is successful', function() {
