@@ -312,6 +312,28 @@ test('ajax post with single parent will use correctly nested endpoint', function
     });
 });
 
+test('boolean values are sent over the wire correctly when value pulled from checkbox', function() {
+    var cart = {id: 1, name: 'yup', complete: true};
+    stubEndpointForHttpRequest('/api/carts/1/', cart);
+    visit("/cart/1").then(function() {
+        var name = find(".name").val();
+        equal(name, "yup");
+        var complete = find(".complete").val();
+        equal(complete, 'on');
+        var response = {id: 1, name: 'newly', complete: true};
+        stubEndpointForHttpRequest('/api/carts/', response, 'POST', 201);
+        fillIn(".name", "newly");
+        return click(".add");
+    }).then(function() {
+        var name = find(".name").val();
+        equal(name, "newly");
+        var complete = find(".complete").val();
+        equal(complete, 'on');
+        equal(ajaxHash.url, '/api/carts/');
+        equal(ajaxHash.data, '{"name":"newly","complete":true}');
+    });
+});
+
 test('ajax post with different single parent will use correctly nested endpoint', function() {
     stubEndpointForHttpRequest('/api/users/1/aliases/', speakers_json);
     stubEndpointForHttpRequest('/api/sessions/1/speakers/', speakers_json);

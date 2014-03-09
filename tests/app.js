@@ -36,6 +36,11 @@ App.CamelUrl = DS.Model.extend({
   test: DS.attr('string')
 });
 
+App.Cart = DS.Model.extend({
+  name: DS.attr('string'),
+  complete: DS.attr('boolean')
+});
+
 App.Camel = DS.Model.extend({
   camelCaseAttribute: DS.attr('string'),
   camelCaseRelationship: DS.hasMany('tag', { async: true })
@@ -154,6 +159,23 @@ App.CamelParentController = Ember.ObjectController.extend({
             var parent = this.store.all('camelParent').objectAt(0);
             var hash = {'description': 'firstkid', 'camelParent': parent};
             this.store.createRecord('camelKid', hash).save();
+        }
+    }
+});
+
+App.CartRoute = Ember.Route.extend({
+  model: function(params) {
+    return this.store.find('cart', params.cart_id);
+  }
+});
+
+App.CartController = Ember.ObjectController.extend({
+    actions: {
+        add: function() {
+            var name = this.get('name');
+            var complete = this.get('complete');
+            var hash = {name: name, complete: complete};
+            this.store.createRecord('cart', hash).save();
         }
     }
 });
@@ -287,6 +309,7 @@ App.Router.map(function() {
   this.resource("ratings", { path : "/ratings" });
   this.resource("session", { path : "/session/:session_id" });
   this.resource("speaker", { path : "/speaker/:speaker_id" });
+  this.resource("cart", { path : "/cart/:cart_id" });
   this.resource("camels", { path : "/camels" });
   this.resource("camelParent", { path : "/camelParent" });
   this.resource("camelUrls", { path : "/camelUrls" });
