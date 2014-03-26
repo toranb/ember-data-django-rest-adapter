@@ -10,7 +10,7 @@
     "karma-qunit": "*",
     "karma-qunit-special-blend": "*",
     "karma": "0.10",
-    "load-grunt-config": "*"
+    "load-grunt-config": "~0.7"
   },
   "scripts": {
     "test": "grunt test"
