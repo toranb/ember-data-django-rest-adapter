@@ -5,8 +5,8 @@
 // ==========================================================================
 
 
-// v1.0.1
-// dec38a1 (2014-02-20 08:53:32 -0500)
+// v1.0.2
+// ab6074c (2014-03-27 13:20:12 +0800)
 
 
 (function() {
@@ -305,7 +305,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
 
 (function() {
 
-var VERSION = "1.0.1";
+var VERSION = "1.0.2";
 
 DS.DjangoRESTSerializer.VERSION = VERSION;
 DS.DjangoRESTAdapter.VERSION = VERSION;
