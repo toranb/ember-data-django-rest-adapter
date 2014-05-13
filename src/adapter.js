@@ -36,8 +36,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     findMany: function(store, type, ids, parent) {
-        var adapter, root, url, endpoint, attribute;
-        adapter = this;
+        var url, endpoint, attribute;
 
         if (parent) {
             attribute = this.getHasManyAttributeName(type, parent, ids);
