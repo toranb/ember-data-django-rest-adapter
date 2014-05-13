@@ -30,10 +30,9 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     updateRecord: function(store, type, record) {
-        // Partial updates are expected be sent as a PATCH
+        // Partial updates are expected to be sent as a PATCH
         var isPartial = false;
         record.eachAttribute(function(key, attribute) {
-          console.log(attribute.options);
           if(attribute.options.readOnly){
             isPartial = true;
           }
