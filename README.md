@@ -34,11 +34,12 @@ Create `app/adapters/application.js` (you may have to create this directory):
 
 ```js
 export default DS.DjangoRESTAdapter.extend({
-  host: ENV.APP.API_HOST
+  host: ENV.APP.API_HOST,
+  defaultSerializer: 'django'
 });
 ```
 
-Create `app/serializers/application.js` (you may have to create this directory):
+Create `app/serializers/django.js` (you may have to create this directory):
 
 ```js
 export default DS.DjangoRESTSerializer.extend();
