@@ -5,8 +5,8 @@
 // ==========================================================================
 
 
-// v1.0.2
-// ab6074c (2014-03-27 13:20:12 +0800)
+// v1.0.3
+// cbd7510 (2014-05-14 16:35:54 -0400)
 
 
 (function() {
@@ -205,8 +205,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     },
 
     findMany: function(store, type, ids, parent) {
-        var adapter, root, url, endpoint, attribute;
-        adapter = this;
+        var url, endpoint, attribute;
 
         if (parent) {
             attribute = this.getHasManyAttributeName(type, parent, ids);
@@ -305,7 +304,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
 
 (function() {
 
-var VERSION = "1.0.2";
+var VERSION = "1.0.3";
 
 DS.DjangoRESTSerializer.VERSION = VERSION;
 DS.DjangoRESTAdapter.VERSION = VERSION;
