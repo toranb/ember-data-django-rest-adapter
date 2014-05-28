@@ -6,6 +6,11 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     extractDjangoPayload: function(store, type, payload) {
         type.eachRelationship(function(key, relationship){
+            var isPolymorphic = false;
+            if (relationship.options && relationship.options.polymorphic) {
+              isPolymorphic = true;
+            }
+
             if (!Ember.isNone(payload[key]) &&
                 typeof(payload[key][0]) !== 'number' &&
                 typeof(payload[key][0]) !== 'string' &&
@@ -14,11 +19,6 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                 // Normalize hasMany payloads
                 var polymorphicPayloads = {};
                 var ids = [];
-
-                var isPolymorphic = false;
-                if (relationship.options && relationship.options.polymorphic) {
-                  isPolymorphic = true;
-                }
 
                 payload[key].forEach(function(model) {
                   if (isPolymorphic) {
@@ -57,8 +57,14 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
             }
             else if (!Ember.isNone(payload[key]) && typeof(payload[key]) === 'object' && relationship.kind ==='belongsTo') {
                 var id=payload[key].id;
-                this.pushSinglePayload(store,relationship.type,payload[key]);
-                payload[key]=id;
+
+                if(isPolymorphic) {
+                  this.pushSinglePayload(store,payload[key].type,payload[key]);
+                } else {
+                  this.pushSinglePayload(store,relationship.type,payload[key]);
+                  payload[key]=id;
+                }
+                console.log('payload',payload);
             }
         }, this);
     },
@@ -98,6 +104,8 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     pushSinglePayload: function(store, type, payload) {
         type = store.modelFor(type);
         payload = this.extract(store, type, payload, null, "find");
+        console.log('type',type);
+        console.log('payload',payload);
         store.push(type, payload);
     },
 
