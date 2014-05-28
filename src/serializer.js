@@ -16,40 +16,12 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                 typeof(payload[key][0]) !== 'string' &&
                 relationship.kind ==='hasMany') {
               if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
-                // Normalize hasMany payloads
-                var polymorphicPayloads = {};
-                var ids = [];
-
-                payload[key].forEach(function(model) {
-                  if (isPolymorphic) {
-                    // Group polymorphic data by the type key
-                    if(!polymorphicPayloads.hasOwnProperty(model.type)) {
-                      polymorphicPayloads[model.type] = [];
-                    }
-
-                    var type = model.type;
-
-                    // Strip the type
-                    var polymorphicModel = Ember.copy(model);
-                    delete polymorphicModel.type;
-
-                    polymorphicPayloads[type].push(polymorphicModel);
-                  } else {
-                    ids.push(model.id);
-                  }
-                });
-
                 if(isPolymorphic) {
-                  // For polymorphic data, all elements are pushed to the store with
-                  // their type attribute removed, and the payload is left untouched.
-                  for (var polymorphicType in polymorphicPayloads) {
-                    var polymorphicObjs = polymorphicPayloads[polymorphicType];
-                    this.pushArrayPayload(store, polymorphicType, polymorphicObjs);
-                  }
+                  Ember.ArrayPolyfills.forEach.call(payload[key], function(hash) {
+                    this.pushSinglePayload(store,this.typeForRoot(hash.type),Ember.copy(hash));
+                  }, this);
                 } else {
-                  // For normal hasMany relationships, push the original
-                  // objects to the store, and then overwrite the payload with
-                  // just a list of ids.
+                  var ids = payload[key].mapBy('id'); //todo find pk (not always id)
                   this.pushArrayPayload(store, relationship.type, payload[key]);
                   payload[key] = ids;
                 }
@@ -59,12 +31,11 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                 var id=payload[key].id;
 
                 if(isPolymorphic) {
-                  this.pushSinglePayload(store,payload[key].type,payload[key]);
+                  this.pushSinglePayload(store,this.typeForRoot(payload[key].type),payload[key]);
                 } else {
                   this.pushSinglePayload(store,relationship.type,payload[key]);
                   payload[key]=id;
                 }
-                console.log('payload',payload);
             }
         }, this);
     },
@@ -75,9 +46,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
         // camelization correctly.
         this.normalize(type, payload);
         this.extractDjangoPayload(store, type, payload);
-        return payload;
     },
-
     extractArray: function(store, type, payload) {
         var self = this;
         for (var j = 0; j < payload.length; j++) {
@@ -104,8 +73,6 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     pushSinglePayload: function(store, type, payload) {
         type = store.modelFor(type);
         payload = this.extract(store, type, payload, null, "find");
-        console.log('type',type);
-        console.log('payload',payload);
         store.push(type, payload);
     },
 

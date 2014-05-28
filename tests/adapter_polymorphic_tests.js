@@ -48,14 +48,12 @@ module('polymorphic integration tests', {
 
 test('ajax response with polymorphic record renders belongsTo correctly', function() {
 		var json = {
-			"message": {
-				"id": 1,
-				"content": "yo yo yo",
-				"author": {
-					"type": "company",
-					"name": "hi",
-					"id": 2
-				}
+			"id": 1,
+			"content": "yo yo yo",
+			"author": {
+				"type": "company",
+				"name": "hi",
+				"id": 2
 			}
 		};
 
