@@ -11,30 +11,47 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                 typeof(payload[key][0]) !== 'string' &&
                 relationship.kind ==='hasMany') {
               if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
-                // Normalize hasMany data to only contain type and id values,
-                // and create an array for each type key.
-                var grouped = {};
+                // Normalize hasMany payloads
+                var polymorphicPayloads = {};
+                var ids = [];
 
-                payload[key].map(function(model) {
-                  var type = model.hasOwnProperty('type') ? model.type : relationship.type;
-                  var normalized = {
-                    id: model.id,
-                    type: type
-                  };
+                var isPolymorphic = false;
+                if (relationship.options && relationship.options.polymorphic) {
+                  isPolymorphic = true;
+                }
 
-                  if(!grouped[type]) {
-                    grouped[type] = [];
+                payload[key].forEach(function(model) {
+                  if (isPolymorphic) {
+                    // Group polymorphic data by the type key
+                    if(!polymorphicPayloads.hasOwnProperty(model.type)) {
+                      polymorphicPayloads[model.type] = [];
+                    }
+
+                    var type = model.type;
+
+                    // Strip the type
+                    var polymorphicModel = Ember.copy(model);
+                    delete polymorphicModel.type;
+
+                    polymorphicPayloads[type].push(polymorphicModel);
+                  } else {
+                    ids.push(model.id);
                   }
-
-                  grouped[type].push(normalized);
-
-                  return normalized;
                 });
 
-                // Loop through each group and push the values to the store
-                for (var type in grouped) {
-                  var objs = grouped[type];
-                  this.pushArrayPayload(store, type, objs);
+                if(isPolymorphic) {
+                  // For polymorphic data, all elements are pushed to the store with
+                  // their type attribute removed, and the payload is left untouched.
+                  for (var polymorphicType in polymorphicPayloads) {
+                    var polymorphicObjs = polymorphicPayloads[polymorphicType];
+                    this.pushArrayPayload(store, polymorphicType, polymorphicObjs);
+                  }
+                } else {
+                  // For normal hasMany relationships, push the original
+                  // objects to the store, and then overwrite the payload with
+                  // just a list of ids.
+                  this.pushArrayPayload(store, relationship.type, payload[key]);
+                  payload[key] = ids;
                 }
               }
             }
