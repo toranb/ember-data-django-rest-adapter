@@ -11,9 +11,31 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                 typeof(payload[key][0]) !== 'string' &&
                 relationship.kind ==='hasMany') {
               if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
-                var ids = payload[key].mapBy('id'); //todo find pk (not always id)
-                this.pushArrayPayload(store, relationship.type, payload[key]);
-                payload[key] = ids;
+                // Normalize hasMany data to only contain type and id values,
+                // and create an array for each type key.
+                var grouped = {};
+
+                payload[key].map(function(model) {
+                  var type = model.hasOwnProperty('type') ? model.type : relationship.type;
+                  var normalized = {
+                    id: model.id,
+                    type: type
+                  };
+
+                  if(!grouped[type]) {
+                    grouped[type] = [];
+                  }
+
+                  grouped[type].push(normalized);
+
+                  return normalized;
+                });
+
+                // Loop through each group and push the values to the store
+                for (var type in grouped) {
+                  var objs = grouped[type];
+                  this.pushArrayPayload(store, type, objs);
+                }
               }
             }
             else if (!Ember.isNone(payload[key]) && typeof(payload[key]) === 'object' && relationship.kind ==='belongsTo') {
