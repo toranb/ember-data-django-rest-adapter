@@ -5,8 +5,8 @@
 // ==========================================================================
 
 
-// v1.0.3
-// cbd7510 (2014-05-14 16:35:54 -0400)
+// v1.0.4
+// 2433300 (2014-05-28 18:44:51 -0700)
 
 
 (function() {
@@ -19,18 +19,32 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     extractDjangoPayload: function(store, type, payload) {
         type.eachRelationship(function(key, relationship){
+            var isPolymorphic = false;
+            if (relationship.options && relationship.options.polymorphic) {
+              isPolymorphic = true;
+            }
+
             if (!Ember.isNone(payload[key]) &&
                 typeof(payload[key][0]) !== 'number' &&
                 typeof(payload[key][0]) !== 'string' &&
                 relationship.kind ==='hasMany') {
               if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
-                var ids = payload[key].mapBy('id'); //todo find pk (not always id)
-                this.pushArrayPayload(store, relationship.type, payload[key]);
-                payload[key] = ids;
+                if(isPolymorphic) {
+                  // If there is a hasMany polymorphic relationship, push each
+                  // item to the store individually, since they might not all
+                  // be the same type
+                  Ember.ArrayPolyfills.forEach.call(payload[key],function(hash) {
+                    store.push(this.typeForRoot(hash.type),hash);
+                  }, this);
+                } else {
+                  var ids = payload[key].mapBy('id'); //todo find pk (not always id)
+                  this.pushArrayPayload(store, relationship.type, payload[key]);
+                  payload[key] = ids;
+                }
               }
             }
             else if (!Ember.isNone(payload[key]) && typeof(payload[key]) === 'object' && relationship.kind ==='belongsTo') {
-                var id=payload[key].id;
+                var id = payload[key].id;
                 this.pushSinglePayload(store,relationship.type,payload[key]);
                 payload[key]=id;
             }
@@ -304,7 +318,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
 
 (function() {
 
-var VERSION = "1.0.3";
+var VERSION = "1.0.4";
 
 DS.DjangoRESTSerializer.VERSION = VERSION;
 DS.DjangoRESTAdapter.VERSION = VERSION;
