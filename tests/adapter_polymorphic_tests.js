@@ -1,4 +1,3 @@
-
 module('polymorphic integration tests', {
     setup: function() {
         ajaxUrl = undefined;
@@ -30,16 +29,11 @@ asyncTest('test polymorphic hasMany', function() {
     stubEndpointForHttpRequest('/api/users/1/', json);
 
     Ember.run(App, function(){
-        // App.store = DS.Store.extend();
-        // var store = TestStore.create();
-        // console.log(store);
         var store = App.__container__.lookup('store:main');
 
         store.find('user', 1).then(function(user) {
             messages = user.get('messages').toArray();
             equal(messages.length, 2);
-            console.log('3');
-            store.unloadAll();
             start();
         });
     });
@@ -67,14 +61,13 @@ asyncTest('test async polymorphic hasMany', function() {
 
     stubEndpointForHttpRequest('/api/users/1/', json);
 
+    App.reset();
+
     Ember.run(App, function(){
         var store = App.__container__.lookup('store:main');
 
         store.find('user', 1).then(function(user) {
-            equal(user.get('id'),1);
-            console.log('1',user.get('messages'));
             user.get('messages').then(function(messages) {
-                console.log('2');
                 equal(messages.toArray().length, 2);
 
                 // Reset to async false
@@ -88,67 +81,45 @@ asyncTest('test async polymorphic hasMany', function() {
     });
 });
 
+asyncTest('test async polymorphic belongsTo', function() {
+    App.Message.reopen({
+        author: DS.belongsTo('author', { polymorphic: true, async: true })
+    });
 
-// asyncTest('test async polymorphic belongsTo', function() {
-// 	var message_json = {
-// 		"id": 1,
-// 		"content": "yo yo yo",
-//         "author": 2,
-//         "authorType": "company"
-// 	};
+	var message_json = {
+		"id": 1,
+		"content": "yo yo yo",
+        "author": 2,
+        "authorType": "company"
+	};
 
-//     var company_json = {
-//         "id": 2,
-//         "name": "Big corp"
-//     }
+    var company_json = {
+        "id": 2,
+        "name": "Big corp"
+    }
 
-//     stubEndpointForHttpRequest('/api/messages/1/', message_json);
-//     stubEndpointForHttpRequest('/api/companies/2/', company_json);
+    stubEndpointForHttpRequest('/api/messages/1/', message_json);
+    stubEndpointForHttpRequest('/api/companies/2/', company_json);
 
-//     Ember.run(App, function(){
-//         var store = App.__container__.lookup('store:main');
+    App.reset();
 
-//         store.find('message', 1).then(function(message) {
-//             equal(message.get('content'),message_json.content);
+    Ember.run(App, function(){
+        var store = App.__container__.lookup('store:main');
 
-//             message.get('author').then(function(author) {
-//                 equal(author.get('name'),company_json.name);
+        store.find('message', 1).then(function(message) {
+            equal(message.get('content'),message_json.content);
 
-//                 // tell QUnit to run tests again
-//                 start();
-//             });
+            message.get('author').then(function(author) {
+                equal(author.get('name'),company_json.name);
 
-//         });
-//     });
-// });
+                App.User.reopen({
+                    author: DS.belongsTo('author', { polymorphic: true })
+                });
 
-// asyncTest('test sideloaded async polymorphic belongsTo', function() {
-//     var message_json = {
-//         "id": 1,
-//         "content": "yo yo yo",
-//         "authorType": "company",
-//         "author": {
-//             "id": 2,
-//             "name": "big corp"
-//         }
-//     };
+                // tell QUnit to run tests again
+                start();
+            });
 
-//     stubEndpointForHttpRequest('/api/messages/1/', message_json);
-
-//     Ember.run(App, function(){
-//         var store = App.__container__.lookup('store:main');
-
-//         store.find('message', 1).then(function(message) {
-//             console.log('message',message);
-//             equal(message.get('content'),message_json.content);
-
-//             message.get('author').then(function(author) {
-//                 equal(author.get('name'),message_json.author.name);
-
-//                 // tell QUnit to run tests again
-//                 start();
-//             });
-
-//         });
-//     });
-// });
+        });
+    });
+});
