@@ -170,12 +170,6 @@ App.MessageRoute = Ember.Route.extend({
   }
 });
 
-App.MessagesRoute = Ember.Route.extend({
-  model: function() {
-    return this.store.find('user', 1);
-  }
-});
-
 App.CamelParentRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('camelParent', 1);
@@ -346,8 +340,6 @@ App.Router.map(function() {
   this.resource("tag", { path : "/tag/:tag_id" });
   this.resource("user", { path : "/user/:user_id" });
   this.resource("preserialized", { path: "/preserialized" });
-  this.resource("messages", { path : "/messages" });
-  this.resource("message", { path : "/message/:message_id" });
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
