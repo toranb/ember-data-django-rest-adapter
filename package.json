@@ -1,5 +1,5 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "dependencies": {
     "grunt": "*",
     "grunt-karma": "0.7.1",
