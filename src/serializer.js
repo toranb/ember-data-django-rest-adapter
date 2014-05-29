@@ -46,6 +46,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
         this.extractDjangoPayload(store, type, payload);
         return payload;
     },
+
     extractArray: function(store, type, payload) {
         var self = this;
         for (var j = 0; j < payload.length; j++) {
