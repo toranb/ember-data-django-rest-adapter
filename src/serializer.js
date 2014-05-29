@@ -18,8 +18,8 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
               if (Ember.typeOf(payload[key]) === 'array' && payload[key].length > 0) {
                 if(isPolymorphic) {
                   // If there is a hasMany polymorphic relationship, push each
-                  // item to the store individually, since there could be
-                  // different types
+                  // item to the store individually, since they might not all
+                  // be the same type
                   Ember.ArrayPolyfills.forEach.call(payload[key],function(hash) {
                     store.push(this.typeForRoot(hash.type),hash);
                   }, this);
