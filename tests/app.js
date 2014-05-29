@@ -164,12 +164,6 @@ App.OthersRoute = Ember.Route.extend({
   }
 });
 
-App.MessageRoute = Ember.Route.extend({
-  model: function() {
-    return this.store.find('message', 1);
-  }
-});
-
 App.CamelParentRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('camelParent', 1);
