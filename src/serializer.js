@@ -32,10 +32,8 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
             }
             else if (!Ember.isNone(payload[key]) && typeof(payload[key]) === 'object' && relationship.kind ==='belongsTo') {
                 var id = payload[key].id;
-
-                if(!isPolymorphic) {
-                  payload[key]=id;
-                }
+                this.pushSinglePayload(store,relationship.type,payload[key]);
+                payload[key]=id;
             }
         }, this);
     },
