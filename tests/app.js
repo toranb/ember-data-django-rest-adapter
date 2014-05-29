@@ -150,7 +150,7 @@ App.CamelKid = DS.Model.extend({
 
 App.Message = DS.Model.extend({
   content: DS.attr('string'),
-  author: DS.belongsTo('author', {polymorphic: true, async: true})
+  author: DS.belongsTo('author', {polymorphic: true})
 });
 
 App.Post = App.Message.extend({});
