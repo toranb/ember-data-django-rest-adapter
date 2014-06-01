@@ -4,7 +4,48 @@
 
 <img src="badge@2x.png" width="130" height="30"> bower install ember-data-django-rest-adapter
 
-## Install
+## Using with Ember-CLI
+
+```
+bower i --save ember-data-django-rest-adapter
+```
+
+In `Brocfile.js` (_after_ the ember-data import):
+
+```js
+app.import({
+  development: 'vendor/ember-data-django-rest-adapter/build/ember-data-django-rest-adapter.js',
+  production: 'vendor/ember-data-django-rest-adapter/build/ember-data-django-rest-adapter.prod.js'
+});
+```
+
+In `config/environment.js` add your API hosts, e.g.:
+
+```js
+if (environment === 'development') {
+  ENV.APP.API_HOST = 'http://localhost:8000';
+}
+if (environment === 'production') {
+  ENV.APP.API_HOST = 'https://api.myproject.com';
+}
+```
+
+Create `app/adapters/application.js` (you may have to create this directory):
+
+```js
+export default DS.DjangoRESTAdapter.extend({
+  host: ENV.APP.API_HOST,
+  defaultSerializer: 'django'
+});
+```
+
+Create `app/serializers/django.js` (you may have to create this directory):
+
+```js
+export default DS.DjangoRESTSerializer.extend();
+```
+
+## Using with vanilla Ember
 
     npm install bower
     bower install ember-data-django-rest-adapter
@@ -295,6 +336,8 @@ export PATH="./node_modules/.bin:$PATH"
 
 ## Integration with Ember App Kit
 
+Note: Ember App Kit will eventually be succeeded by [Ember CLI][].
+
 ### Install manually
 
 Using Ember Data Django REST Adapter with [Ember App Kit][] is easy!
@@ -387,4 +430,4 @@ Licensed under the MIT License
 
 
 [Ember App Kit]: https://github.com/stefanpenner/ember-app-kit
-
+[Ember CLI]: https://github.com/stefanpenner/ember-cli
