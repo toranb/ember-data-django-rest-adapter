@@ -130,6 +130,134 @@ Nested endpoints must match their relation field name
         url(r'^/groups/(?P<group_pk>\d+)/members/$', NestedPeopleView.as_view()),
     )
 
+## Polymorphic relationships
+
+Polymorphic relationships are partially supported in ember-data-django-rest-adapter. There are a couple of defaults set in place, but they can all be modified.
+
+### Example of polymorphic relationship
+
+
+Models:
+
+````
+App.User = App.Author.extend({
+    messages: DS.hasMany('message', { polymorphic: true })
+});
+
+App.Message = DS.Model.extend({});
+
+App.Post = App.Message.extend({});
+````
+
+
+Endpoints:
+
+`api/users/1`:
+
+````
+{
+    "id": 1,
+    "messages": [
+        {
+            "id": 2,
+            "type": "post",
+        }
+    ]
+}        
+````
+
+### Embedded belongsTo relationship
+
+`api/messages/1`:
+
+````
+{
+	"id": 1,
+	"author": {
+		"id": 2,
+		"name": "website",
+		"type": "company"
+	}
+}
+````
+
+### Async belongsTo relationship
+
+````
+App.Message = DS.Model.extend({
+	author: DS.belongsTo('author', { polymorphic: true, async: true })
+});
+````
+
+`api/messages/1`:
+
+````
+{
+	"id": 400,
+	"author": 401,
+	"author_type": "company"
+}
+````
+
+`api/companies/1`:
+
+````
+{
+	"id": 401,
+	"name": "Big corp"
+}
+````
+
+###To change the name of the type key, override `keyForType`, and/or `keyForEmbeddedType`
+
+````
+App.ApplicationSerializer = DS.RESTSerializer.extend({
+	keyForType: function(key) {
+		return key + "_xyz_type";
+	},
+	keyForEmbeddedType: function(key) {
+		return 'embedded_type';
+	},
+});
+````
+
+`api/messages/1`:
+
+````
+{
+	"author_xyz_type": "company",
+	"embedded_record": {
+		"embedded_type": "Foo"
+	}
+}
+````
+
+###Note
+Saving polymorphic hasMany records is not supported at the time, but it will be added once it's supported natively in Ember Data. See https://github.com/emberjs/data/pull/1457.
+
+Saving belongsTo records does work, but it just attaches the foreign key, and does not embed the record. So if you loaded data looking like:
+
+````
+{
+	"id": 600,
+	"content": "foo bar",
+	"receiver": {
+		"id": 601,
+		"type": "company"
+	}
+};
+````
+
+That results in the following PUT request data when the model is saved.
+
+````
+{
+	content: "foo bar"
+	receiver: "601"
+	receiver_type: "company"
+}
+````
+
 ## CSRF Support
 This adapter does not require you send a CSRF token with each $.ajax request
 

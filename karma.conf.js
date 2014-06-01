@@ -6,7 +6,8 @@ module.exports = function(karma) {
           "dist/deps.min.js",
           "helper.js",
           "adapter_tests.js",
-          "adapter_embedded_tests.js"
+          "adapter_embedded_tests.js",
+          "adapter_polymorphic_tests.js"
         ],
 
         logLevel: karma.LOG_ERROR,
