@@ -1,3 +1,4 @@
+/* global App: true */
 App = Ember.Application.create({
   rootElement: '#ember'
 });
@@ -101,15 +102,21 @@ App.Association = DS.Model.extend({
   speakers: DS.hasMany('speaker', { async: true})
 });
 
-App.User = DS.Model.extend({
+App.Author = DS.Model.extend({
+});
+
+App.User = App.Author.extend({
+    name: DS.attr('string'),
     username: DS.attr('string'),
     aliases: DS.hasMany('speaker', { async: true}),
     image: DS.attr('string', {readOnly: true})
+    messages: DS.hasMany('message', { polymorphic: true })
 });
 
-App.Company = DS.Model.extend({
+App.Company = App.Author.extend({
     name: DS.attr('string'),
     sponsors: DS.hasMany('sponsor', { async: true}),
+    messages: DS.hasMany('message', { polymorphic: true }),
     persona: DS.belongsTo('persona')
 });
 
@@ -141,6 +148,17 @@ App.CamelKid = DS.Model.extend({
     description: DS.attr('string'),
     camelParent: DS.belongsTo('camelParent')
 });
+
+App.Message = DS.Model.extend({
+  content: DS.attr('string'),
+  author: DS.belongsTo('author', {polymorphic: true}),
+  receiver: DS.belongsTo('author', {polymorphic: true})
+});
+
+App.Post = App.Message.extend({});
+
+App.Comment = App.Message.extend({});
+
 
 App.OthersRoute = Ember.Route.extend({
   model: function() {
