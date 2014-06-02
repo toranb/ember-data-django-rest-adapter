@@ -292,7 +292,7 @@ asyncTest('should not serialize polymorphic hasMany associations', function() {
     });
 });
 
-asyncTest('test serializing with custom key for polymorphic hasMany', function() {
+asyncTest('test custom key for polymorphic hasMany', function() {
     DS.DjangoRESTSerializer.reopen({
         keyForEmbeddedType: function(key) {
             return 'custom_type';
