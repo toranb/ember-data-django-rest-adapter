@@ -50,6 +50,8 @@ asyncTest('test polymorphic hasMany', function() {
 });
 
 asyncTest('test async polymorphic hasMany', function() {
+    App.reset();
+
     App.User.reopen({
         messages: DS.hasMany('message', { polymorphic: true, async: true })
     });
@@ -71,8 +73,6 @@ asyncTest('test async polymorphic hasMany', function() {
 
     stubEndpointForHttpRequest('/api/users/200/', json);
 
-    App.reset();
-
     Ember.run(App, function(){
         var store = App.__container__.lookup('store:main');
 
@@ -91,6 +91,8 @@ asyncTest('test async polymorphic hasMany', function() {
 });
 
 asyncTest('test polymorphic belongsTo', function() {
+    App.reset();
+
     var message_json = {
         "id": 300,
         "content": "yo yo yo",
@@ -103,7 +105,6 @@ asyncTest('test polymorphic belongsTo', function() {
 
     stubEndpointForHttpRequest('/api/messages/300/', message_json);
 
-    App.reset();
     Ember.run(App, function(){
         var store = App.__container__.lookup('store:main');
 
@@ -118,6 +119,8 @@ asyncTest('test polymorphic belongsTo', function() {
 });
 
 asyncTest('test async polymorphic belongsTo', function() {
+    App.reset();
+
     App.Message.reopen({
         author: DS.belongsTo('author', { polymorphic: true, async: true })
     });
@@ -136,8 +139,6 @@ asyncTest('test async polymorphic belongsTo', function() {
 
     stubEndpointForHttpRequest('/api/messages/400/', message_json);
     stubEndpointForHttpRequest('/api/companies/401/', company_json);
-
-    App.reset();
 
     Ember.run(App, function(){
         var store = App.__container__.lookup('store:main');
@@ -167,8 +168,6 @@ asyncTest('test loading with custom key for polymorphic belongsTo', function() {
             return 'custom_type';
         }
     });
-
-    App.reset();
 
     var message_json = {
         "id": 500,
@@ -218,6 +217,8 @@ asyncTest('test loading with custom key for polymorphic belongsTo', function() {
 });
 
 asyncTest('test serializing with custom key for polymorphic belongsTo', function() {
+    App.reset();
+
     DS.DjangoRESTSerializer.reopen({
         keyForType: function(key) {
             return key + "_custom_type";
@@ -226,8 +227,6 @@ asyncTest('test serializing with custom key for polymorphic belongsTo', function
             return 'custom_type';
         }
     });
-
-    App.reset();
 
     var message_json = {
         "id": 600,
@@ -264,7 +263,9 @@ asyncTest('test serializing with custom key for polymorphic belongsTo', function
 });
 
 asyncTest('should not serialize polymorphic hasMany associations', function() {
-   var json = {
+    App.reset();
+
+    var json = {
         "id": 700,
         "name": "Paul",
         "username": "Paul",
@@ -285,6 +286,49 @@ asyncTest('should not serialize polymorphic hasMany associations', function() {
             var serialized = store.serialize(user);
 
             deepEqual(serialized,{name: "Paul", username: "Paul"});
+
+            start();
+        });
+    });
+});
+
+asyncTest('test serializing with custom key for polymorphic hasMany', function() {
+    DS.DjangoRESTSerializer.reopen({
+        keyForEmbeddedType: function(key) {
+            return 'custom_type';
+        }
+    });
+
+    App.reset();
+
+    var json = {
+        "id": 800,
+        "username": "Paul",
+        "messages": [
+            {
+                "id": 801,
+                "custom_type": "post",
+                "content": "I am a message"
+            }
+        ]
+    };
+
+    stubEndpointForHttpRequest('/api/users/800/', json);
+
+    Ember.run(function(){
+        var store = App.__container__.lookup('store:main');
+
+        store.find('user', 800).then(function(user) {
+            var messages = user.get('messages').toArray();
+            var message = messages[0];
+
+            equal(message.content,json["messages"]["content"]);
+
+            DS.DjangoRESTSerializer.reopen({
+                keyForEmbeddedType: function(key) {
+                    return 'type';
+                }
+            });
 
             start();
         });
