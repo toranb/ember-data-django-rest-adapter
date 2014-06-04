@@ -284,6 +284,5 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
     */
     normalizeTypeKey: function(obj,key) {
       obj.type = obj[key];
-      delete obj[key];
     }
 });
