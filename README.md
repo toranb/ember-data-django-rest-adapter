@@ -30,16 +30,28 @@ if (environment === 'production') {
 }
 ```
 
-Create `app/adapters/application.js` (you may have to create this directory):
+Create ApplicationAdapter:
+
+```console
+ember generate adapter application
+```
+
+and modify it (`app/adapters/application.js`):
 
 ```js
 export default DS.DjangoRESTAdapter.extend({
-  host: ENV.APP.API_HOST,
+  host: MyProjectENV.APP.API_HOST,
   defaultSerializer: 'django'
 });
 ```
 
-Create `app/serializers/django.js` (you may have to create this directory):
+Create DjangoSerializer:
+
+```console
+ember generate serializer django
+```
+
+and modify it (`app/serializers/django.js`):
 
 ```js
 export default DS.DjangoRESTSerializer.extend();
