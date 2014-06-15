@@ -1,3 +1,6 @@
+var map = Ember.ArrayPolyfills.map;
+var forEach = Ember.ArrayPolyfills.forEach;
+
 DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     init: function() {
@@ -38,7 +41,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
                   // If there is a hasMany polymorphic relationship, push each
                   // item to the store individually, since they might not all
                   // be the same type
-                  Ember.ArrayPolyfills.forEach.call(payload[key],function(hash) {
+                  forEach.call(payload[key],function(hash) {
                     var type = this.typeForRoot(hash.type);
                     this.pushSinglePayload(store,type,hash);
                   }, this);
@@ -258,14 +261,28 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
               var embeddedData = hash[relationship.key];
               var embeddedTypeKey = this.keyForEmbeddedType(relationship.key);
               if(embeddedTypeKey !== 'type') {
-                if(embeddedData[embeddedTypeKey]) {
-                  embeddedData.type = embeddedData[embeddedTypeKey];
-                  delete embeddedData[embeddedTypeKey];
+                if(Ember.isArray(embeddedData) && embeddedData.length) {
+                  map.call(embeddedData, function(obj,i) {
+                    this.normalizeTypeKey(obj,embeddedTypeKey);
+                  }, this);
+                } else if(embeddedData[embeddedTypeKey]) {
+                  this.normalizeTypeKey(embeddedData,embeddedTypeKey);
                 }
               }
             }
           }
         }, this);
       }
+    },
+
+    /**
+      Replace a custom type key with a key named `type`.
+
+      @method normalizeTypeKey
+      @param {Object} obj
+      @param {String} key
+    */
+    normalizeTypeKey: function(obj,key) {
+      obj.type = obj[key];
     }
 });
