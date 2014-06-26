@@ -65,6 +65,22 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
         return this._super(url, type, hash);
     },
 
+    ajaxError: function(jqXHR) {
+        var error = this._super(jqXHR);
+
+        if (jqXHR && jqXHR.status === 400) {
+            var response = Ember.$.parseJSON(jqXHR.responseText), errors = {};
+
+            Ember.EnumerableUtils.forEach(Ember.keys(response), function(key) {
+                errors[Ember.String.camelize(key)] = response[key];
+            });
+
+            return new DS.InvalidError(errors);
+        } else {
+            return error;
+        }
+    },
+
     buildURL: function(type, id) {
         var url = this._super(type, id);
 
