@@ -1,4 +1,5 @@
   {{input class="name" value=name}}<br />
+  <div id="name-errors">{{#each errors.name}}{{this}}{{/each}}</div><br />
   {{input class="location" value=location}}<br />
   <button class="update" {{action 'updateSpeaker' model}}>Update Speaker</button><br />
 
@@ -9,5 +10,3 @@
   {{#each badge in model.badges}}
     <span {{bind-attr class="badge.city"}}>{{badge.city}}</span><br />
   {{/each}}
-
-  <div id="errors">{{model.errors}}</div>

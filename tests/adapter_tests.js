@@ -214,23 +214,23 @@ test('finding nested attributes makes GET request to the correct attribute-based
 
 test('basic error handling will bubble to the model', function() {
     var session = {"id": 1, "name": "x", "room": "y", "tags": [], ratings: [], speakers: [1]};
-    var speaker = {"id": 1, "name": "wat", "location": "iowa", "session": 1, "association": null, "personas": [1], "zidentity": null};
+    var speaker = {"id": 1, "name": "", "location": "iowa", "session": 1, "association": null, "personas": [1], "zidentity": null};
     var personas = [{"id": 1, "nickname": "magic", "speaker": 1, "company": null}];
     stubEndpointForHttpRequest('/api/sessions/1/', session);
     stubEndpointForHttpRequest('/api/speakers/1/', speaker);
     stubEndpointForHttpRequest('/api/speakers/1/personas/', personas);
     visit("/speaker/1").then(function() {
         var name = $("input.name").val();
-        equal(name, "wat", "name was instead: " + name);
+        equal(name, "", "name was instead: " + name);
         var errors = Ember.$.trim($("#errors").text());
         equal(errors, "", "errors was instead: " + errors);
-        stubEndpointForHttpRequest('/api/speakers/1/', {}, 'PUT', 400);
+        stubEndpointForHttpRequest('/api/speakers/1/', {"name": ["This field is required."]}, 'PUT', 400);
         return click(".update");
     }).then(function() {
         var name = $("input.name").val();
-        equal(name, "wat", "name was instead: " + name);
-        var errors = Ember.$.trim($("#errors").text());
-        equal(errors, "operation failed for model: speaker", "errors was instead: " + errors);
+        equal(name, "", "name was instead: " + name);
+        var errors = Ember.$.trim($("#name-errors").text());
+        equal(errors, "This field is required.", "errors was instead: " + errors);
     });
 });
 
