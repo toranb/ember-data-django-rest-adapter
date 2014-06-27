@@ -249,7 +249,7 @@ App.AssociationsRoute = Ember.Route.extend({
 App.SpeakerController = Ember.ObjectController.extend({
   actions: {
       updateSpeaker: function(model) {
-          model.save();
+          model.save().then(function() {}, function() { /* errors goes here */ });
       }
   }
 });
