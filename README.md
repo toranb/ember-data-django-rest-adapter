@@ -4,22 +4,16 @@
 
 <img src="badge@2x.png" width="130" height="30"> bower install ember-data-django-rest-adapter
 
-## Using with Ember-CLI
+## Using with Ember CLI
+
+The adapter is [packaged separately](https://github.com/dustinfarris/ember-django-adapter)
+as an Ember CLI add-on.  Installation is very simple:
 
 ```
-bower i --save ember-data-django-rest-adapter
+npm i --save-dev ember-django-adapter
 ```
 
-In `Brocfile.js` (_after_ the ember-data import):
-
-```js
-app.import({
-  development: 'vendor/ember-data-django-rest-adapter/build/ember-data-django-rest-adapter.js',
-  production: 'vendor/ember-data-django-rest-adapter/build/ember-data-django-rest-adapter.prod.js'
-});
-```
-
-In `config/environment.js` add your API hosts, e.g.:
+and set the `API_HOST` environment variable in `config/environment.js`, e.g.:
 
 ```js
 if (environment === 'development') {
@@ -28,33 +22,6 @@ if (environment === 'development') {
 if (environment === 'production') {
   ENV.APP.API_HOST = 'https://api.myproject.com';
 }
-```
-
-Create ApplicationAdapter:
-
-```console
-ember generate adapter application
-```
-
-and modify it (`app/adapters/application.js`):
-
-```js
-export default DS.DjangoRESTAdapter.extend({
-  host: MyProjectENV.APP.API_HOST,
-  defaultSerializer: 'django'
-});
-```
-
-Create DjangoSerializer:
-
-```console
-ember generate serializer django
-```
-
-and modify it (`app/serializers/django.js`):
-
-```js
-export default DS.DjangoRESTSerializer.extend();
 ```
 
 ## Using with vanilla Ember
