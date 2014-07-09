@@ -1,6 +1,6 @@
 {
   "name": "ember-data-django-rest-adapter",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "https://github.com/toranb/ember-data-django-rest-adapter",
   "authors": [
     "Toran Billups <toranb@gmail.com>"
