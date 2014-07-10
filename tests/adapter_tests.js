@@ -178,16 +178,19 @@ test('test pushArrayPayload', function() {
 });
 
 test('skip serializing readOnly attributes', function() {
-  var user = {"id": 1, "username": "foo", "image": "http://example.org/foo.png"};
-  var expect = {"username": "foo"};
-  Ember.run(App, function(){
+  var user = {
+    "id": 1,
+    "username": "foo",
+    "image": "http://example.org/foo.png"
+  };
+  Ember.run(App, function() {
     var store = App.__container__.lookup("store:main");
     var serializer = store.serializerFor('user');
     serializer.pushSinglePayload(store, 'user', user);
 
-    store.find('user', 1).then(function(record){
+    store.find('user', 1).then(function(record) {
       var result = serializer.serialize(record);
-      deepEqual(expect, result, "expected " + JSON.stringify(expect) + " got " + JSON.stringify(result));
+      equal(result.image, undefined);
     });
   });
 });
