@@ -1,10 +1,15 @@
-# ember-data-django-rest-adapter 
+ember-data-django-rest-adapter 
+==============================
 
-[![Build Status](https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master)](https://travis-ci.org/toranb/ember-data-django-rest-adapter) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Build Status][]](https://travis-ci.org/toranb/ember-data-django-rest-adapter)
 
-<img src="badge@2x.png" width="130" height="30"> bower install ember-data-django-rest-adapter
+This package enables you to build modern web applications using [Ember.js][]
+and [Django REST Framework][].  For detailed information on installing and
+using the adapter, see the [wiki documentation].
 
-## Using with Ember CLI
+
+Installing
+----------
 
 The adapter is [packaged separately](https://github.com/dustinfarris/ember-django-adapter)
 as an Ember CLI add-on.  Installation is very simple:
@@ -24,389 +29,43 @@ if (environment === 'production') {
 }
 ```
 
-## Using with vanilla Ember
+See the [wiki documentation][] for additional installation instructions,
+including how to use the adapter with vanilla ember (without using ember-cli).
 
-    npm install bower
-    bower install ember-data-django-rest-adapter
-    add the following scripts to your application
 
-    <script type="text/javascript" src="/bower_components/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="/bower_components/handlebars/handlebars.js"></script>
-    <script type="text/javascript" src="/bower_components/ember/ember.js"></script>
-    <script type="text/javascript" src="/bower_components/ember-data/ember-data.js"></script>
-    <script type="text/javascript" src="/bower_components/ember-data-django-rest-adapter/build/ember-data-django-rest-adapter.js"></script>
+Pending Issues
+--------------
 
-## Motivation
-- The `django-rest-framework` is a great REST framework for python / django developers
-- The default `ember-data` `RESTAdapter` does not follow the conventions used by the django rest framework
+* Date and DateTime are not yet built into the adapter (see the WIP PR for a 
+  workaround)
 
-## Usage
+* Async belongsTo/hasMany requires a pull-request be merged into ember-data 
+  core (see the WIP branch for a workaround)
 
-#### Javascript side
-- Include the `ember-data-django-rest-adapter.js` after `ember-data.js` in your HTML/build system
+* Pagination is not yet supported
 
-Basic code to use it with the last ember-data revision:
 
-      App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({});
+Credits
+-------
 
-Creating with a namespace (not to be confused with Django namespace urls) that will be used as the root url:
+I took a large part of this project (including the motivation) from @escalant3 
+and his [tastypie adapter][].
 
-      App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
-          namespace: 'codecamp'
-      });
+Special thanks to all [contributors][]!
 
-#### python/django side
-This project requires the `django-rest-framework` 2.x branch (specifically 2.1.14 or newer)
 
-i) The adapter assumes you have 2 different endpoints per django model
+License
+-------
 
-    class People(generics.ListCreateAPIView):
-        model = Person
-        serializer_class = PersonSerializer
-
-    class Person(generics.RetrieveUpdateDestroyAPIView):
-        model = Person
-        serializer_class = PersonSerializer
-
-
-ii) The above might have a `urls.py` something like the below
-
-    urlpatterns = patterns('',
-        url(r'^/people/(?P<pk>\d+)/$', Person.as_view()),
-        url(r'^/people/$', People.as_view()),
-    )
-
-
-## Filtering Support
-This adapter supports basic query string filtering
-
-On the client side you would apply a filter using the `ember-data` find api (this returns an DS.AdapterPopulatedRecordArray)
-
-    App.Person = DS.Model.extend({
-        name: DS.attr('string')
-    });
-    var people = this.store.find('person', {name: 'Toran'});
-
-On the server side you first need to add the `django-filter` dependency
-
-    pip install django-filter
-
-Next you need to add a setting to tell the `django-rest-framework` that you intend to use this dependency as your filter backend
-
-    REST_FRAMEWORK = {
-        'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend'
-    }
-
-Now you can apply the filter to your `ListAPIView` or `ListCreateAPIView`
-
-    class People(generics.ListCreateAPIView):
-        model = Person
-        serializer_class = PersonSerializer
-        filter_fields = ('name', )
-
-If you have this setup correctly you should see an ajax request that looks something like the below
-
-    http://localhost:8000/codecamp/people/?name=Toran
-
-To learn more about the filtering options available in the django-rest-framework, please refer to the [api-guide][filtering]
-
-[filtering]: http://django-rest-framework.org/api-guide/filtering.html#generic-filtering
-
-
-## Record Nesting
-When nesting resources, which is common in many-to-many or foreign-key relationships, the following conventions apply.
-
-Nested endpoints must be list only.  Any nested resources must also have their own top level endpoints for create / update / delete
-
-    class PeopleView(generics.ListCreateAPIView):
-        ...
-    
-    class PersonView(generics.RetrieveUpdateDestroyAPIView):
-        ...
-    
-    class NestedPeopleView(generics.ListAPIView):
-        ...
-    
-    class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
-        ...
-    
-    urlpatterns = patterns('',
-        url(r'^/people/$', PeopleView.as_view()),
-        url(r'^/people/(?P<pk>\d+)/$', PersonView.as_view()),
-        url(r'^/groups/(?P<pk>\d+)/$', GroupDetailView.as_view()),
-        url(r'^/groups/(?P<group_pk>\d+)/people/$', NestedPeopleView.as_view()),
-    )
-
-Nested endpoints must match their relation field name
-
-    class Person(models.Model):
-        name = models.CharField(...)
-    
-    class Group(models.Model):
-        members = models.ManyToManyField(Person)
-    
-    urlpatterns = patterns('',
-        #/groups/:id/people/ WILL NOT WORK
-        url(r'^/groups/(?P<group_pk>\d+)/members/$', NestedPeopleView.as_view()),
-    )
-
-## Polymorphic relationships
-
-Polymorphic relationships are partially supported in ember-data-django-rest-adapter. There are a couple of defaults set in place, but they can all be modified.
-
-### Example of polymorphic relationship
-
-
-Models:
-
-````
-App.User = App.Author.extend({
-    messages: DS.hasMany('message', { polymorphic: true })
-});
-
-App.Message = DS.Model.extend({});
-
-App.Post = App.Message.extend({});
-````
-
-
-Endpoints:
-
-`api/users/1`:
-
-````
-{
-    "id": 1,
-    "messages": [
-        {
-            "id": 2,
-            "type": "post",
-        }
-    ]
-}        
-````
-
-### Embedded belongsTo relationship
-
-`api/messages/1`:
-
-````
-{
-	"id": 1,
-	"author": {
-		"id": 2,
-		"name": "website",
-		"type": "company"
-	}
-}
-````
-
-### Async belongsTo relationship
-
-````
-App.Message = DS.Model.extend({
-	author: DS.belongsTo('author', { polymorphic: true, async: true })
-});
-````
-
-`api/messages/1`:
-
-````
-{
-	"id": 400,
-	"author": 401,
-	"author_type": "company"
-}
-````
-
-`api/companies/1`:
-
-````
-{
-	"id": 401,
-	"name": "Big corp"
-}
-````
-
-###To change the name of the type key, override `keyForType`, and/or `keyForEmbeddedType`
-
-````
-App.ApplicationSerializer = DS.RESTSerializer.extend({
-	keyForType: function(key) {
-		return key + "_xyz_type";
-	},
-	keyForEmbeddedType: function(key) {
-		return 'embedded_type';
-	},
-});
-````
-
-`api/messages/1`:
-
-````
-{
-	"author_xyz_type": "company",
-	"embedded_record": {
-		"embedded_type": "Foo"
-	}
-}
-````
-
-###Note
-Saving polymorphic hasMany records is not supported at the time, but it will be added once it's supported natively in Ember Data. See https://github.com/emberjs/data/pull/1457.
-
-Saving belongsTo records does work, but it just attaches the foreign key, and does not embed the record. So if you loaded data looking like:
-
-````
-{
-	"id": 600,
-	"content": "foo bar",
-	"receiver": {
-		"id": 601,
-		"type": "company"
-	}
-};
-````
-
-That results in the following PUT request data when the model is saved.
-
-````
-{
-	content: "foo bar"
-	receiver: "601"
-	receiver_type: "company"
-}
-````
-
-## CSRF Support
-This adapter does not require you send a CSRF token with each $.ajax request
-
-If you want to send the token with each request, add a snippet of javascript to ensure your application adds the csrf token to the http headers
-
-    <script type="text/javascript">
-      jQuery(document).ajaxSend(function(event, xhr, settings) {
-        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-          xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
-        }
-      });
-    </script>
-
-## Building ember-data-django-rest-adapter
-
-To build the minified versions of ember-data-django-rest-adapter you will need [node.js](http://nodejs.org)
-
-From the main project folder run the command below (This does not require `sudo`)
-
-```shell
-npm install
-```
-
-At this point the dependencies have been installed and you can build ember-data-django-rest-adapter
-
-```shell
-grunt
-```
-
-If you don't have all the node modules available on your path you can do this manually (ie- the grunt command does not work)
-
-```shell
-export PATH="./node_modules/.bin:$PATH"
-```
-
-## Integration with Ember App Kit
-
-Note: Ember App Kit will eventually be succeeded by [Ember CLI][].
-
-### Install manually
-
-Using Ember Data Django REST Adapter with [Ember App Kit][] is easy!
-Add the source file to the `/vendor/` directory, and add an exception to
-`.gitignore`:
-
-```
-!/vendor/ember-data-django-rest-adapter.prod.js
-```
-### Install through bower
-
-```
-bower install --save ember-data-django-rest-adapter
-```
-
-### Configure
-
-Then include the adapter in `app/index.html` somewhere after the
-Ember Data include:
-
-```html
-<script src="/vendor/ember-data-django-rest-adapter.prod.js"></script>
-```
-
-Finally, initialize the adapter by replacing the contents of
-`app/adapters/application.js` with:
-
-```js
-var AppAdapter = DS.DjangoRESTAdapter.extend();
-
-export default AppAdapter;
-```
-
-And initialize the serializer by adding the file
-`app/serializers/application.js` with the contents:
-
-```js
-var AppSerializer = DS.DjangoRESTSerializer.extend();
-
-export default AppSerializer;
-```
-
-Your project will now use the Django REST Adapter.  If you are serving
-your API on a separate domain (or even a separate PORT!) you will need
-to configure this in the adapter instantiation—in
-`app/adapters/application.js`.  For example:
-
-```js
-var AppAdapter = DS.DjangoRESTAdapter.extend({
-  host: 'http://api.mydomain.com'
-});
-
-export default AppAdapter;
-```
-
-## Contributing
-This adapter was built by the community for the community. If you would like to extend it or fix a bug, please open an issue or create a pull request. If you can provide a test case for the issue in question, it will help the core team solve the issue more quickly.
-
-## Unit tests
-
-    npm install
-    grunt test
-
-## Versions
-    ember.js 1.4.0
-    ember-data 1.0 beta 5
-
-## Pending Issues
-
-    i) Date and DateTime are not yet built into the adapter (see the WIP PR for a workaround)
-
-    ii) Async belongsTo/hasMany requires a pull-request be merged into ember-data core (see the WIP branch for a workaround)
-
-    iii) Pagination is not yet supported
-
-## Examples
-An example project that shows the adapter in action can be found below
-
-https://github.com/toranb/complex-ember-data-example.git
-
-## Credits
-I took a large part of this project (including the motivation) from @escalant3 and his tastypie adapter
-
-https://github.com/escalant3/ember-data-tastypie-adapter/
-
-## License
 Copyright © 2014 Toran Billups http://toranbillups.com
 
 Licensed under the MIT License
 
 
-[Ember App Kit]: https://github.com/stefanpenner/ember-app-kit
+[Build Status]: https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master
+[wiki documentation]: https://github.com/toranb/ember-data-django-rest-adapter/wiki
+[Ember.js]: http://emberjs.com/
+[Django REST Framework]: http://www.django-rest-framework.org/
 [Ember CLI]: https://github.com/stefanpenner/ember-cli
+[tastypie adapter]: https://github.com/escalant3/ember-data-tastypie-adapter/
+[contributors]: https://github.com/toranb/ember-data-django-rest-adapter/graphs/contributors
