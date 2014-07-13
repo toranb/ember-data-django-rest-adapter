@@ -4,13 +4,11 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
   defaultSerializer: "DS/djangoREST",
 
   /**
-   * Overrides the `pathForType` method to build underscored URLs.
-   *
-   * Stolen from ActiveModelAdapter
+   * Overrides the `pathForType` method to build dasherized URLs.
    *
    * ```js
    * this.pathForType("famousPerson");
-   * //=> "famous_people"
+   * //=> "famous-people"
    * ```
    *
    * @method pathForType
@@ -18,8 +16,8 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
    * @returns String
    */
   pathForType: function(type) {
-    var decamelized = Ember.String.decamelize(type);
-    return Ember.String.pluralize(decamelized);
+    var dasherized = Ember.String.dasherize(type);
+    return Ember.String.pluralize(dasherized);
   },
 
   createRecord: function(store, type, record) {
