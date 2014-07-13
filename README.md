@@ -43,13 +43,12 @@ including how to use the adapter with vanilla ember (without using ember-cli).
 Pending Issues
 --------------
 
-* Date and DateTime are not yet built into the adapter (see the WIP PR for a 
-  workaround)
+* Date and DateTime are not yet built into the adapter ([#61][])
 
 * Async belongsTo/hasMany requires a pull-request be merged into ember-data 
-  core (see the WIP branch for a workaround)
+  core ([#63][])
 
-* Pagination is not yet supported
+* Pagination is not yet supported ([#80][])
 
 
 Credits
@@ -77,3 +76,6 @@ Licensed under the MIT License
 [Ember CLI]: https://github.com/stefanpenner/ember-cli
 [tastypie adapter]: https://github.com/escalant3/ember-data-tastypie-adapter/
 [contributors]: https://github.com/toranb/ember-data-django-rest-adapter/graphs/contributors
+[#61]: https://github.com/toranb/ember-data-django-rest-adapter/issues/61
+[#63]: https://github.com/toranb/ember-data-django-rest-adapter/pull/63
+[#80]: https://github.com/toranb/ember-data-django-rest-adapter/issues/80
