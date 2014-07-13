@@ -8,6 +8,13 @@ and [Django REST Framework][].  For detailed information on installing and
 using the adapter, see the [wiki documentation].
 
 
+Community
+---------
+
+* IRC: #ember-django-adapter on freenode
+* Issues: [ember-data-django-rest-adapter/issues][]
+
+
 Installing
 ----------
 
@@ -64,6 +71,7 @@ Licensed under the MIT License
 
 [Build Status]: https://secure.travis-ci.org/toranb/ember-data-django-rest-adapter.png?branch=master
 [wiki documentation]: https://github.com/toranb/ember-data-django-rest-adapter/wiki
+[ember-data-django-rest-adapter/issues]: https://github.com/toranb/ember-data-django-rest-adapter/issues
 [Ember.js]: http://emberjs.com/
 [Django REST Framework]: http://www.django-rest-framework.org/
 [Ember CLI]: https://github.com/stefanpenner/ember-cli
