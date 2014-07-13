@@ -363,39 +363,44 @@ test('ajax post with different single parent will use correctly nested endpoint'
 });
 
 test('multiword hasMany key is serialized correctly on save', function() {
-  var store = App.__container__.lookup('store:main'),
-  car;
-  stubEndpointForHttpRequest('/api/cars/1/',
-                             {'id': 1, 'car_parts': [1,2]}, 'PUT');
+  var store = App.__container__.lookup('store:main'), car;
+  stubEndpointForHttpRequest(
+    '/api/cars/1/',
+    {'id': 1, 'car_parts': [1,2]}, 'PUT');
 
-                             Ember.run(function(){
-                               var serializer = store.serializerFor('car');
-                               serializer.pushSinglePayload(store, 'car',
-                                                            {'id': 1, 'car_parts': []});
-                                                            serializer.pushArrayPayload(store, 'carPart',
-                                                                                        [{'id': 1, 'cars': []}, {'id': 2, 'cars': []}]);
+    Ember.run(function(){
+      var serializer = store.serializerFor('car');
+      serializer.pushSinglePayload(store, 'car', {
+        'id': 1, 'car_parts': []
+      });
+      serializer.pushArrayPayload(store, 'carPart', [
+        {'id': 1, 'cars': []},
+        {'id': 2, 'cars': []}
+      ]);
+      store.find('car', 1).then(function(result) {
+        car = result;
+        return Ember.RSVP.all([
+          store.find('carPart', 1),
+          store.find('carPart', 2)
+        ]);
+      }).then(function(carParts) {
+        car.set('carParts', carParts);
+        return car.save();
+      }).then(function(car) {
+        equal(ajaxHash.data, '{"car_parts":[]}');
+        return;
+      });
+    });
 
-                                                                                        store.find('car', 1).then(function(result){
-                                                                                          car = result;
-                                                                                          return Ember.RSVP.all(
-                                                                                            [store.find('carPart', 1), store.find('carPart', 2)]) ;
-                                                                                        }).then(function(carParts){
-                                                                                          car.set('carParts', carParts);
-                                                                                          return car.save();
-                                                                                        }).then(function(car){
-                                                                                          equal(ajaxHash.data, '{"car_parts":[]}');
-                                                                                          return;
-                                                                                        });
-                             });
-
-                             wait();
+    wait();
 });
 
 test('camelCase belongsTo key is serialized with underscores on save', function() {
   var store = App.__container__.lookup('store:main');
   stubEndpointForHttpRequest('/api/camel_parents/1/', {'id': 1, 'name': 'parent'});
   visit("/camelParent").then(function() {
-    stubEndpointForHttpRequest('/api/camel_kids/', {"description":"firstkid","camel_parent":"1"}, 'POST', 201);
+    stubEndpointForHttpRequest(
+      '/api/camel_kids/', {"description":"firstkid","camel_parent":"1"}, 'POST', 201);
     return click(".add");
   }).then(function() {
     equal(ajaxHash.data, '{"description":"firstkid","camel_parent":"1"}');
