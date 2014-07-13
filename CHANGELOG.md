@@ -2,7 +2,7 @@ ember-data-django-rest-adapter Changelog
 ========================================
 
 * [ENHANCEMENT] Move documentation to GitHub Wiki
-  [#80](https://github.com/toranb/ember-data-django-rest-adapter/issues/80)
+  ([#80](https://github.com/toranb/ember-data-django-rest-adapter/issues/80))
 
 
 1.0.5
