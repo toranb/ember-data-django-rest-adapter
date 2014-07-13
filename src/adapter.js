@@ -7,8 +7,8 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
    * Overrides the `pathForType` method to build dasherized URLs.
    *
    * ```js
-   *   this.pathForType("famousPerson");
-   *   //=> "famous-people"
+   * this.pathForType("famousPerson");
+   * //=> "famous-people"
    * ```
    *
    * @method pathForType
