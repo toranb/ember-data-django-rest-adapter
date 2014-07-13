@@ -1,20 +1,20 @@
 module.exports = function(karma) {
-    karma.set({
-        basePath: 'tests',
+  karma.set({
+    basePath: 'tests',
 
-        files: [
-          "dist/deps.min.js",
-          "helper.js",
-          "adapter_tests.js",
-          "adapter_embedded_tests.js",
-          "adapter_polymorphic_tests.js"
-        ],
+    files: [
+      "dist/deps.min.js",
+      "helper.js",
+      "adapter_tests.js",
+      "adapter_embedded_tests.js",
+      "adapter_polymorphic_tests.js"
+    ],
 
-        logLevel: karma.LOG_ERROR,
-        browsers: ['PhantomJS'],
-        singleRun: true,
-        autoWatch: false,
+    logLevel: karma.LOG_ERROR,
+    browsers: ['PhantomJS'],
+    singleRun: true,
+    autoWatch: false,
 
-        frameworks: ['qunit', 'qunit-sb']
-    });
+    frameworks: ['qunit', 'qunit-sb']
+  });
 };

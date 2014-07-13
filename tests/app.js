@@ -60,15 +60,15 @@ App.Session = DS.Model.extend({
 });
 
 App.Speaker = DS.Model.extend({
-    name: DS.attr('string'),
-    location: DS.attr('string'),
-    association: DS.belongsTo('association'),
-    personas: DS.hasMany('persona', { async: true }),
-    badges: DS.hasMany('badge', { async: true }),
-    session: DS.belongsTo('session'),
-    zidentity: DS.belongsTo('user'),
-    other: DS.belongsTo('other'),
-    errors: ''
+  name: DS.attr('string'),
+  location: DS.attr('string'),
+  association: DS.belongsTo('association'),
+  personas: DS.hasMany('persona', { async: true }),
+  badges: DS.hasMany('badge', { async: true }),
+  session: DS.belongsTo('session'),
+  zidentity: DS.belongsTo('user'),
+  other: DS.belongsTo('other'),
+  errors: ''
 });
 
 App.Other = DS.Model.extend({
@@ -80,10 +80,10 @@ App.Other = DS.Model.extend({
 });
 
 App.Speaker.reopen({
-    becameError: function(errors) {
-        var model = this.constructor.typeKey;
-        this.set('errors', "operation failed for model: " + model);
-    }
+  becameError: function(errors) {
+    var model = this.constructor.typeKey;
+    this.set('errors', "operation failed for model: " + model);
+  }
 });
 
 App.Tag = DS.Model.extend({
@@ -106,46 +106,46 @@ App.Author = DS.Model.extend({
 });
 
 App.User = App.Author.extend({
-    name: DS.attr('string'),
-    username: DS.attr('string'),
-    aliases: DS.hasMany('speaker', { async: true}),
-    messages: DS.hasMany('message', { polymorphic: true })
+  name: DS.attr('string'),
+  username: DS.attr('string'),
+  aliases: DS.hasMany('speaker', { async: true}),
+  messages: DS.hasMany('message', { polymorphic: true })
 });
 
 App.Company = App.Author.extend({
-    name: DS.attr('string'),
-    sponsors: DS.hasMany('sponsor', { async: true}),
-    messages: DS.hasMany('message', { polymorphic: true }),
-    persona: DS.belongsTo('persona')
+  name: DS.attr('string'),
+  sponsors: DS.hasMany('sponsor', { async: true}),
+  messages: DS.hasMany('message', { polymorphic: true }),
+  persona: DS.belongsTo('persona')
 });
 
 App.Persona = DS.Model.extend({
-    nickname: DS.attr('string'),
-    speaker: DS.belongsTo('speaker'),
-    company: DS.belongsTo('company')
+  nickname: DS.attr('string'),
+  speaker: DS.belongsTo('speaker'),
+  company: DS.belongsTo('company')
 });
 
 App.Badge = DS.Model.extend({
-    city: DS.attr('string'),
-    speaker: DS.belongsTo('speaker')
+  city: DS.attr('string'),
+  speaker: DS.belongsTo('speaker')
 });
 
 App.Sponsor = DS.Model.extend({
-    name: DS.attr('string'),
-    company: DS.belongsTo('company')
+  name: DS.attr('string'),
+  company: DS.belongsTo('company')
 });
 
 App.CarPart = DS.Model.extend({ cars: DS.hasMany('car', {async: true})});
 App.Car = DS.Model.extend({ carParts: DS.hasMany('carPart', {async: true})});
 
 App.CamelParent = DS.Model.extend({
-    name: DS.attr('string'),
-    camelKids: DS.hasMany('camelKid', {async: true})
+  name: DS.attr('string'),
+  camelKids: DS.hasMany('camelKid', {async: true})
 });
 
 App.CamelKid = DS.Model.extend({
-    description: DS.attr('string'),
-    camelParent: DS.belongsTo('camelParent')
+  description: DS.attr('string'),
+  camelParent: DS.belongsTo('camelParent')
 });
 
 App.Message = DS.Model.extend({
@@ -172,13 +172,13 @@ App.CamelParentRoute = Ember.Route.extend({
 });
 
 App.CamelParentController = Ember.ObjectController.extend({
-    actions: {
-        addCamelKid: function() {
-            var parent = this.store.all('camelParent').objectAt(0);
-            var hash = {'description': 'firstkid', 'camelParent': parent};
-            this.store.createRecord('camelKid', hash).save();
-        }
+  actions: {
+    addCamelKid: function() {
+      var parent = this.store.all('camelParent').objectAt(0);
+      var hash = {'description': 'firstkid', 'camelParent': parent};
+      this.store.createRecord('camelKid', hash).save();
     }
+  }
 });
 
 App.CartRoute = Ember.Route.extend({
@@ -188,14 +188,14 @@ App.CartRoute = Ember.Route.extend({
 });
 
 App.CartController = Ember.ObjectController.extend({
-    actions: {
-        add: function() {
-            var name = this.get('name');
-            var complete = this.get('complete');
-            var hash = {name: name, complete: complete};
-            this.store.createRecord('cart', hash).save();
-        }
+  actions: {
+    add: function() {
+      var name = this.get('name');
+      var complete = this.get('complete');
+      var hash = {name: name, complete: complete};
+      this.store.createRecord('cart', hash).save();
     }
+  }
 });
 
 App.RatingsRoute = Ember.Route.extend({
@@ -236,85 +236,85 @@ App.SessionsRoute = Ember.Route.extend({
 
 App.SpeakersRoute = Ember.Route.extend({
   model: function() {
-      return this.store.find('speaker', {name: 'Joel Taddei'});
-    }
+    return this.store.find('speaker', {name: 'Joel Taddei'});
+  }
 });
 
 App.AssociationsRoute = Ember.Route.extend({
   model: function() {
-      return this.store.find('association');
-    }
+    return this.store.find('association');
+  }
 });
 
 App.SpeakerController = Ember.ObjectController.extend({
   actions: {
-      updateSpeaker: function(model) {
-          model.save().then(function() {}, function() { /* errors goes here */ });
-      }
+    updateSpeaker: function(model) {
+      model.save().then(function() {}, function() { /* errors goes here */ });
+    }
   }
 });
 
 App.OtherController = Ember.ObjectController.extend({
   actions: {
-      addRating: function(other) {
-        var score = this.get('score');
-        var feedback = this.get('feedback');
-        if (score === undefined || feedback === undefined || Ember.$.trim(score) === "" || Ember.$.trim(feedback) === "") {
-          return;
-        }
-        var rating = { score: score, feedback: feedback, other: other};
-        this.store.createRecord('rating', rating).save();
-        this.set('score', '');
-        this.set('feedback', '');
+    addRating: function(other) {
+      var score = this.get('score');
+      var feedback = this.get('feedback');
+      if (score === undefined || feedback === undefined || Ember.$.trim(score) === "" || Ember.$.trim(feedback) === "") {
+        return;
       }
+      var rating = { score: score, feedback: feedback, other: other};
+      this.store.createRecord('rating', rating).save();
+      this.set('score', '');
+      this.set('feedback', '');
+    }
   }
 });
 
 App.SessionController = Ember.ObjectController.extend({
   actions: {
-      addSpeaker: function(session) {
-          var self = this;
-          var name = this.get('speaker');
-          var location = this.get('location');
-          this.store.find('user', 1).then(function(user) {
-            //to simulate a record create with multiple parents
-            var hash = {zidentity: user, name: name, location: location, session: session};
-            self.store.createRecord('speaker', hash).save();
-          });
-      },
-      addSpeakerWithUserSingleParent: function(session) {
-          var self = this;
-          var name = this.get('speaker');
-          var location = this.get('location');
-          this.store.find('user', 1).then(function(user) {
-            //to simulate a record create with single user parent
-            var hash = {zidentity: user, name: name, location: location};
-            self.store.createRecord('speaker', hash).save();
-          });
-      },
-      addSpeakerWithSingleParent: function(session) {
-          var self = this;
-          var name = this.get('speaker');
-          var location = this.get('location');
-          //to simulate a record create with just a single parent
-          var hash = {name: name, location: location, session: session};
-          self.store.createRecord('speaker', hash).save();
-      },
-      addRating: function(session) {
-        var score = this.get('score');
-        var feedback = this.get('feedback');
-        if (score === undefined || feedback === undefined || Ember.$.trim(score) === "" || Ember.$.trim(feedback) === "") {
-          return;
-        }
-        var rating = { score: score, feedback: feedback, session: session};
-        this.store.createRecord('rating', rating).save();
-        this.set('score', '');
-        this.set('feedback', '');
-      },
-      deleteRating: function(rating) {
-          rating.deleteRecord();
-          rating.save();
+    addSpeaker: function(session) {
+      var self = this;
+      var name = this.get('speaker');
+      var location = this.get('location');
+      this.store.find('user', 1).then(function(user) {
+        //to simulate a record create with multiple parents
+        var hash = {zidentity: user, name: name, location: location, session: session};
+        self.store.createRecord('speaker', hash).save();
+      });
+    },
+    addSpeakerWithUserSingleParent: function(session) {
+      var self = this;
+      var name = this.get('speaker');
+      var location = this.get('location');
+      this.store.find('user', 1).then(function(user) {
+        //to simulate a record create with single user parent
+        var hash = {zidentity: user, name: name, location: location};
+        self.store.createRecord('speaker', hash).save();
+      });
+    },
+    addSpeakerWithSingleParent: function(session) {
+      var self = this;
+      var name = this.get('speaker');
+      var location = this.get('location');
+      //to simulate a record create with just a single parent
+      var hash = {name: name, location: location, session: session};
+      self.store.createRecord('speaker', hash).save();
+    },
+    addRating: function(session) {
+      var score = this.get('score');
+      var feedback = this.get('feedback');
+      if (score === undefined || feedback === undefined || Ember.$.trim(score) === "" || Ember.$.trim(feedback) === "") {
+        return;
       }
+      var rating = { score: score, feedback: feedback, session: session};
+      this.store.createRecord('rating', rating).save();
+      this.set('score', '');
+      this.set('feedback', '');
+    },
+    deleteRating: function(rating) {
+      rating.deleteRecord();
+      rating.save();
+    }
   }
 });
 
@@ -338,18 +338,18 @@ App.Router.map(function() {
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({
-    namespace: 'api'
+  namespace: 'api'
 });
 
 //monkey patch the ajax method for testing
 var ajaxUrl, ajaxType, ajaxHash;
 DS.DjangoRESTAdapter.reopen({
-    ajax: function(url, type, hash) {
-        ajaxUrl = url;
-        ajaxType = type;
-        ajaxHash = hash;
-        hash = hash || {};
-        hash.cache = false;
-        return this._super(url, type, hash);
-    }
+  ajax: function(url, type, hash) {
+    ajaxUrl = url;
+    ajaxType = type;
+    ajaxHash = hash;
+    hash = hash || {};
+    hash.cache = false;
+    return this._super(url, type, hash);
+  }
 });
