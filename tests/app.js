@@ -162,6 +162,22 @@ App.Comment = App.Message.extend({});
 App.Obituary = DS.Model.extend({
   publishOn: DS.attr('date'),
   timeOfDeath: DS.attr('datetime'),
+
+  publishOnUtc: function() {
+    if (!Ember.isEmpty(this.get('publishOn'))) {
+      return this.get('publishOn').toUTCString();
+    } else {
+      return '';
+    }
+  }.property('publishOn'),
+
+  timeOfDeathUtc: function() {
+    if (!Ember.isEmpty(this.get('timeOfDeath'))) {
+      return this.get('timeOfDeath').toUTCString();
+    } else {
+      return '';
+    }
+  }.property('timeOfDeath')
 });
 
 

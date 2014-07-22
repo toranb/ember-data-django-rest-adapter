@@ -42,7 +42,7 @@ test('date attribute deserializes properly', function() {
   visit('/obituaries/');
 
   andThen(function() {
-    equal(find('.publish-on').text(), 'Tue Aug 28 2012 20:00:00 GMT-0400 (EDT)');
+    equal(find('.publish-on').text(), 'Wed, 29 Aug 2012 00:00:00 GMT');
   });
 });
 
@@ -52,6 +52,6 @@ test('datetime attribute deserializes properly', function() {
   visit('/obituaries/');
 
   andThen(function() {
-    equal(find('.time-of-death').text(), 'Wed Nov 19 2014 12:38:00 GMT-0500 (EST)');
+    equal(find('.time-of-death').text(), 'Wed, 19 Nov 2014 17:38:00 GMT');
   });
 });
