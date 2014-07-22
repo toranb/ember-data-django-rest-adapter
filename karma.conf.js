@@ -8,6 +8,7 @@ module.exports = function(karma) {
       "adapter_tests.js",
       "adapter_embedded_tests.js",
       "adapter_polymorphic_tests.js"
+      'transforms_tests.js'
     ],
 
     logLevel: karma.LOG_ERROR,
