@@ -159,6 +159,59 @@ App.Post = App.Message.extend({});
 App.Comment = App.Message.extend({});
 
 
+App.Obituary = DS.Model.extend({
+  publishOn: DS.attr('date'),
+  timeOfDeath: DS.attr('datetime'),
+
+  publishOnUtc: function() {
+    if (!Ember.isEmpty(this.get('publishOn'))) {
+      return this.get('publishOn').toUTCString();
+    } else {
+      return '';
+    }
+  }.property('publishOn'),
+
+  timeOfDeathUtc: function() {
+    if (!Ember.isEmpty(this.get('timeOfDeath'))) {
+      return this.get('timeOfDeath').toUTCString();
+    } else {
+      return '';
+    }
+  }.property('timeOfDeath')
+});
+
+
+App.NewObituaryController = Ember.Controller.extend({
+  publishOn: '',
+  timeOfDeath: '',
+
+  actions: {
+
+    createObituary: function() {
+
+      var newObituary = this.store.createRecord('obituary', {
+        publishOn: new Date(this.get('publishOn')),
+        timeOfDeath: new Date(this.get('timeOfDeath')),
+      });
+
+      return newObituary.save();
+    }
+  }
+});
+
+
+App.ObituariesRoute = Ember.Route.extend({
+
+  model: function() {
+    return this.store.find('obituary');
+  }
+});
+
+
+App.ObituariesController = Ember.ArrayController.extend({
+});
+
+
 App.OthersRoute = Ember.Route.extend({
   model: function() {
     return this.store.find('other');
@@ -335,6 +388,8 @@ App.Router.map(function() {
   this.resource("tag", { path : "/tag/:tag_id" });
   this.resource("user", { path : "/user/:user_id" });
   this.resource("preserialized", { path: "/preserialized" });
+  this.resource('obituaries');
+  this.route('new-obituary');
 });
 
 App.ApplicationAdapter = DS.DjangoRESTAdapter.extend({

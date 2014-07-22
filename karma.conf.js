@@ -3,11 +3,12 @@ module.exports = function(karma) {
     basePath: 'tests',
 
     files: [
-      "dist/deps.min.js",
-      "helper.js",
-      "adapter_tests.js",
-      "adapter_embedded_tests.js",
-      "adapter_polymorphic_tests.js"
+      'dist/deps.min.js',
+      'helper.js',
+      'adapter_tests.js',
+      'adapter_embedded_tests.js',
+      'adapter_polymorphic_tests.js',
+      'transforms_tests.js'
     ],
 
     logLevel: karma.LOG_ERROR,

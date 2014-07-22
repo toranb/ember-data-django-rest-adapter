@@ -1,0 +1,15 @@
+<h2>Add an Obituary</h2>
+
+<form {{action 'createObituary'}} on='submit'>
+  <div>
+    <label>Publish On</label>
+    {{input class='publish-on' value=publishOn}}
+  </div>
+  <div>
+    <label>Time of Death</label>
+    {{input class='time-of-death' value=timeOfDeath}}
+  </div>
+  <div>
+    <button class="submit" type="submit">Submit</button>
+  </div>
+</form>
