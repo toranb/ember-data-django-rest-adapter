@@ -43,8 +43,6 @@ including how to use the adapter with vanilla ember (without using ember-cli).
 Pending Issues
 --------------
 
-* Date and DateTime are not yet built into the adapter ([#61][])
-
 * Async belongsTo/hasMany requires a pull-request be merged into ember-data 
   core ([#63][])
 
