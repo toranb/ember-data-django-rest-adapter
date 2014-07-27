@@ -25,14 +25,17 @@ as an Ember CLI add-on.  Installation is very simple:
 npm i --save-dev ember-django-adapter
 ```
 
-and set the `API_HOST` environment variable in `config/environment.js`, e.g.:
+and set the `API_HOST` and `API_NAMESPACE` configuration variables in
+`config/environment.js`, e.g.:
 
 ```js
 if (environment === 'development') {
   ENV.APP.API_HOST = 'http://localhost:8000';
+  ENV.APP.API_NAMESPACE = 'api/v2';
 }
 if (environment === 'production') {
   ENV.APP.API_HOST = 'https://api.myproject.com';
+  ENV.APP.API_NAMESPACE = 'v2';
 }
 ```
 
