@@ -5,6 +5,10 @@ ember-data-django-rest-adapter Changelog
   ([#90](https://github.com/toranb/ember-data-django-rest-adapter/issues/90))
 * [ENHANCEMENT] Add date and datetime transforms
   ([#96](https://github.com/toranb/ember-data-django-rest-adapter/pull/96))
+* [ENHANCEMENT] Enable PATCH requests
+  ([#97](https://github.com/toranb/ember-data-django-rest-adapter/pull/97))
+* [ENHANCEMENT] Enable read-only model attributes
+  ([#97](https://github.com/toranb/ember-data-django-rest-adapter/pull/97))
 
 
 1.0.5

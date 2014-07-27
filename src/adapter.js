@@ -29,9 +29,18 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
   },
 
   updateRecord: function(store, type, record) {
+    // Partial updates are expected to be sent as a PATCH
+    var isPartial = false;
+    record.eachAttribute(function(key, attribute) {
+      if(attribute.options.readOnly){
+        isPartial = true;
+      }
+    }, this);
+    var method = isPartial ? "PATCH" : "PUT";
+
     var data = store.serializerFor(type.typeKey).serialize(record);
     var id = get(record, 'id'); //todo find pk (not always id)
-    return this.ajax(this.buildURL(type.typeKey, id), "PUT", { data: data });
+    return this.ajax(this.buildURL(type.typeKey, id), method, { data: data });
   },
 
   findMany: function(store, type, ids, parent) {
@@ -93,7 +102,7 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
   },
 
   /**
-   * Extract the attribute name given the parent record, the ids of the 
+   * Extract the attribute name given the parent record, the ids of the
    * referenced model, and the type of the referenced model.
    *
    * Given the model definition

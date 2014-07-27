@@ -177,6 +177,52 @@ test('test pushArrayPayload', function() {
   });
 });
 
+test('skip serializing readOnly attributes', function() {
+  expect(1);
+
+  var user = {
+    'id': 1,
+    'username': 'foo',
+    'image': 'http://example.org/foo.png'
+  };
+
+  Ember.run(App, function() {
+    var store = App.__container__.lookup('store:main');
+    var serializer = store.serializerFor('user');
+    serializer.pushSinglePayload(store, 'user', user);
+
+    store.find('user', 1).then(function(record) {
+      var result = serializer.serialize(record);
+      equal(result.image, undefined);
+    });
+  });
+});
+
+test('partial updates are sent as PATCH', function() {
+  expect(1);
+
+  var user = {"id": 1, "username": "foo", "image": "http://example.org/foo.png"};
+
+  Ember.run(App, function(){
+    var store = App.__container__.lookup("store:main");
+    var serializer = store.serializerFor('user');
+    serializer.pushSinglePayload(store, 'user', user);
+
+    store.find('user', 1).then(function(record){
+      stubEndpointForHttpRequest('/api/users/1/', {
+        "id": 1,
+        "username": "patched",
+        "image": "http://example.org/foo.png"
+      }, "PATCH");
+      record.save().then(function(user){
+        equal(user.get("username"), "patched");
+      });
+    });
+  });
+  wait();
+});
+
+
 test('finding nested attributes when some requested records are already loaded makes GET request to the correct attribute-based URL', function() {
   var user = {"id": 1, "username": "foo", "aliases": [8, 9]};
   var aliases = [{"id": 8, "name": "ember"}, {"id": 9, "name": "tomster"}];
