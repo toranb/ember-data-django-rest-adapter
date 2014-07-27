@@ -1,4 +1,4 @@
-ember-data-django-rest-adapter 
+ember-data-django-rest-adapter
 ==============================
 
 [![Build Status][]](https://travis-ci.org/toranb/ember-data-django-rest-adapter)
@@ -43,7 +43,7 @@ including how to use the adapter with vanilla ember (without using ember-cli).
 Pending Issues
 --------------
 
-* Async belongsTo/hasMany requires a pull-request be merged into ember-data 
+* Async belongsTo/hasMany requires a pull-request be merged into ember-data
   core ([#63][])
 
 * Pagination is not yet supported ([#80][])
@@ -52,7 +52,7 @@ Pending Issues
 Credits
 -------
 
-I took a large part of this project (including the motivation) from @escalant3 
+I took a large part of this project (including the motivation) from @escalant3
 and his [tastypie adapter][].
 
 Special thanks to all [contributors][]!
