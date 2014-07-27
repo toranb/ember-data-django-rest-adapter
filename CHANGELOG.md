@@ -1,6 +1,8 @@
 ember-data-django-rest-adapter Changelog
 ========================================
 
+1.0.6
+-----
 * [ENHANCEMENT] Move documentation to GitHub Wiki
   ([#90](https://github.com/toranb/ember-data-django-rest-adapter/issues/90))
 * [ENHANCEMENT] Add date and datetime transforms
