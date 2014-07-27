@@ -150,6 +150,18 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
   },
 
   /**
+   * Adds support for skipping serialization of
+   * DS.attr('foo', { readOnly: true })
+   *
+   * @method serializeAttribute
+   */
+  serializeAttribute: function(record, json, key, attribute) {
+    if (!attribute.options.readOnly) {
+      return this._super(record, json, key, attribute);
+    }
+  },
+
+  /**
    * Underscore relationship names when serializing belongsToRelationships
    *
    * @method serializeBelongsTo
@@ -228,9 +240,9 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
    *   }
    * }
    * ```
-   * 
+   *
    * To:
-   * 
+   *
    * ```js
    * {
    *   minion: "1"

@@ -108,7 +108,8 @@ App.Author = DS.Model.extend({
 App.User = App.Author.extend({
   name: DS.attr('string'),
   username: DS.attr('string'),
-  aliases: DS.hasMany('speaker', { async: true}),
+  aliases: DS.hasMany('speaker', { async: true }),
+  image: DS.attr('string', { readOnly: true }),
   messages: DS.hasMany('message', { polymorphic: true })
 });
 
