@@ -31,7 +31,7 @@ and set the `API_HOST` and `API_NAMESPACE` configuration variables in
 ```js
 if (environment === 'development') {
   ENV.APP.API_HOST = 'http://localhost:8000';
-  ENV.APP.API_NAMESPACE = 'api/v2';
+  ENV.APP.API_NAMESPACE = 'api';
 }
 if (environment === 'production') {
   ENV.APP.API_HOST = 'https://api.myproject.com';
