@@ -1,7 +1,7 @@
-module.exports = function(karma) {
-  karma.set({
+module.exports = function(config) {
+  config.set({
     basePath: 'tests',
-
+    frameworks: ['qunit'],
     files: [
       'dist/deps.min.js',
       'helper.js',
@@ -10,12 +10,12 @@ module.exports = function(karma) {
       'adapter_polymorphic_tests.js',
       'transforms_tests.js'
     ],
-
-    logLevel: karma.LOG_ERROR,
-    browsers: ['PhantomJS'],
-    singleRun: true,
+    reporters: ['dots'],
+    port: 9876,
+    colors: true,
+    logLevel: config.LOG_ERROR,
     autoWatch: false,
-
-    frameworks: ['qunit', 'qunit-sb']
+    browsers: ['PhantomJS'],
+    singleRun: true
   });
 };
