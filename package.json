@@ -2,14 +2,14 @@
   "version": "1.0.6",
   "dependencies": {
     "grunt": "*",
-    "grunt-karma": "0.7.1",
+    "grunt-karma": "~0.9.0",
     "grunt-cli": "*",
     "grunt-contrib-concat": "*",
     "grunt-contrib-jshint": "*",
     "grunt-ember-template-compiler": "1.3.0",
     "karma-qunit": "*",
     "karma-qunit-special-blend": "*",
-    "karma": "0.10",
+    "karma": "~0.12",
     "load-grunt-config": "~0.7"
   },
   "scripts": {
