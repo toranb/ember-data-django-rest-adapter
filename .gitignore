@@ -3,8 +3,10 @@ syntax: glob
 dist
 tmp
 *swp
+*.log
 
 node_modules/*
+bower_components/
 tests/dist/
 
 tests/lib/tmpl.min.js
