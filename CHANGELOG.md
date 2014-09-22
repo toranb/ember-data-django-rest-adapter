@@ -1,6 +1,10 @@
 ember-data-django-rest-adapter Changelog
 ========================================
 
+* [BUGFIX] Avoid date serializer discrepancies due to local time zone
+  ([#102](https://github.com/toranb/ember-data-django-rest-adapter/pull/102))
+
+
 1.0.6
 -----
 * [ENHANCEMENT] Move documentation to GitHub Wiki
