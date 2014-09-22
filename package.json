@@ -16,12 +16,13 @@
     "test": "grunt test"
   },
   "devDependencies": {
-    "grunt-neuter": "~0.6.0",
     "grunt-banner": "*",
-    "grunt-contrib-uglify": "~0.2.4",
-    "grunt-text-replace": "~0.3.8",
     "grunt-bump": "0.0.13",
     "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-watch": "~0.5.3"
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-neuter": "~0.6.0",
+    "grunt-text-replace": "~0.3.8",
+    "karma-phantomjs-launcher": "^0.1.4"
   }
 }
