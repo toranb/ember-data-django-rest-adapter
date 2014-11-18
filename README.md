@@ -1,3 +1,18 @@
+### DEPRECATED
+
+This package has been deprecated and will not be supported beyond critical
+bugfixes for currently supported versions of Ember and Ember Data.
+
+For all new Ember + Django REST Framework projects, please use [Ember CLI][]
+and the [Ember Django Adapter][] addon.
+
+When ember-django-adapter [version 1.0][] is released, support for this package
+will be dropped entirely.
+
+
+-------------------------------------------------------------------------------
+
+
 ember-data-django-rest-adapter
 ==============================
 
@@ -75,6 +90,8 @@ Licensed under the MIT License
 [Ember.js]: http://emberjs.com/
 [Django REST Framework]: http://www.django-rest-framework.org/
 [Ember CLI]: https://github.com/stefanpenner/ember-cli
+[Ember Django Adapter]: https://github.com/dustinfarris/ember-django-adapter
+[version 1.0]: https://github.com/dustinfarris/ember-django-adapter/milestones/Version%201.0
 [tastypie adapter]: https://github.com/escalant3/ember-data-tastypie-adapter/
 [contributors]: https://github.com/toranb/ember-data-django-rest-adapter/graphs/contributors
 [#61]: https://github.com/toranb/ember-data-django-rest-adapter/issues/61
