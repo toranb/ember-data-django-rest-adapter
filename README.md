@@ -1,13 +1,9 @@
-### DEPRECATED
+### END OF LIFE
 
-This package has been deprecated and will not be supported beyond critical
-bugfixes for currently supported versions of Ember and Ember Data.
+This package has reached EOL and is no longer supported.
 
-For all new Ember + Django REST Framework projects, please use [Ember CLI][]
-and the [Ember Django Adapter][] addon.
-
-When ember-django-adapter [version 1.0][] is released, support for this package
-will be dropped entirely.
+For Ember + Django REST Framework projects, use [Ember CLI][] and
+[Ember Django Adapter][].
 
 
 -------------------------------------------------------------------------------
