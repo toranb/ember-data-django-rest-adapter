@@ -268,7 +268,7 @@ test('basic error handling will bubble to the model', function() {
   visit("/speaker/1").then(function() {
     var name = $("input.name").val();
     equal(name, "", "name was instead: " + name);
-    var errors = Ember.$.trim($("#errors").text());
+    var errors = Ember.$.trim($("#name-errors").text());
     equal(errors, "", "errors was instead: " + errors);
     stubEndpointForHttpRequest('/api/speakers/1/', {"name": ["This field is required."]}, 'PUT', 400);
     return click(".update");

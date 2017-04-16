@@ -1,5 +1,14 @@
   {{input class="name" value=name}}<br />
-  <div id="name-errors">{{#each errors.name}}{{this}}{{/each}}</div><br />
+  <!--  pre beta 5 errors.name contained a string, starting with beta 5 the error text is accessed through the message attribute -->
+  <div id="name-errors">
+    {{#each errors.name}}
+      {{#if message}}
+        {{message}}
+      {{else}}
+        {{this}}
+      {{/if}}
+    {{/each}}
+  </div><br />
   {{input class="location" value=location}}<br />
   <button class="update" {{action 'updateSpeaker' model}}>Update Speaker</button><br />
 

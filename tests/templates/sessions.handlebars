@@ -1,4 +1,5 @@
 <table>
+<tbody>
 {{#each session in controller}}
 <tr>
   <td class="name">{{session.name}}</td>
@@ -25,6 +26,7 @@
   <td>{{#link-to 'session' session}}View Session Details{{/link-to}}</td>
 </tr>
 {{/each}}
+</tbody>
 </table>
 
 <div class="associations">

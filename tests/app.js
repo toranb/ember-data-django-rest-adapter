@@ -67,8 +67,7 @@ App.Speaker = DS.Model.extend({
   badges: DS.hasMany('badge', { async: true }),
   session: DS.belongsTo('session'),
   zidentity: DS.belongsTo('user'),
-  other: DS.belongsTo('other'),
-  errors: ''
+  other: DS.belongsTo('other')
 });
 
 App.Other = DS.Model.extend({
