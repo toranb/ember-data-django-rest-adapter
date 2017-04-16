@@ -53,7 +53,7 @@ asyncTest('test async polymorphic hasMany', function() {
   App.reset();
 
   App.User.reopen({
-    messages: DS.hasMany('message', { polymorphic: true, async: true })
+    messages: DS.hasMany('message', { polymorphic: true, inverse: 'author', async: true })
   });
 
   var json = {
@@ -81,7 +81,7 @@ asyncTest('test async polymorphic hasMany', function() {
         equal(messages.toArray().length, 2);
 
         App.User.reopen({
-          messages: DS.hasMany('message', { polymorphic: true })
+          messages: DS.hasMany('message', { polymorphic: true, inverse: 'author' })
         });
 
         start();

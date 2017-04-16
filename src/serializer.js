@@ -199,7 +199,7 @@ DS.DjangoRESTSerializer = DS.RESTSerializer.extend({
 
     var key = relationship.key,
     json_key = this.keyForRelationship(key, "hasMany"),
-    relationshipType = DS.RelationshipChange ? DS.RelationshipChange.determineRelationshipType(record.constructor, relationship) : record.constructor.determineRelationshipType(relationship);
+    relationshipType = record.constructor.determineRelationshipType(relationship);
 
       if (relationshipType === 'manyToNone' || relationshipType === 'manyToMany') {
         json[json_key] = record.get(key).mapBy('id');

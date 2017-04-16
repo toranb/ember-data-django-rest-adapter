@@ -110,13 +110,13 @@ App.User = App.Author.extend({
   username: DS.attr('string'),
   aliases: DS.hasMany('speaker', { async: true }),
   image: DS.attr('string', { readOnly: true }),
-  messages: DS.hasMany('message', { polymorphic: true })
+  messages: DS.hasMany('message', { polymorphic: true, inverse: 'author' })
 });
 
 App.Company = App.Author.extend({
   name: DS.attr('string'),
   sponsors: DS.hasMany('sponsor', { async: true}),
-  messages: DS.hasMany('message', { polymorphic: true }),
+  messages: DS.hasMany('message', { polymorphic: true, inverse: 'author' }),
   persona: DS.belongsTo('persona')
 });
 

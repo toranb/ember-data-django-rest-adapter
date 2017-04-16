@@ -81,8 +81,8 @@ DS.DjangoRESTAdapter = DS.RESTAdapter.extend({
     }
   },
 
-  buildURL: function(type, id) {
-    var url = this._super(type, id);
+  buildURL: function(type, id, record) {
+    var url = this._super(type, id, record);
 
     if (url.charAt(url.length -1) !== '/') {
       url += '/';
