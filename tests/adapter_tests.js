@@ -37,9 +37,9 @@ test('attribute transforms are applied', function() {
   });
 });
 
-test('models with camelCase converted to underscore urls', function() {
+test('models with camelCase converted to dasherized urls', function() {
   var json = [{"id": 1, "test": "foobar"}];
-  stubEndpointForHttpRequest('/api/camel_urls/', json);
+  stubEndpointForHttpRequest('/api/camel-urls/', json);
   visit("/camelUrls").then(function() {
     var spans = find("span").length;
     equal(spans, 1, "found " + spans + " spans");
@@ -441,9 +441,9 @@ test('multiword hasMany key is serialized correctly on save', function() {
     wait();
 });
 
-test('camelCase belongsTo key is serialized with underscores on save', function() {
+test('camelCase belongsTo key is serialized with dashes on save', function() {
   var store = App.__container__.lookup('store:main');
-  stubEndpointForHttpRequest('/api/camel_parents/1/', {'id': 1, 'name': 'parent'});
+  stubEndpointForHttpRequest('/api/camel-parents/1/', {'id': 1, 'name': 'parent'});
   visit("/camelParent").then(function() {
     stubEndpointForHttpRequest(
       '/api/camel_kids/', {"description":"firstkid","camel_parent":"1"}, 'POST', 201);
